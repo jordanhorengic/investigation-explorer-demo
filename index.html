@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Metropolis Explorer — PnE English Mock</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <nav class="icon-rail" aria-label="Global navigation">
+        <button class="rail-btn" type="button" title="Home">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z"/></svg>
+        </button>
+        <button class="rail-btn" type="button" title="Search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Zm0 2a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Zm6.9 11.4 4.6 4.6-1.4 1.4-4.6-4.6 1.4-1.4Z"/></svg>
+        </button>
+        <button class="rail-btn rail-btn--active" type="button" title="Context Models">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h4v6H4V5Zm0 8h6v10H6a2 2 0 0 1-2-2v-8Zm8-10h4a2 2 0 0 1 2 2v6h-6V3Zm0 10h6v8a2 2 0 0 1-2 2h-4v-10Z"/></svg>
+        </button>
+        <button class="rail-btn" type="button" title="Data">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4V6Zm0 5h16v2H4v-2Zm0 5h16v2H4v-2Z"/></svg>
+        </button>
+        <div class="rail-spacer"></div>
+        <div class="rail-user" title="Jordan Horengic">JH</div>
+      </nav>
+
+      <aside class="package-sidebar">
+        <div class="package-sidebar__top">
+          <button class="btn btn-outline btn-sm" type="button">New asset</button>
+          <button class="icon-btn" type="button" title="Search package">⌕</button>
+          <button class="icon-btn" type="button" title="Filter">☰</button>
+        </div>
+        <div class="package-sidebar__section">
+          <button class="package-nav-item" type="button">AI Builder</button>
+          <button class="package-nav-item" type="button">Browse Context Model</button>
+          <button class="package-nav-item package-nav-item--active" type="button">Object Explorer</button>
+        </div>
+        <div id="object-type-nav" class="package-object-list"></div>
+      </aside>
+
+      <div class="main-column">
+        <header class="studio-header">
+          <div class="studio-header__left">
+            <nav class="breadcrumbs" aria-label="Breadcrumb">
+              <span>Context Models</span>
+              <span class="breadcrumbs__sep">›</span>
+              <span class="breadcrumbs__current">Police Database</span>
+              <button class="icon-btn icon-btn--ghost" type="button" title="Favorite">☆</button>
+            </nav>
+            <div class="workbench-tabs">
+              <button class="workbench-tab workbench-tab--active" type="button">
+                Object Explorer
+                <span class="workbench-tab__close">×</span>
+              </button>
+            </div>
+          </div>
+          <div class="studio-header__actions">
+            <button class="icon-btn icon-btn--ghost" type="button" title="Warnings">⚠</button>
+            <button class="icon-btn icon-btn--ghost" type="button" title="Package">▣</button>
+            <button class="btn btn-outline" type="button">Create version</button>
+            <button class="btn btn-primary" type="button">Deploy</button>
+          </div>
+        </header>
+
+        <main class="workbench">
+          <div class="explorer-header">
+            <h1>Object Explorer</h1>
+            <div class="explorer-tabs" role="tablist">
+              <button class="explorer-tab active" data-view="search" type="button">Search</button>
+              <button class="explorer-tab" data-view="map" type="button">Map</button>
+              <button class="explorer-tab" data-view="graph" type="button">Graph</button>
+              <button class="explorer-tab" data-view="augmentation" type="button">New Object</button>
+            </div>
+          </div>
+
+          <div id="explorer-layout" class="explorer-layout">
+            <section class="explorer-main">
+              <div id="view-search" class="view active">
+                <div class="search-toolbar">
+                  <div class="search-toolbar__row">
+                    <div class="search-shell">
+                      <input
+                        id="global-search"
+                        type="search"
+                        placeholder="Search..."
+                        autocomplete="off"
+                      />
+                      <span class="search-shell__icon" aria-hidden="true">⌕</span>
+                    </div>
+                    <button id="btn-toggle-search-filters" class="search-filter-btn" type="button" aria-label="Search filters" aria-expanded="false" aria-controls="search-filter-panel">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                        <path d="M4 6h16M7 12h10M10 18h4"/>
+                      </svg>
+                      <span id="search-filter-count" class="search-filter-count hidden">0</span>
+                    </button>
+                  </div>
+                  <div id="search-filter-panel" class="search-filter-panel hidden">
+                    <div class="search-filter-panel__scroll">
+                      <div class="search-filter-section">
+                        <div class="search-filter-section__head">
+                          <h3 class="search-filter-section__title">Object types</h3>
+                          <div class="search-filter-section__actions">
+                            <button id="btn-select-all-types" class="btn btn-outline btn-sm" type="button">All</button>
+                            <button id="btn-clear-all-types" class="btn btn-outline btn-sm" type="button">None</button>
+                          </div>
+                        </div>
+                        <div id="search-type-filters" class="search-filter-chips"></div>
+                      </div>
+                      <div class="search-filter-section">
+                        <div class="search-filter-section__head">
+                          <h3 class="search-filter-section__title">Search in attributes</h3>
+                          <div class="search-filter-section__actions">
+                            <button id="btn-clear-all-search-fields" class="btn btn-outline btn-sm" type="button">Reset</button>
+                          </div>
+                        </div>
+                        <p class="search-filter-section__hint">Optional. Restrict the text search to specific attribute fields.</p>
+                        <div id="search-field-filters" class="search-filter-chips"></div>
+                      </div>
+                      <div class="search-filter-section">
+                        <div class="search-filter-section__head">
+                          <h3 class="search-filter-section__title">Attribute filters</h3>
+                          <button id="btn-add-attribute-filter" class="btn btn-outline btn-sm" type="button">Add filter</button>
+                        </div>
+                        <p class="search-filter-section__hint">Show only objects whose attributes match these rules.</p>
+                        <div id="search-attribute-rules" class="search-attribute-rules"></div>
+                      </div>
+                    </div>
+                    <div class="search-filter-panel__footer">
+                      <p id="search-filter-summary" class="search-filter-summary"></p>
+                      <div class="search-filter-panel__actions">
+                        <button id="btn-clear-search-filters" class="btn btn-outline btn-sm" type="button">Clear</button>
+                        <button id="btn-cancel-search-filters" class="btn btn-outline btn-sm" type="button">Cancel</button>
+                        <button id="btn-apply-search-filters" class="btn btn-primary btn-sm" type="button">Apply filters</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id="search-results" class="search-results search-results--list"></div>
+              </div>
+
+              <div id="view-map" class="view">
+                <div class="search-toolbar">
+                  <div class="search-toolbar__row">
+                    <div class="search-shell">
+                      <input
+                        id="map-search"
+                        type="search"
+                        placeholder="Search..."
+                        autocomplete="off"
+                      />
+                      <span class="search-shell__icon" aria-hidden="true">⌕</span>
+                    </div>
+                    <button id="btn-toggle-map-filters" class="search-filter-btn" type="button" aria-label="Search filters" aria-expanded="false" aria-controls="search-filter-panel">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                        <path d="M4 6h16M7 12h10M10 18h4"/>
+                      </svg>
+                      <span class="search-filter-count hidden">0</span>
+                    </button>
+                  </div>
+                  <p id="map-filter-summary" class="search-filter-summary search-filter-summary--inline hidden"></p>
+                </div>
+                <div id="map-search-results" class="search-results search-results--list view-search-results"></div>
+                <div class="map-frame">
+                  <div class="viz-frame-actions">
+                    <button id="btn-clear-map" class="view-clear-btn" type="button" aria-label="Clear map pins">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                        <path d="M18 6 6 18M6 6l12 12"/>
+                      </svg>
+                      <span>Clear</span>
+                    </button>
+                  </div>
+                  <div id="map"></div>
+                  <div class="map-legend" id="map-legend"></div>
+                  <div id="map-context-menu" class="graph-context-menu hidden" role="menu">
+                    <button id="map-context-details" type="button" role="menuitem">Open object details</button>
+                    <button id="map-context-related" type="button" role="menuitem">Show related objects</button>
+                    <button id="map-context-graph" type="button" role="menuitem">Add to graph</button>
+                  </div>
+                  <div id="map-heatmap-panel" class="map-heatmap-panel">
+                    <label class="map-heatmap-option">
+                      <input id="map-show-heatmap" type="checkbox" disabled />
+                      <span>Show heatmap</span>
+                    </label>
+                    <p id="map-heatmap-hint" class="map-heatmap-hint">Add objects to the map to enable heatmap.</p>
+                    <div id="map-heatmap-filters" class="map-heatmap-filters hidden">
+                      <span class="map-heatmap-filters__label">Heatmap object types</span>
+                      <div id="map-heatmap-type-filters" class="search-filter-chips map-heatmap-type-filters"></div>
+                    </div>
+                  </div>
+                  <div class="map-controls">
+                    <button class="map-control-btn" type="button">Layered</button>
+                    <div class="map-zoom">100%</div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="view-graph" class="view">
+                <div class="search-toolbar">
+                  <div class="search-toolbar__row">
+                    <div class="search-shell">
+                      <input
+                        id="graph-search"
+                        type="search"
+                        placeholder="Search..."
+                        autocomplete="off"
+                      />
+                      <span class="search-shell__icon" aria-hidden="true">⌕</span>
+                    </div>
+                    <button id="btn-toggle-graph-filters" class="search-filter-btn" type="button" aria-label="Search filters" aria-expanded="false" aria-controls="search-filter-panel">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                        <path d="M4 6h16M7 12h10M10 18h4"/>
+                      </svg>
+                      <span class="search-filter-count hidden">0</span>
+                    </button>
+                  </div>
+                  <p id="graph-filter-summary" class="search-filter-summary search-filter-summary--inline hidden"></p>
+                </div>
+                <div id="graph-search-results" class="search-results search-results--list view-search-results"></div>
+                <div class="graph-frame">
+                  <div class="viz-frame-actions">
+                    <button id="btn-graph-clear" class="view-clear-btn" type="button" aria-label="Clear graph">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                        <path d="M18 6 6 18M6 6l12 12"/>
+                      </svg>
+                      <span>Clear</span>
+                    </button>
+                  </div>
+                  <svg id="graph-svg" viewBox="0 0 960 520" role="img" aria-label="Network graph"></svg>
+                  <p id="graph-caption" class="graph-caption">Search for an object above and select a result to add it to the graph.</p>
+                  <button id="btn-graph-open-panel" class="graph-panel-toggle" type="button" aria-label="Open object details" title="Object details">›</button>
+                  <div id="graph-context-menu" class="graph-context-menu hidden" role="menu">
+                    <button id="graph-context-details" type="button" role="menuitem">Open object details</button>
+                    <button id="graph-context-expand" type="button" role="menuitem">Expand relationships</button>
+                    <button id="graph-context-map" type="button" role="menuitem">Add to map</button>
+                  </div>
+                  <div id="graph-node-tooltip" class="graph-node-tooltip hidden" aria-hidden="true"></div>
+                  <div class="graph-controls">
+                    <button id="btn-graph-zoom-out" class="map-control-btn" type="button" aria-label="Zoom out">−</button>
+                    <div class="map-zoom" id="graph-zoom">100%</div>
+                    <button id="btn-graph-zoom-in" class="map-control-btn" type="button" aria-label="Zoom in">+</button>
+                  </div>
+                  <p class="graph-hint">Drag canvas to pan · Scroll to zoom · Drag nodes to move</p>
+                </div>
+              </div>
+
+              <div id="view-augmentation" class="view">
+                <div class="new-object-view">
+                  <div class="new-object-view__header">
+                    <h2>New Object</h2>
+                    <p class="new-object-view__intro">Add a new instance to the dataset. Choose a type, fill in attributes, and optionally link it to existing objects.</p>
+                  </div>
+                  <form id="new-object-form" class="new-object-form">
+                    <section class="new-object-section">
+                      <label class="new-object-section__label" for="new-object-type">Object type</label>
+                      <select id="new-object-type" class="new-object-type-select"></select>
+                    </section>
+
+                    <section class="new-object-section">
+                      <h3 class="new-object-section__title">Attributes</h3>
+                      <p id="new-object-attributes-empty" class="new-object-hint">Select an object type to show attribute fields.</p>
+                      <div id="new-object-attributes" class="new-object-fields"></div>
+                    </section>
+
+                    <section class="new-object-section">
+                      <div class="new-object-section__head">
+                        <h3 class="new-object-section__title">Documents &amp; images</h3>
+                      </div>
+                      <p class="new-object-hint">Upload files and tag what each image or document represents.</p>
+                      <div class="new-object-upload">
+                        <label class="new-object-upload__field">
+                          <span class="new-object-upload__label">File</span>
+                          <input id="new-object-file" class="new-object-upload__input" type="file" accept="image/*,.pdf,.doc,.docx,.txt,application/pdf" />
+                        </label>
+                        <label class="new-object-upload__field">
+                          <span class="new-object-upload__label">Tag</span>
+                          <input id="new-object-file-tag" class="new-object-upload__input" type="text" list="new-object-attachment-tags" placeholder="e.g. Mugshot, Report" autocomplete="off" />
+                        </label>
+                        <label id="new-object-person-photo-wrap" class="new-object-upload__person-photo hidden">
+                          <input id="new-object-person-photo" type="checkbox" />
+                          <span>Photo of this person</span>
+                        </label>
+                        <button id="btn-add-attachment" class="btn btn-outline btn-sm" type="button">Add file</button>
+                      </div>
+                      <datalist id="new-object-attachment-tags"></datalist>
+                      <p id="new-object-attachments-empty" class="new-object-hint">No files added yet.</p>
+                      <div id="new-object-attachments" class="new-object-attachments"></div>
+                    </section>
+
+                    <section class="new-object-section">
+                      <div class="new-object-section__head">
+                        <h3 class="new-object-section__title">Relationships</h3>
+                        <button id="btn-add-relationship" class="btn btn-outline btn-sm" type="button">Add relationship</button>
+                      </div>
+                      <p id="new-object-relationships-empty" class="new-object-hint">No relationships yet. Add one to connect this object to existing instances.</p>
+                      <div id="new-object-relationships" class="new-object-relationships"></div>
+                      <datalist id="new-object-relationship-labels"></datalist>
+                    </section>
+
+                    <div class="new-object-form__actions">
+                      <button id="btn-reset-new-object" class="btn btn-outline" type="button">Reset</button>
+                      <button id="btn-create-new-object" class="btn btn-primary" type="submit">Create object</button>
+                    </div>
+                    <p id="new-object-status" class="new-object-status hidden" role="status"></p>
+                  </form>
+                </div>
+              </div>
+            </section>
+
+            <div id="instance-backdrop" class="instance-backdrop hidden" aria-hidden="true"></div>
+
+            <aside id="instance-panel" class="instance-panel" aria-label="Instance details" aria-hidden="true">
+              <div class="instance-panel__toolbar">
+                <div class="instance-panel__toolbar-spacer"></div>
+                <button id="btn-close-panel" class="icon-btn icon-btn--ghost" type="button" aria-label="Close">×</button>
+              </div>
+
+              <div class="instance-panel__scroll">
+                <div class="instance-panel__hero">
+                  <div class="instance-panel__identity">
+                    <div id="inspector-photo" class="instance-panel__photo hidden" aria-hidden="true"></div>
+                    <div id="inspector-icon" class="instance-panel__icon">obj</div>
+                  </div>
+                  <div class="instance-panel__titles">
+                    <h2 id="inspector-title"></h2>
+                    <p id="inspector-subtitle" class="instance-panel__subtitle"></p>
+                    <p id="inspector-id" class="instance-panel__id"></p>
+                  </div>
+                  <div id="instance-panel-actions" class="instance-panel__header-actions">
+                    <button id="btn-pin-map" class="instance-panel__action-btn" type="button" aria-label="Add to map" data-tooltip="Add to map">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                        <circle cx="12" cy="11" r="2.2" fill="currentColor"/>
+                      </svg>
+                    </button>
+                    <button id="btn-add-graph" class="instance-panel__action-btn" type="button" aria-label="Add to graph" data-tooltip="Add to graph">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="6" cy="12" r="2.5" fill="currentColor"/>
+                        <circle cx="18" cy="6" r="2.5" fill="currentColor"/>
+                        <circle cx="18" cy="18" r="2.5" fill="currentColor"/>
+                        <path d="M8.2 11.2 15.8 7.2M8.2 12.8l7.6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div id="instance-panel-related-options" class="instance-panel__related-options hidden">
+                  <label class="instance-related-option">
+                    <input id="show-related-objects" type="checkbox" />
+                    <span>Show related objects</span>
+                  </label>
+                  <div id="related-object-filters" class="instance-related-filters hidden">
+                    <div class="instance-related-filter-field">
+                      <span class="instance-related-filter-field__label">Object types</span>
+                      <div id="related-type-filters" class="search-filter-chips instance-related-type-filters"></div>
+                    </div>
+                    <label class="field-inline" for="related-time-period">
+                      Time period
+                      <select id="related-time-period">
+                        <option value="all">All time</option>
+                        <option value="1m">Last 30 days</option>
+                        <option value="3m">Last 3 months</option>
+                        <option value="6m">Last 6 months</option>
+                        <option value="12m">Last 12 months</option>
+                        <option value="24m">Last 24 months</option>
+                        <option value="36m">Last 3 years</option>
+                        <option value="5y">Last 5 years</option>
+                      </select>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="instance-panel__body">
+                <section class="instance-section">
+                  <h3 class="instance-section__title">Attributes</h3>
+                  <div class="instance-table-wrap">
+                    <table class="instance-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Value</th>
+                        </tr>
+                      </thead>
+                      <tbody id="inspector-attributes"></tbody>
+                    </table>
+                  </div>
+                </section>
+
+                <section class="instance-section">
+                  <h3 class="instance-section__title">
+                    Related objects
+                    <span id="inspector-related-count" class="instance-section__count"></span>
+                  </h3>
+                  <div class="instance-table-wrap">
+                    <table class="instance-table instance-table--related">
+                      <thead>
+                        <tr>
+                          <th>Relationship</th>
+                          <th>Object</th>
+                        </tr>
+                      </thead>
+                      <tbody id="inspector-related"></tbody>
+                    </table>
+                  </div>
+                  <p id="inspector-related-empty" class="instance-empty hidden">No related objects for this instance.</p>
+                </section>
+
+                <section class="instance-section instance-section--documents">
+                  <h3 class="instance-section__title">
+                    Documents &amp; images
+                    <span id="inspector-documents-count" class="instance-section__count"></span>
+                  </h3>
+                  <div id="inspector-documents" class="instance-documents"></div>
+                  <p id="inspector-documents-empty" class="instance-empty">No documents or images uploaded for this object.</p>
+                </section>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script src="./data/mock-data.js"></script>
+    <script src="./data/mock-data-bulk.js"></script>
+    <script src="./js/display-names.js"></script>
+    <script src="./js/object-icons.js"></script>
+    <script src="./js/entity-attachments.js"></script>
+    <script src="./data/mock-attachments.js"></script>
+    <script src="./js/map-locations.js"></script>
+    <script src="./js/map-heatmap.js"></script>
+    <script src="./js/search-filters.js"></script>
+    <script src="./js/graph-view.js"></script>
+    <script src="./js/new-object.js"></script>
+    <script src="./js/app.js"></script>
+  </body>
+</html>
