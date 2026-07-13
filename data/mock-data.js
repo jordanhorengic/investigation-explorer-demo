@@ -139,6 +139,7 @@ window.INVESTIGATION_MOCK = {
       attributes: {
         NAME: 'Hells Wolves MC München',
         ORGANISATIONSTYP: 'Rockerclub',
+        BRANCHE: 'Vereinswesen',
         SITZ_OERTLICHKEIT_ID: 'a1b2c3d4-0000-0000-0000-000000000003',
       },
       locationId: 'a1b2c3d4-0000-0000-0000-000000000003',
@@ -149,6 +150,7 @@ window.INVESTIGATION_MOCK = {
       attributes: {
         NAME: 'Autowerkstatt Müller GmbH',
         ORGANISATIONSTYP: 'Kfz-Betrieb',
+        BRANCHE: 'Einzelhandel',
         SITZ_OERTLICHKEIT_ID: 'a1b2c3d4-0000-0000-0000-000000000006',
       },
       locationId: 'a1b2c3d4-0000-0000-0000-000000000006',
@@ -159,6 +161,7 @@ window.INVESTIGATION_MOCK = {
       attributes: {
         NAME: 'Iron Riders MC Augsburg',
         ORGANISATIONSTYP: 'Rockerclub',
+        BRANCHE: 'Vereinswesen',
         SITZ_OERTLICHKEIT_ID: 'a1b2c3d4-0000-0000-0000-000000000008',
       },
       locationId: 'a1b2c3d4-0000-0000-0000-000000000008',

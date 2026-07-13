@@ -5,7 +5,6 @@
   const technicalNames = Object.fromEntries(objectTypes.map((type) => [type.id, type.technicalName]));
 
   const attributeCatalog = SearchFilters.buildAttributeCatalog(entities, objectTypes);
-  let attributeRuleCounter = 0;
 
   const state = {
     selectedId: null,
@@ -16,10 +15,8 @@
     graphRoots: new Set(),
     searchTerm: '',
     searchFilters: SearchFilters.createDefault(objectTypes),
-    draftSearchFilters: SearchFilters.createDefault(objectTypes),
-    filtersPanelOpen: false,
-    mapSearchCollapsed: true,
-    graphSearchCollapsed: true,
+    vizSearchModalOpen: false,
+    vizSearchContext: null,
     activeView: 'search',
     collapsedResultGroups: new Set(),
     mapHeatmap: {
@@ -91,29 +88,16 @@
 
   const els = {
     search: document.getElementById('global-search'),
-    mapSearch: document.getElementById('map-search'),
-    graphSearch: document.getElementById('graph-search'),
+    vizSearchInput: document.getElementById('viz-search-input'),
     searchResults: document.getElementById('search-results'),
-    mapSearchResults: document.getElementById('map-search-results'),
-    graphSearchResults: document.getElementById('graph-search-results'),
-    btnToggleSearchFilters: document.getElementById('btn-toggle-search-filters'),
-    btnToggleMapFilters: document.getElementById('btn-toggle-map-filters'),
-    btnToggleGraphFilters: document.getElementById('btn-toggle-graph-filters'),
-    searchFilterPanel: document.getElementById('search-filter-panel'),
-    searchFilterCount: document.getElementById('search-filter-count'),
-    searchFilterSummary: document.getElementById('search-filter-summary'),
-    mapFilterSummary: document.getElementById('map-filter-summary'),
-    graphFilterSummary: document.getElementById('graph-filter-summary'),
-    searchTypeFilters: document.getElementById('search-type-filters'),
-    searchFieldFilters: document.getElementById('search-field-filters'),
-    searchAttributeRules: document.getElementById('search-attribute-rules'),
-    btnSelectAllTypes: document.getElementById('btn-select-all-types'),
-    btnClearAllTypes: document.getElementById('btn-clear-all-types'),
-    btnClearAllSearchFields: document.getElementById('btn-clear-all-search-fields'),
-    btnAddAttributeFilter: document.getElementById('btn-add-attribute-filter'),
-    btnClearSearchFilters: document.getElementById('btn-clear-search-filters'),
-    btnCancelSearchFilters: document.getElementById('btn-cancel-search-filters'),
-    btnApplySearchFilters: document.getElementById('btn-apply-search-filters'),
+    vizSearchResults: document.getElementById('viz-search-results'),
+    btnOpenMapSearch: document.getElementById('btn-open-map-search'),
+    btnOpenGraphSearch: document.getElementById('btn-open-graph-search'),
+    vizSearchModal: document.getElementById('viz-search-modal'),
+    vizSearchBackdrop: document.getElementById('viz-search-backdrop'),
+    vizSearchToolbar: document.getElementById('viz-search-toolbar'),
+    vizSearchModalTitle: document.getElementById('viz-search-modal-title'),
+    btnCloseVizSearch: document.getElementById('btn-close-viz-search'),
     objectTypeNav: document.getElementById('object-type-nav'),
     instancePanel: document.getElementById('instance-panel'),
     instancePanelActions: document.getElementById('instance-panel-actions'),
@@ -150,11 +134,10 @@
     btnGraphZoomIn: document.getElementById('btn-graph-zoom-in'),
     btnGraphZoomOut: document.getElementById('btn-graph-zoom-out'),
     graphZoom: document.getElementById('graph-zoom'),
-    btnGraphOpenPanel: document.getElementById('btn-graph-open-panel'),
     mapLegend: document.getElementById('map-legend'),
+    mapStatusBar: document.querySelector('.map-status-bar'),
     mapFrame: document.querySelector('.map-frame'),
     mapShowHeatmap: document.getElementById('map-show-heatmap'),
-    mapHeatmapHint: document.getElementById('map-heatmap-hint'),
     mapHeatmapFilters: document.getElementById('map-heatmap-filters'),
     mapHeatmapTypeFilters: document.getElementById('map-heatmap-type-filters'),
     mapContextMenu: document.getElementById('map-context-menu'),
@@ -200,8 +183,11 @@
     const enabled = canEnableHeatmap();
     const options = getHeatmapTypeOptions();
 
+    if (els.mapStatusBar) {
+      els.mapStatusBar.classList.toggle('hidden', !enabled);
+    }
+
     els.mapShowHeatmap.disabled = !enabled;
-    els.mapHeatmapHint.classList.toggle('hidden', enabled);
 
     if (!enabled) {
       els.mapShowHeatmap.checked = false;
@@ -812,127 +798,46 @@
     if (!hasSearchCriteria()) {
       return false;
     }
-    if (context === 'map' && state.mapSearchCollapsed) {
-      return false;
-    }
-    if (context === 'graph' && state.graphSearchCollapsed) {
-      return false;
+    if (context === 'map' || context === 'graph') {
+      return state.vizSearchModalOpen && state.vizSearchContext === context;
     }
     return true;
   }
 
-  function collapseMapSearch() {
-    state.mapSearchCollapsed = true;
-    state.searchTerm = '';
-    syncSearchInputs();
+  function closeVizSearchModal(options = {}) {
+    const wasOpen = state.vizSearchModalOpen;
+    state.vizSearchModalOpen = false;
+    state.vizSearchContext = null;
+    els.vizSearchModal.classList.add('hidden');
+    els.vizSearchModal.setAttribute('aria-hidden', 'true');
+
+    if (options.clearSearch) {
+      state.searchTerm = '';
+      SmartSearchBar.syncAll();
+    }
+
+    if (wasOpen) {
+      refreshSearchResults();
+    }
+  }
+
+  function openVizSearchModal(context) {
+    state.vizSearchModalOpen = true;
+    state.vizSearchContext = context;
+    els.vizSearchModalTitle.textContent = context === 'map' ? 'Add to map' : 'Add to graph';
+    els.vizSearchModal.classList.remove('hidden');
+    els.vizSearchModal.setAttribute('aria-hidden', 'false');
+    SmartSearchBar.syncAll();
     refreshSearchResults();
+    requestAnimationFrame(() => els.vizSearchInput?.focus());
+  }
+
+  function collapseMapSearch() {
+    closeVizSearchModal({ clearSearch: true });
   }
 
   function collapseGraphSearch() {
-    state.graphSearchCollapsed = true;
-    state.searchTerm = '';
-    syncSearchInputs();
-    refreshSearchResults();
-  }
-
-  function expandMapSearch() {
-    state.mapSearchCollapsed = false;
-    refreshSearchResults();
-  }
-
-  function expandGraphSearch() {
-    state.graphSearchCollapsed = false;
-    refreshSearchResults();
-  }
-
-  function getFilterToggleButtons() {
-    return [els.btnToggleSearchFilters, els.btnToggleMapFilters, els.btnToggleGraphFilters].filter(Boolean);
-  }
-
-  function updateFilterToggleButtonsUI() {
-    const count = SearchFilters.activeFilterCount(state.searchFilters, objectTypes, attributeCatalog);
-    const summary = SearchFilters.describeSummary(state.searchFilters, objectTypes, attributeCatalog);
-
-    for (const button of getFilterToggleButtons()) {
-      const badge = button.querySelector('.search-filter-count');
-      if (badge) {
-        badge.textContent = String(count);
-        badge.classList.toggle('hidden', count === 0);
-      }
-      button.classList.toggle('search-filter-btn--active', count > 0);
-      button.setAttribute('aria-expanded', state.filtersPanelOpen ? 'true' : 'false');
-    }
-
-    for (const element of [els.mapFilterSummary, els.graphFilterSummary]) {
-      element.textContent = summary ? `Filters active: ${summary}` : '';
-      element.classList.toggle('hidden', !summary);
-    }
-  }
-
-  function mountFilterPanel() {
-    const view = document.getElementById(`view-${state.activeView}`);
-    const toolbar = view?.querySelector('.search-toolbar');
-    if (!toolbar || !els.searchFilterPanel || toolbar.contains(els.searchFilterPanel)) {
-      return;
-    }
-    toolbar.appendChild(els.searchFilterPanel);
-  }
-
-  function updateFilterSummaryUI() {
-    updateFilterToggleButtonsUI();
-  }
-
-  function updateDraftFilterSummaryUI() {
-    const summary = SearchFilters.describeSummary(state.draftSearchFilters, objectTypes, attributeCatalog);
-    els.searchFilterSummary.textContent = summary || 'No filters selected.';
-  }
-
-  function syncDraftFromApplied() {
-    state.draftSearchFilters = SearchFilters.clone(state.searchFilters);
-  }
-
-  function applyDraftFilters() {
-    state.searchFilters = SearchFilters.clone(state.draftSearchFilters);
-    updateFilterSummaryUI();
-    refreshSearchResults();
-    closeFiltersPanel();
-  }
-
-  function closeFiltersPanel() {
-    state.filtersPanelOpen = false;
-    els.searchFilterPanel.classList.add('hidden');
-    updateFilterToggleButtonsUI();
-  }
-
-  function openFiltersPanel() {
-    syncDraftFromApplied();
-    renderSearchFilterUI();
-    mountFilterPanel();
-    state.filtersPanelOpen = true;
-    els.searchFilterPanel.classList.remove('hidden');
-    updateFilterToggleButtonsUI();
-  }
-
-  function renderTypeFilterChips() {
-    els.searchTypeFilters.innerHTML = '';
-    for (const type of objectTypes) {
-      const label = document.createElement('label');
-      label.className = `search-filter-chip${state.draftSearchFilters.types.has(type.id) ? ' search-filter-chip--active' : ''}`;
-      label.innerHTML = `
-        <input type="checkbox" value="${type.id}" ${state.draftSearchFilters.types.has(type.id) ? 'checked' : ''} />
-        <span>${type.id}</span>
-      `;
-      label.querySelector('input').addEventListener('change', (event) => {
-        if (event.target.checked) {
-          state.draftSearchFilters.types.add(type.id);
-        } else {
-          state.draftSearchFilters.types.delete(type.id);
-        }
-        pruneFiltersForSelectedTypes(state.draftSearchFilters);
-        renderSearchFilterUI();
-      });
-      els.searchTypeFilters.appendChild(label);
-    }
+    closeVizSearchModal({ clearSearch: true });
   }
 
   function pruneFiltersForSelectedTypes(filters) {
@@ -947,177 +852,19 @@
       }
     }
 
-    filters.attributeRules = filters.attributeRules.map((rule) => ({
-      ...rule,
-      fieldId: availableFields.has(rule.fieldId) ? rule.fieldId : [...availableFields][0] || '',
-    }));
+    filters.attributeRules = filters.attributeRules.filter((rule) => rule.fieldId);
   }
 
-  function renderSearchFieldFilterChips() {
-    const availableFields = SearchFilters.getAvailableFields(attributeCatalog, state.draftSearchFilters.types);
-    els.searchFieldFilters.innerHTML = '';
-
-    if (availableFields.length === 0) {
-      els.searchFieldFilters.innerHTML = '<p class="search-filter-section__hint">Select at least one object type.</p>';
-      return;
-    }
-
-    for (const fieldId of availableFields) {
-      const label = document.createElement('label');
-      const active = !state.draftSearchFilters.searchFields || state.draftSearchFilters.searchFields.has(fieldId);
-      label.className = `search-filter-chip${active ? ' search-filter-chip--active' : ''}`;
-      label.innerHTML = `
-        <input type="checkbox" value="${fieldId}" ${active ? 'checked' : ''} />
-        <span>${DisplayNames.formatFieldLabel(fieldId)}</span>
-      `;
-      label.querySelector('input').addEventListener('change', (event) => {
-        if (!state.draftSearchFilters.searchFields) {
-          if (!event.target.checked) {
-            state.draftSearchFilters.searchFields = new Set(availableFields.filter((field) => field !== fieldId));
-          }
-        } else if (event.target.checked) {
-          state.draftSearchFilters.searchFields.add(fieldId);
-          if (state.draftSearchFilters.searchFields.size === availableFields.length) {
-            state.draftSearchFilters.searchFields = null;
-          }
-        } else {
-          state.draftSearchFilters.searchFields.delete(fieldId);
-          if (state.draftSearchFilters.searchFields.size === 0) {
-            state.draftSearchFilters.searchFields = null;
-          }
-        }
-        renderSearchFilterUI();
-      });
-      els.searchFieldFilters.appendChild(label);
-    }
-  }
-
-  function createAttributeRuleRow(rule = {}) {
-    const row = document.createElement('div');
-    row.className = 'search-attribute-rule';
-    row.dataset.ruleId = rule.id;
-
-    const availableFields = SearchFilters.getAvailableFields(attributeCatalog, state.draftSearchFilters.types);
-    const fieldOptions = availableFields
-      .map(
-        (fieldId) =>
-          `<option value="${fieldId}" ${rule.fieldId === fieldId ? 'selected' : ''}>${DisplayNames.formatFieldLabel(fieldId)}</option>`
-      )
-      .join('');
-
-    row.innerHTML = `
-      <select class="search-attribute-rule__field" aria-label="Attribute field">
-        <option value="">Select attribute…</option>
-        ${fieldOptions}
-      </select>
-      <select class="search-attribute-rule__operator" aria-label="Filter operator">
-        <option value="contains" ${rule.operator === 'contains' ? 'selected' : ''}>contains</option>
-        <option value="equals" ${rule.operator === 'equals' ? 'selected' : ''}>equals</option>
-        <option value="exists" ${rule.operator === 'exists' ? 'selected' : ''}>is set</option>
-      </select>
-      <input class="search-attribute-rule__value" type="text" placeholder="Value…" value="${rule.value || ''}" aria-label="Filter value" />
-      <button class="icon-btn icon-btn--ghost search-attribute-rule__remove" type="button" aria-label="Remove filter">×</button>
-    `;
-
-    const fieldSelect = row.querySelector('.search-attribute-rule__field');
-    const operatorSelect = row.querySelector('.search-attribute-rule__operator');
-    const valueInput = row.querySelector('.search-attribute-rule__value');
-    const removeButton = row.querySelector('.search-attribute-rule__remove');
-
-    function syncValueVisibility() {
-      valueInput.classList.toggle('hidden', operatorSelect.value === 'exists');
-    }
-
-    function persistRule() {
-      const existing = state.draftSearchFilters.attributeRules.find((entry) => entry.id === rule.id);
-      if (!existing) {
-        return;
-      }
-      existing.fieldId = fieldSelect.value;
-      existing.operator = operatorSelect.value;
-      existing.value = valueInput.value;
-      updateDraftFilterSummaryUI();
-    }
-
-    fieldSelect.addEventListener('change', persistRule);
-    operatorSelect.addEventListener('change', () => {
-      syncValueVisibility();
-      persistRule();
-    });
-    valueInput.addEventListener('input', persistRule);
-    removeButton.addEventListener('click', () => {
-      state.draftSearchFilters.attributeRules = state.draftSearchFilters.attributeRules.filter(
-        (entry) => entry.id !== rule.id
-      );
-      renderSearchFilterUI();
-    });
-
-    syncValueVisibility();
-    return row;
-  }
-
-  function renderAttributeRuleRows() {
-    els.searchAttributeRules.innerHTML = '';
-    if (state.draftSearchFilters.attributeRules.length === 0) {
-      els.searchAttributeRules.innerHTML =
-        '<p class="search-filter-section__hint">No attribute filters yet. Add one to require specific attribute values.</p>';
-      return;
-    }
-
-    for (const rule of state.draftSearchFilters.attributeRules) {
-      els.searchAttributeRules.appendChild(createAttributeRuleRow(rule));
-    }
-  }
-
-  function renderSearchFilterUI() {
-    renderTypeFilterChips();
-    renderSearchFieldFilterChips();
-    renderAttributeRuleRows();
-    updateDraftFilterSummaryUI();
-  }
-
-  function addAttributeRule() {
-    const availableFields = SearchFilters.getAvailableFields(attributeCatalog, state.draftSearchFilters.types);
-    const rule = {
-      id: `rule-${attributeRuleCounter += 1}`,
-      fieldId: availableFields[0] || '',
-      operator: 'contains',
-      value: '',
-    };
-    state.draftSearchFilters.attributeRules.push(rule);
-    renderSearchFilterUI();
-  }
-
-  function clearSearchFilters() {
-    state.searchFilters = SearchFilters.createDefault(objectTypes);
-    state.draftSearchFilters = SearchFilters.clone(state.searchFilters);
-    renderSearchFilterUI();
-    updateFilterSummaryUI();
+  function handleSmartSearchChange() {
+    SmartSearchBar.syncAll();
     refreshSearchResults();
-    closeFiltersPanel();
   }
 
   function setTypeFilter(typeId) {
     state.searchFilters.types = new Set([typeId]);
-    state.draftSearchFilters = SearchFilters.clone(state.searchFilters);
     pruneFiltersForSelectedTypes(state.searchFilters);
-    pruneFiltersForSelectedTypes(state.draftSearchFilters);
-    if (state.filtersPanelOpen) {
-      renderSearchFilterUI();
-    }
-    updateFilterSummaryUI();
+    SmartSearchBar.syncAll();
     refreshSearchResults();
-    closeFiltersPanel();
-  }
-
-  function toggleFiltersPanel(forceOpen = null) {
-    const shouldOpen = forceOpen ?? !state.filtersPanelOpen;
-    if (shouldOpen) {
-      openFiltersPanel();
-      return;
-    }
-    syncDraftFromApplied();
-    closeFiltersPanel();
   }
 
   const SIDEBAR_EXCLUDED_TYPES = new Set([
@@ -1164,20 +911,12 @@
   }
 
   function syncSearchInputs() {
-    els.search.value = state.searchTerm;
-    els.mapSearch.value = state.searchTerm;
-    els.graphSearch.value = state.searchTerm;
+    SmartSearchBar.syncAll();
   }
 
-  function setSearchTerm(term, options = {}) {
+  function setSearchTerm(term) {
     state.searchTerm = term;
-    if (options.expandMapSearch && state.activeView === 'map') {
-      state.mapSearchCollapsed = false;
-    }
-    if (options.expandGraphSearch && state.activeView === 'graph') {
-      state.graphSearchCollapsed = false;
-    }
-    syncSearchInputs();
+    SmartSearchBar.syncAll();
     refreshSearchResults();
   }
 
@@ -1317,9 +1056,7 @@
   }
 
   function renderGroupedSearchResults(items, container, context) {
-    container.className = `search-results search-results--grouped view-search-results${
-      shouldShowContextResults(context) ? ' view-search-results--visible' : ''
-    }`;
+    container.className = 'search-results search-results--grouped';
     container.innerHTML = '';
 
     if (!shouldShowContextResults(context)) {
@@ -1327,7 +1064,8 @@
     }
 
     if (items.length === 0) {
-      container.innerHTML = '<div class="empty-state"><p>No results found.</p></div>';
+      const variant = hasSearchCriteria() ? 'search-no-results' : 'search-idle';
+      container.innerHTML = EmptyStates.render(variant, { context });
       return;
     }
 
@@ -1618,19 +1356,26 @@
     for (const pin of pins) {
       pinnedTypes.add(pin.colorType);
     }
-    els.mapLegend.innerHTML = '<strong>Map pins</strong>';
+
     if (pinnedTypes.size === 0) {
-      els.mapLegend.innerHTML += '<div class="legend-row">Search and select a result to add map pins</div>';
+      els.mapLegend.innerHTML =
+        '<span class="map-legend-empty"><span class="map-legend-empty__dot" aria-hidden="true"></span>Pin objects from search to see them here</span>';
       return;
     }
+
+    const chips = [];
     for (const type of pinnedTypes) {
       const color = typeColors[type] || '#1b44b1';
-      els.mapLegend.innerHTML += `<div class="legend-row">${ObjectIcons.iconMarkup(type, { size: 14, color, className: 'legend-icon' })}${type}</div>`;
+      chips.push(
+        `<span class="legend-chip">${ObjectIcons.iconMarkup(type, { size: 12, color, className: 'legend-icon' })}${type}</span>`
+      );
     }
     if (pins.some((pin) => pin.connectionType === 'indirect')) {
-      els.mapLegend.innerHTML +=
-        '<div class="legend-row"><span class="legend-dot legend-dot--indirect"></span>Indirect (2 hops)</div>';
+      chips.push(
+        '<span class="legend-chip"><span class="legend-dot legend-dot--indirect"></span>Indirect</span>'
+      );
     }
+    els.mapLegend.innerHTML = chips.join('');
   }
 
   function updateGraphZoomLabel() {
@@ -1859,9 +1604,10 @@
 
   function renderGraphView() {
     const hasNodes = graphState.nodeIds.size > 0;
-    els.graphCaption.style.display = hasNodes ? 'none' : 'block';
+    els.graphCaption.style.display = hasNodes ? 'none' : '';
     if (!hasNodes) {
       GraphView.clearGraphSvg(els.graphSvg);
+      els.graphCaption.innerHTML = EmptyStates.render('graph-empty');
       return;
     }
 
@@ -1913,21 +1659,27 @@
     resetGraphViewport();
     hideGraphContextMenu();
     GraphView.clearGraphSvg(els.graphSvg);
-    els.graphCaption.style.display = 'block';
-    els.graphCaption.innerHTML = 'Search for an object above and select a result to add it to the graph.';
+    els.graphCaption.style.display = '';
+    els.graphCaption.innerHTML = EmptyStates.render('graph-empty');
     refreshSearchResults();
   }
 
   function refreshSearchResults() {
     const items = runSearch(state.searchTerm);
     renderSearchResults(items, els.searchResults, 'search');
-    renderSearchResults(items, els.mapSearchResults, 'map');
-    renderSearchResults(items, els.graphSearchResults, 'graph');
-    updateFilterSummaryUI();
+    if (state.vizSearchModalOpen && state.vizSearchContext) {
+      renderSearchResults(items, els.vizSearchResults, state.vizSearchContext);
+    } else if (els.vizSearchResults) {
+      els.vizSearchResults.innerHTML = '';
+    }
 
     if (!hasSearchCriteria()) {
-      els.searchResults.innerHTML =
-        '<div class="empty-state"><p>Search instances across all object types and attributes, or apply filters to narrow results.</p></div>';
+      els.searchResults.innerHTML = EmptyStates.render('search-idle');
+      if (state.vizSearchModalOpen) {
+        els.vizSearchResults.innerHTML = EmptyStates.render('search-viz', {
+          context: state.vizSearchContext,
+        });
+      }
     }
   }
 
@@ -1952,6 +1704,9 @@
 
   function switchView(viewName) {
     state.activeView = viewName;
+    if (viewName !== 'map' && viewName !== 'graph') {
+      closeVizSearchModal();
+    }
     if (viewName !== 'map') {
       hideMapContextMenu();
     }
@@ -1973,73 +1728,37 @@
       if (state.pinnedIds.size > 0) {
         renderMapPins();
       }
-      if (!state.searchTerm.trim()) {
-        state.mapSearchCollapsed = true;
-      }
     }
     if (viewName === 'graph') {
       renderGraphView();
-      if (!state.searchTerm.trim()) {
-        state.graphSearchCollapsed = true;
-      }
-    }
-    if (['search', 'map', 'graph'].includes(viewName)) {
-      mountFilterPanel();
-      if (state.filtersPanelOpen) {
-        els.searchFilterPanel.classList.remove('hidden');
-      }
-    } else {
-      closeFiltersPanel();
     }
     if (els.instancePanel.classList.contains('open')) {
       updateInspectorPanelContext();
     }
-    syncSearchInputs();
+    SmartSearchBar.syncAll();
     refreshSearchResults();
   }
 
-  for (const input of [els.search, els.mapSearch, els.graphSearch]) {
-    input.addEventListener('input', (event) => {
-      setSearchTerm(event.target.value, {
-        expandMapSearch: event.target === els.mapSearch,
-        expandGraphSearch: event.target === els.graphSearch,
-      });
-    });
-  }
+  els.btnOpenMapSearch?.addEventListener('click', () => openVizSearchModal('map'));
+  els.btnOpenGraphSearch?.addEventListener('click', () => openVizSearchModal('graph'));
+  els.btnCloseVizSearch?.addEventListener('click', () => closeVizSearchModal({ clearSearch: true }));
+  els.vizSearchBackdrop?.addEventListener('click', () => closeVizSearchModal({ clearSearch: true }));
 
-  els.mapSearch.addEventListener('focus', () => {
-    if (state.activeView === 'map') {
-      expandMapSearch();
+  document.addEventListener('keydown', (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === '/') {
+      if (state.activeView === 'map') {
+        event.preventDefault();
+        openVizSearchModal('map');
+      } else if (state.activeView === 'graph') {
+        event.preventDefault();
+        openVizSearchModal('graph');
+      }
+    }
+    if (event.key === 'Escape' && state.vizSearchModalOpen) {
+      event.preventDefault();
+      closeVizSearchModal({ clearSearch: true });
     }
   });
-
-  els.graphSearch.addEventListener('focus', () => {
-    if (state.activeView === 'graph') {
-      expandGraphSearch();
-    }
-  });
-
-  els.btnToggleSearchFilters.addEventListener('click', () => toggleFiltersPanel());
-  els.btnToggleMapFilters?.addEventListener('click', () => toggleFiltersPanel());
-  els.btnToggleGraphFilters?.addEventListener('click', () => toggleFiltersPanel());
-  els.btnApplySearchFilters.addEventListener('click', applyDraftFilters);
-  els.btnCancelSearchFilters.addEventListener('click', () => toggleFiltersPanel(false));
-  els.btnSelectAllTypes.addEventListener('click', () => {
-    state.draftSearchFilters.types = new Set(objectTypes.map((type) => type.id));
-    pruneFiltersForSelectedTypes(state.draftSearchFilters);
-    renderSearchFilterUI();
-  });
-  els.btnClearAllTypes.addEventListener('click', () => {
-    state.draftSearchFilters.types.clear();
-    pruneFiltersForSelectedTypes(state.draftSearchFilters);
-    renderSearchFilterUI();
-  });
-  els.btnClearAllSearchFields.addEventListener('click', () => {
-    state.draftSearchFilters.searchFields = null;
-    renderSearchFilterUI();
-  });
-  els.btnAddAttributeFilter.addEventListener('click', addAttributeRule);
-  els.btnClearSearchFilters.addEventListener('click', clearSearchFilters);
 
   els.btnPinMap.addEventListener('click', () => {
     if (!state.selectedId) {
@@ -2257,12 +1976,6 @@
     }
   });
 
-  els.btnGraphOpenPanel.addEventListener('click', () => {
-    if (state.selectedId) {
-      renderInspector(lookup.get(state.selectedId));
-    }
-  });
-
   els.btnClosePanel.addEventListener('click', closeInstancePanel);
   els.instanceBackdrop.addEventListener('click', closeInstancePanel);
 
@@ -2270,10 +1983,37 @@
     tab.addEventListener('click', () => switchView(tab.dataset.view));
   });
 
+  const smartSearchOptions = {
+    getState: () => ({ searchTerm: state.searchTerm, searchFilters: state.searchFilters }),
+    setSearchTerm: (term) => {
+      state.searchTerm = term;
+    },
+    setSearchFilters: (filters) => {
+      state.searchFilters = filters;
+      pruneFiltersForSelectedTypes(state.searchFilters);
+    },
+    objectTypes,
+    attributeCatalog,
+    onChange: handleSmartSearchChange,
+  };
+
+  SmartSearchBar.init({
+    root: document.getElementById('global-smart-search'),
+    input: els.search,
+    pillsEl: document.getElementById('global-search-pills'),
+    menuEl: document.getElementById('global-search-menu'),
+    ...smartSearchOptions,
+  });
+
+  SmartSearchBar.init({
+    root: document.getElementById('viz-smart-search'),
+    input: els.vizSearchInput,
+    pillsEl: document.getElementById('viz-search-pills'),
+    menuEl: document.getElementById('viz-search-menu'),
+    ...smartSearchOptions,
+  });
+
   renderObjectTypeNav();
-  state.draftSearchFilters = SearchFilters.clone(state.searchFilters);
-  renderSearchFilterUI();
-  updateFilterSummaryUI();
   initRelatedTypeFilters();
   syncHeatmapFromMapPins();
   renderLegend([]);

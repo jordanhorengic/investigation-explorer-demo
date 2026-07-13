@@ -84,92 +84,34 @@
             <section class="explorer-main">
               <div id="view-search" class="view active">
                 <div class="search-toolbar">
-                  <div class="search-toolbar__row">
-                    <div class="search-shell">
+                  <div class="smart-search" id="global-smart-search">
+                    <div class="smart-search__surface">
+                      <div class="smart-search__pills" id="global-search-pills"></div>
                       <input
                         id="global-search"
-                        type="search"
-                        placeholder="Search..."
+                        class="smart-search__input"
+                        type="text"
+                        placeholder="Search…"
                         autocomplete="off"
+                        spellcheck="false"
                       />
-                      <span class="search-shell__icon" aria-hidden="true">⌕</span>
                     </div>
-                    <button id="btn-toggle-search-filters" class="search-filter-btn" type="button" aria-label="Search filters" aria-expanded="false" aria-controls="search-filter-panel">
-                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-                        <path d="M4 6h16M7 12h10M10 18h4"/>
-                      </svg>
-                      <span id="search-filter-count" class="search-filter-count hidden">0</span>
-                    </button>
-                  </div>
-                  <div id="search-filter-panel" class="search-filter-panel hidden">
-                    <div class="search-filter-panel__scroll">
-                      <div class="search-filter-section">
-                        <div class="search-filter-section__head">
-                          <h3 class="search-filter-section__title">Object types</h3>
-                          <div class="search-filter-section__actions">
-                            <button id="btn-select-all-types" class="btn btn-outline btn-sm" type="button">All</button>
-                            <button id="btn-clear-all-types" class="btn btn-outline btn-sm" type="button">None</button>
-                          </div>
-                        </div>
-                        <div id="search-type-filters" class="search-filter-chips"></div>
-                      </div>
-                      <div class="search-filter-section">
-                        <div class="search-filter-section__head">
-                          <h3 class="search-filter-section__title">Search in attributes</h3>
-                          <div class="search-filter-section__actions">
-                            <button id="btn-clear-all-search-fields" class="btn btn-outline btn-sm" type="button">Reset</button>
-                          </div>
-                        </div>
-                        <p class="search-filter-section__hint">Optional. Restrict the text search to specific attribute fields.</p>
-                        <div id="search-field-filters" class="search-filter-chips"></div>
-                      </div>
-                      <div class="search-filter-section">
-                        <div class="search-filter-section__head">
-                          <h3 class="search-filter-section__title">Attribute filters</h3>
-                          <button id="btn-add-attribute-filter" class="btn btn-outline btn-sm" type="button">Add filter</button>
-                        </div>
-                        <p class="search-filter-section__hint">Show only objects whose attributes match these rules.</p>
-                        <div id="search-attribute-rules" class="search-attribute-rules"></div>
-                      </div>
-                    </div>
-                    <div class="search-filter-panel__footer">
-                      <p id="search-filter-summary" class="search-filter-summary"></p>
-                      <div class="search-filter-panel__actions">
-                        <button id="btn-clear-search-filters" class="btn btn-outline btn-sm" type="button">Clear</button>
-                        <button id="btn-cancel-search-filters" class="btn btn-outline btn-sm" type="button">Cancel</button>
-                        <button id="btn-apply-search-filters" class="btn btn-primary btn-sm" type="button">Apply filters</button>
-                      </div>
-                    </div>
+                    <div id="global-search-menu" class="smart-search__menu hidden" role="listbox" aria-label="Search commands"></div>
                   </div>
                 </div>
                 <div id="search-results" class="search-results search-results--list"></div>
               </div>
 
               <div id="view-map" class="view">
-                <div class="search-toolbar">
-                  <div class="search-toolbar__row">
-                    <div class="search-shell">
-                      <input
-                        id="map-search"
-                        type="search"
-                        placeholder="Search..."
-                        autocomplete="off"
-                      />
-                      <span class="search-shell__icon" aria-hidden="true">⌕</span>
-                    </div>
-                    <button id="btn-toggle-map-filters" class="search-filter-btn" type="button" aria-label="Search filters" aria-expanded="false" aria-controls="search-filter-panel">
-                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-                        <path d="M4 6h16M7 12h10M10 18h4"/>
-                      </svg>
-                      <span class="search-filter-count hidden">0</span>
-                    </button>
-                  </div>
-                  <p id="map-filter-summary" class="search-filter-summary search-filter-summary--inline hidden"></p>
-                </div>
-                <div id="map-search-results" class="search-results search-results--list view-search-results"></div>
                 <div class="map-frame">
-                  <div class="viz-frame-actions">
-                    <button id="btn-clear-map" class="view-clear-btn" type="button" aria-label="Clear map pins">
+                  <div class="viz-chrome">
+                    <button id="btn-open-map-search" class="viz-search-trigger" type="button" aria-label="Search objects to add to map">
+                      <span class="viz-search-trigger__label">Search</span>
+                      <span class="viz-search-trigger__keys" aria-hidden="true">
+                        <kbd>⌘</kbd><kbd>/</kbd>
+                      </span>
+                    </button>
+                    <button id="btn-clear-map" class="viz-chrome__action view-clear-btn" type="button" aria-label="Clear map pins">
                       <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
                         <path d="M18 6 6 18M6 6l12 12"/>
                       </svg>
@@ -177,55 +119,37 @@
                     </button>
                   </div>
                   <div id="map"></div>
-                  <div class="map-legend" id="map-legend"></div>
+                  <div class="map-status-bar">
+                    <div id="map-heatmap-panel" class="map-status-bar__heatmap">
+                      <label class="map-heatmap-option">
+                        <input id="map-show-heatmap" type="checkbox" />
+                        <span>Heatmap</span>
+                      </label>
+                      <div id="map-heatmap-filters" class="map-heatmap-filters hidden">
+                        <div id="map-heatmap-type-filters" class="search-filter-chips map-heatmap-type-filters"></div>
+                      </div>
+                    </div>
+                    <div class="map-status-bar__divider" aria-hidden="true"></div>
+                    <div class="map-status-bar__legend" id="map-legend"></div>
+                  </div>
                   <div id="map-context-menu" class="graph-context-menu hidden" role="menu">
                     <button id="map-context-details" type="button" role="menuitem">Open object details</button>
                     <button id="map-context-related" type="button" role="menuitem">Show related objects</button>
                     <button id="map-context-graph" type="button" role="menuitem">Add to graph</button>
                   </div>
-                  <div id="map-heatmap-panel" class="map-heatmap-panel">
-                    <label class="map-heatmap-option">
-                      <input id="map-show-heatmap" type="checkbox" disabled />
-                      <span>Show heatmap</span>
-                    </label>
-                    <p id="map-heatmap-hint" class="map-heatmap-hint">Add objects to the map to enable heatmap.</p>
-                    <div id="map-heatmap-filters" class="map-heatmap-filters hidden">
-                      <span class="map-heatmap-filters__label">Heatmap object types</span>
-                      <div id="map-heatmap-type-filters" class="search-filter-chips map-heatmap-type-filters"></div>
-                    </div>
-                  </div>
-                  <div class="map-controls">
-                    <button class="map-control-btn" type="button">Layered</button>
-                    <div class="map-zoom">100%</div>
-                  </div>
                 </div>
               </div>
 
               <div id="view-graph" class="view">
-                <div class="search-toolbar">
-                  <div class="search-toolbar__row">
-                    <div class="search-shell">
-                      <input
-                        id="graph-search"
-                        type="search"
-                        placeholder="Search..."
-                        autocomplete="off"
-                      />
-                      <span class="search-shell__icon" aria-hidden="true">⌕</span>
-                    </div>
-                    <button id="btn-toggle-graph-filters" class="search-filter-btn" type="button" aria-label="Search filters" aria-expanded="false" aria-controls="search-filter-panel">
-                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-                        <path d="M4 6h16M7 12h10M10 18h4"/>
-                      </svg>
-                      <span class="search-filter-count hidden">0</span>
-                    </button>
-                  </div>
-                  <p id="graph-filter-summary" class="search-filter-summary search-filter-summary--inline hidden"></p>
-                </div>
-                <div id="graph-search-results" class="search-results search-results--list view-search-results"></div>
                 <div class="graph-frame">
-                  <div class="viz-frame-actions">
-                    <button id="btn-graph-clear" class="view-clear-btn" type="button" aria-label="Clear graph">
+                  <div class="viz-chrome">
+                    <button id="btn-open-graph-search" class="viz-search-trigger" type="button" aria-label="Search objects to add to graph">
+                      <span class="viz-search-trigger__label">Search</span>
+                      <span class="viz-search-trigger__keys" aria-hidden="true">
+                        <kbd>⌘</kbd><kbd>/</kbd>
+                      </span>
+                    </button>
+                    <button id="btn-graph-clear" class="viz-chrome__action view-clear-btn" type="button" aria-label="Clear graph">
                       <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
                         <path d="M18 6 6 18M6 6l12 12"/>
                       </svg>
@@ -233,8 +157,7 @@
                     </button>
                   </div>
                   <svg id="graph-svg" viewBox="0 0 960 520" role="img" aria-label="Network graph"></svg>
-                  <p id="graph-caption" class="graph-caption">Search for an object above and select a result to add it to the graph.</p>
-                  <button id="btn-graph-open-panel" class="graph-panel-toggle" type="button" aria-label="Open object details" title="Object details">›</button>
+                  <div id="graph-caption" class="graph-caption" aria-live="polite"></div>
                   <div id="graph-context-menu" class="graph-context-menu hidden" role="menu">
                     <button id="graph-context-details" type="button" role="menuitem">Open object details</button>
                     <button id="graph-context-expand" type="button" role="menuitem">Expand relationships</button>
@@ -242,11 +165,11 @@
                   </div>
                   <div id="graph-node-tooltip" class="graph-node-tooltip hidden" aria-hidden="true"></div>
                   <div class="graph-controls">
-                    <button id="btn-graph-zoom-out" class="map-control-btn" type="button" aria-label="Zoom out">−</button>
-                    <div class="map-zoom" id="graph-zoom">100%</div>
-                    <button id="btn-graph-zoom-in" class="map-control-btn" type="button" aria-label="Zoom in">+</button>
+                    <button id="btn-graph-zoom-out" class="graph-controls__btn" type="button" aria-label="Zoom out">−</button>
+                    <div class="graph-controls__zoom" id="graph-zoom">100%</div>
+                    <button id="btn-graph-zoom-in" class="graph-controls__btn" type="button" aria-label="Zoom in">+</button>
                   </div>
-                  <p class="graph-hint">Drag canvas to pan · Scroll to zoom · Drag nodes to move</p>
+                  <p class="graph-hint">Drag to pan · Scroll to zoom</p>
                 </div>
               </div>
 
@@ -314,6 +237,33 @@
             </section>
 
             <div id="instance-backdrop" class="instance-backdrop hidden" aria-hidden="true"></div>
+
+            <div id="viz-search-modal" class="viz-search-modal hidden" aria-hidden="true">
+              <div id="viz-search-backdrop" class="viz-search-modal__backdrop"></div>
+              <div class="viz-search-modal__panel" role="dialog" aria-modal="true" aria-labelledby="viz-search-modal-title">
+                <div class="viz-search-modal__header">
+                  <h2 id="viz-search-modal-title" class="viz-search-modal__title">Add to map</h2>
+                  <button id="btn-close-viz-search" class="viz-search-modal__close" type="button" aria-label="Close search">×</button>
+                </div>
+                <div id="viz-search-toolbar" class="viz-search-modal__toolbar search-toolbar">
+                  <div class="smart-search" id="viz-smart-search">
+                    <div class="smart-search__surface">
+                      <div class="smart-search__pills" id="viz-search-pills"></div>
+                      <input
+                        id="viz-search-input"
+                        class="smart-search__input"
+                        type="text"
+                        placeholder="Search…"
+                        autocomplete="off"
+                        spellcheck="false"
+                      />
+                    </div>
+                    <div id="viz-search-menu" class="smart-search__menu hidden" role="listbox" aria-label="Search commands"></div>
+                  </div>
+                </div>
+                <div id="viz-search-results" class="search-results search-results--list viz-search-modal__results"></div>
+              </div>
+            </div>
 
             <aside id="instance-panel" class="instance-panel" aria-label="Instance details" aria-hidden="true">
               <div class="instance-panel__toolbar">
@@ -408,7 +358,7 @@
                       <tbody id="inspector-related"></tbody>
                     </table>
                   </div>
-                  <p id="inspector-related-empty" class="instance-empty hidden">No related objects for this instance.</p>
+                  <p id="inspector-related-empty" class="instance-empty hidden">No related objects linked to this instance yet.</p>
                 </section>
 
                 <section class="instance-section instance-section--documents">
@@ -417,7 +367,7 @@
                     <span id="inspector-documents-count" class="instance-section__count"></span>
                   </h3>
                   <div id="inspector-documents" class="instance-documents"></div>
-                  <p id="inspector-documents-empty" class="instance-empty">No documents or images uploaded for this object.</p>
+                  <p id="inspector-documents-empty" class="instance-empty">No documents or images attached yet.</p>
                 </section>
                 </div>
               </div>
@@ -438,6 +388,8 @@
     <script src="./js/map-locations.js"></script>
     <script src="./js/map-heatmap.js"></script>
     <script src="./js/search-filters.js"></script>
+    <script src="./js/smart-search.js"></script>
+    <script src="./js/empty-states.js"></script>
     <script src="./js/graph-view.js"></script>
     <script src="./js/new-object.js"></script>
     <script src="./js/app.js"></script>
