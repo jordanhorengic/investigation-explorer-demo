@@ -137,7 +137,7 @@
     document.querySelector('.viz-strip-actions')?.classList.toggle('hidden', current !== 'strip');
     dockHeader?.classList.toggle('hidden', current !== 'dock' || dockCollapsed);
     dockToggle?.classList.toggle('hidden', current !== 'dock' || !dockCollapsed);
-    footer?.classList.toggle('hidden', current === 'strip' || current === 'dropdown' || !isResultsExpanded());
+    footer?.classList.toggle('hidden', current === 'strip' || current === 'dropdown' || current === 'dock' || !isResultsExpanded());
   }
 
   function updateStripResultsVisibility(open) {
@@ -427,7 +427,7 @@
       document.body.classList.add('viz-variant-alt');
       modal?.classList.add('viz-search-modal--disabled');
       modalHeader?.classList.add('hidden');
-      persistentFooter?.classList.remove('hidden');
+      persistentFooter?.classList.add('hidden');
     }
 
     doneButton?.addEventListener('click', () => {

@@ -463,6 +463,10 @@ html[data-viz-variant='dock'] .viz-strip-results-panel {
 }
 
 html[data-viz-variant='dock'] .viz-strip-results-panel .viz-add-shell__results,
+html[data-viz-variant='dock'] .viz-add-shell__footer {
+  display: none !important;
+}
+
 html[data-viz-variant='dock'] .viz-strip-results-panel #viz-search-results {
   flex: 1 1 0;
   height: 0;
