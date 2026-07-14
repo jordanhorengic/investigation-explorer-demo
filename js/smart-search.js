@@ -69,11 +69,15 @@
     );
   }
 
-  function buildInFieldSuggestions(catalog, objectTypes, partial = '') {
+  function buildInFieldSuggestions(catalog, objectTypes, filters, partial = '') {
     const entries = [];
     const needle = String(partial || '').trim().toLowerCase();
+    const restricted = SearchFilters.isRestrictedTypes(filters, objectTypes.length);
+    const typesToShow = restricted
+      ? objectTypes.filter((type) => filters.types.has(type.id))
+      : objectTypes;
 
-    for (const type of objectTypes) {
+    for (const type of typesToShow) {
       const fieldIds = [...(catalog.byType.get(type.id) || [])].sort((a, b) => a.localeCompare(b));
       const matches = fieldIds.filter((fieldId) => {
         if (!needle) {
@@ -276,7 +280,7 @@
 
     if (/^in$/i.test(trimmed) || /^in:/i.test(trimmed)) {
       const partial = trimmed.match(/^in:(.*)$/i)?.[1]?.trim() || '';
-      return buildInFieldSuggestions(catalog, objectTypes, partial);
+      return buildInFieldSuggestions(catalog, objectTypes, filters, partial);
     }
 
     const fields = SearchFilters.getAvailableFields(catalog, filters.types);
