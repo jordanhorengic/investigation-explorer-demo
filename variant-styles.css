@@ -132,6 +132,12 @@
   max-width: none;
 }
 
+#view-search .search-toolbar .smart-search {
+  flex: none;
+  max-width: 920px;
+  width: 100%;
+}
+
 .viz-add-shell__collapse {
   flex-shrink: 0;
   width: 32px;

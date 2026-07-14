@@ -518,6 +518,21 @@
     return true;
   }
 
+  function unpinEntityFromMap(entityId, options = {}) {
+    if (!state.pinnedIds.has(entityId)) {
+      return false;
+    }
+
+    state.pinnedIds.delete(entityId);
+    state.pinSettings.delete(entityId);
+    ensureMap();
+    if (!options.skipRender) {
+      renderMapPins({ preserveView: true });
+      refreshSearchResults();
+    }
+    return true;
+  }
+
   function appendEntityToGraph(entityId, options = {}) {
     const entity = lookup.get(entityId);
     if (!entity) {
@@ -848,6 +863,16 @@
     finishVizSearchSession({ clearSearch: true });
   }
 
+  function afterVizRemove(context) {
+    if (VizSearchVariant.isPersistent()) {
+      refreshSearchResults();
+      VizSearchVariant.showToast(context === 'map' ? 'Removed from map' : 'Removed from graph');
+      requestAnimationFrame(() => els.vizSearchInput?.focus());
+      return;
+    }
+    refreshSearchResults();
+  }
+
   function closeVizSearchModal(options = {}) {
     const wasOpen = state.vizSearchModalOpen;
     state.vizSearchModalOpen = false;
@@ -1034,14 +1059,24 @@
     }
 
     if (context === 'map') {
-      pinEntityOnMap(entityId, { stayOnMap: true });
-      afterVizAdd('map');
+      if (state.pinnedIds.has(entityId)) {
+        unpinEntityFromMap(entityId);
+        afterVizRemove('map');
+      } else {
+        pinEntityOnMap(entityId, { stayOnMap: true });
+        afterVizAdd('map');
+      }
       return;
     }
 
     if (context === 'graph') {
-      addToGraph(entityId, { openDetails: false });
-      afterVizAdd('graph');
+      if (graphState.nodeIds.has(entityId)) {
+        removeEntityFromGraph(entityId);
+        afterVizRemove('graph');
+      } else {
+        addToGraph(entityId, { openDetails: false });
+        afterVizAdd('graph');
+      }
     }
   }
 
@@ -1071,9 +1106,6 @@
     const groupedList = options.groupedList === true;
     const highlighted = isSelectionHighlighted(entity.id);
     const card = document.createElement('div');
-    card.className = groupedList
-      ? `result-row${highlighted ? ' result-row--selected' : ''}`
-      : `result-card${highlighted ? ' selected' : ''}`;
     const match = SearchFilters.resolveResultMatch(entity, state.searchTerm, state.searchFilters, lookup);
     const onMap = state.pinnedIds.has(entity.id);
     const onGraph = graphState.nodeIds.has(entity.id);
@@ -1081,10 +1113,20 @@
 
     if (groupedList) {
       let status = '';
+      let onViz = false;
       if (context === 'map' && onMap) {
         status = '<span class="result-row__status">On map</span>';
+        onViz = true;
       } else if (context === 'graph' && onGraph) {
         status = '<span class="result-row__status">On graph</span>';
+        onViz = true;
+      }
+
+      card.className = `result-row${highlighted ? ' result-row--selected' : ''}${
+        context === 'map' && onMap ? ' result-row--on-map' : ''
+      }${context === 'graph' && onGraph ? ' result-row--on-graph' : ''}`;
+      if (onViz) {
+        card.title = 'Click to remove';
       }
 
       card.innerHTML = `
@@ -1109,6 +1151,8 @@
       }
       return card;
     }
+
+    card.className = `result-card${highlighted ? ' selected' : ''}`;
 
     let footer = '';
     if (context === 'search') {
@@ -1725,6 +1769,20 @@
 
   function addToGraph(entityId, options = {}) {
     return appendEntityToGraph(entityId, options);
+  }
+
+  function removeEntityFromGraph(entityId, options = {}) {
+    if (!graphState.nodeIds.has(entityId)) {
+      return false;
+    }
+
+    GraphView.removeNode(graphState, entityId);
+    state.graphRoots.delete(entityId);
+    if (!options.skipRender) {
+      renderGraphView();
+      refreshSearchResults();
+    }
+    return true;
   }
 
   function expandGraphFromNode(entityId, options = {}) {
