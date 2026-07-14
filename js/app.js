@@ -2183,7 +2183,6 @@
   });
 
   VizSearchVariant.init({
-    onDone: () => finishVizSearchSession({ clearSearch: false }),
     focusInput: () => els.vizSearchInput?.focus(),
     onClearSearch: () => {
       state.searchTerm = '';

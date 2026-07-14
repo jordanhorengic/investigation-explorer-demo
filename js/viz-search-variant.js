@@ -37,9 +37,8 @@
   let frames = { map: null, graph: null };
   let chrome = { map: null, graph: null };
   let toastTimer = null;
-  let onDoneCallback = null;
-  let focusInputCallback = null;
   let onResultsChangeCallback = null;
+  let focusInputCallback = null;
   let onClearSearchCallback = null;
   let resultsExpanded = false;
   let dockCollapsed = false;
@@ -130,14 +129,12 @@
     const closeResultsBtn = document.getElementById('btn-viz-search-close-results');
     const dockHeader = shell?.querySelector('[data-dock-only]');
     const dockToggle = document.getElementById('btn-viz-dock-toggle');
-    const footer = document.querySelector('[data-persistent-only]');
 
     collapseBtn?.classList.toggle('hidden', current !== 'strip');
     closeResultsBtn?.classList.toggle('hidden', current !== 'strip');
     document.querySelector('.viz-strip-actions')?.classList.toggle('hidden', current !== 'strip');
     dockHeader?.classList.toggle('hidden', current !== 'dock' || dockCollapsed);
     dockToggle?.classList.toggle('hidden', current !== 'dock' || !dockCollapsed);
-    footer?.classList.toggle('hidden', current === 'strip' || current === 'dropdown' || current === 'dock' || !isResultsExpanded());
   }
 
   function updateStripResultsVisibility(open) {
@@ -153,8 +150,6 @@
     }
     results?.classList.toggle('hidden', !open);
     results?.setAttribute('aria-hidden', open ? 'false' : 'true');
-    const footer = document.querySelector('[data-persistent-only]');
-    footer?.classList.add('hidden');
   }
 
   function layoutStripHost(host) {
@@ -399,9 +394,8 @@
   function init(options = {}) {
     current = readVariantFromUrl();
     document.documentElement.dataset.vizVariant = current;
-    onDoneCallback = options.onDone || null;
-    focusInputCallback = options.focusInput || null;
     onResultsChangeCallback = options.onResultsChange || null;
+    focusInputCallback = options.focusInput || null;
     onClearSearchCallback = options.onClearSearch || null;
 
     shell = document.getElementById('viz-add-shell');
@@ -417,22 +411,14 @@
 
     const modal = document.getElementById('viz-search-modal');
     const modalHeader = shell?.querySelector('[data-modal-only]');
-    const persistentFooter = document.querySelector('[data-persistent-only]');
-    const doneButton = document.getElementById('btn-viz-search-done');
 
     if (isModal()) {
       document.body.classList.add('viz-variant-modal');
-      persistentFooter?.classList.add('hidden');
     } else {
       document.body.classList.add('viz-variant-alt');
       modal?.classList.add('viz-search-modal--disabled');
       modalHeader?.classList.add('hidden');
-      persistentFooter?.classList.add('hidden');
     }
-
-    doneButton?.addEventListener('click', () => {
-      onDoneCallback?.({ clearSearch: false });
-    });
 
     document.getElementById('btn-viz-search-collapse')?.addEventListener('mousedown', (event) => {
       event.preventDefault();

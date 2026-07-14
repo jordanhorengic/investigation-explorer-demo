@@ -158,23 +158,6 @@
   min-height: 0;
 }
 
-.viz-add-shell__footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-shrink: 0;
-  padding: 10px 12px;
-  border-top: 1px solid rgb(16 24 40 / 6%);
-  background: var(--bg-subtle);
-}
-
-.viz-add-shell__hint {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 12px;
-}
-
 .viz-add-toast {
   position: fixed;
   bottom: 24px;
@@ -463,10 +446,6 @@ html[data-viz-variant='dock'] .viz-strip-results-panel {
 }
 
 html[data-viz-variant='dock'] .viz-strip-results-panel .viz-add-shell__results,
-html[data-viz-variant='dock'] .viz-add-shell__footer {
-  display: none !important;
-}
-
 html[data-viz-variant='dock'] .viz-strip-results-panel #viz-search-results {
   flex: 1 1 0;
   height: 0;
