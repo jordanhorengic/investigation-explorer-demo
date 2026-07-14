@@ -1752,6 +1752,43 @@
     }
   }
 
+  function mountContextMenus() {
+    for (const menu of [els.mapContextMenu, els.graphContextMenu]) {
+      if (menu && menu.parentElement !== document.body) {
+        document.body.appendChild(menu);
+      }
+    }
+  }
+
+  function openContextMenu(menu, clientX, clientY) {
+    if (!menu) {
+      return;
+    }
+
+    menu.classList.remove('hidden');
+    menu.style.position = 'fixed';
+    menu.style.left = `${clientX}px`;
+    menu.style.top = `${clientY}px`;
+    menu.style.right = 'auto';
+    menu.style.bottom = 'auto';
+    menu.style.zIndex = '10000';
+
+    const rect = menu.getBoundingClientRect();
+    const padding = 8;
+    let left = clientX;
+    let top = clientY;
+
+    if (left + rect.width > window.innerWidth - padding) {
+      left = window.innerWidth - rect.width - padding;
+    }
+    if (top + rect.height > window.innerHeight - padding) {
+      top = window.innerHeight - rect.height - padding;
+    }
+
+    menu.style.left = `${Math.max(padding, left)}px`;
+    menu.style.top = `${Math.max(padding, top)}px`;
+  }
+
   function showGraphContextMenu(entityId, clientX, clientY, selectionSnapshot = null) {
     hideMapContextMenu();
     prepareContextSelection(entityId);
@@ -1767,10 +1804,7 @@
     setContextMenuLabel(els.graphContextRemove, 'Remove object', count);
     els.graphContextExpand.classList.toggle('hidden', count > 1);
 
-    els.graphContextMenu.style.position = 'fixed';
-    els.graphContextMenu.style.left = `${clientX}px`;
-    els.graphContextMenu.style.top = `${clientY}px`;
-    els.graphContextMenu.classList.remove('hidden');
+    openContextMenu(els.graphContextMenu, clientX, clientY);
   }
 
   function showMapContextMenu(entityId, clientX, clientY, selectionSnapshot = null) {
@@ -1794,10 +1828,7 @@
     );
     els.mapContextRelated.classList.toggle('hidden', count > 1);
 
-    els.mapContextMenu.style.position = 'fixed';
-    els.mapContextMenu.style.left = `${clientX}px`;
-    els.mapContextMenu.style.top = `${clientY}px`;
-    els.mapContextMenu.classList.remove('hidden');
+    openContextMenu(els.mapContextMenu, clientX, clientY);
   }
 
   function toggleRelatedObjectsForEntity(entityId) {
@@ -2323,6 +2354,7 @@
 
   renderObjectTypeNav();
   initRelatedTypeFilters();
+  mountContextMenus();
   syncHeatmapFromMapPins();
   renderLegend([]);
   refreshSearchResults();
