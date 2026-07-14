@@ -16,6 +16,7 @@
     searchTerm: '',
     searchFilters: SearchFilters.createDefault(objectTypes),
     vizSearchModalOpen: false,
+    vizSearchSessionOpen: false,
     vizSearchContext: null,
     activeView: 'search',
     collapsedResultGroups: new Set(),
@@ -798,10 +799,47 @@
     if (!hasSearchCriteria()) {
       return false;
     }
+    if (context === 'search') {
+      return true;
+    }
     if (context === 'map' || context === 'graph') {
-      return state.vizSearchModalOpen && state.vizSearchContext === context;
+      if (VizSearchVariant.isModal()) {
+        return state.vizSearchModalOpen && state.vizSearchContext === context;
+      }
+      if (state.activeView !== context) {
+        return false;
+      }
+      if (VizSearchVariant.needsExplicitOpen()) {
+        return state.vizSearchSessionOpen;
+      }
+      return true;
     }
     return true;
+  }
+
+  function finishVizSearchSession(options = {}) {
+    const clearSearch = options.clearSearch !== false;
+    if (VizSearchVariant.isModal()) {
+      closeVizSearchModal({ clearSearch });
+      return;
+    }
+    state.vizSearchSessionOpen = false;
+    VizSearchVariant.updateOpenState(false);
+    if (clearSearch) {
+      state.searchTerm = '';
+      SmartSearchBar.syncAll();
+    }
+    refreshSearchResults();
+  }
+
+  function afterVizAdd(context) {
+    if (VizSearchVariant.isPersistent()) {
+      refreshSearchResults();
+      VizSearchVariant.showToast(context === 'map' ? 'Added to map' : 'Added to graph');
+      requestAnimationFrame(() => els.vizSearchInput?.focus());
+      return;
+    }
+    finishVizSearchSession({ clearSearch: true });
   }
 
   function closeVizSearchModal(options = {}) {
@@ -821,6 +859,24 @@
     }
   }
 
+  function openVizSearch(context) {
+    state.vizSearchContext = context;
+    if (VizSearchVariant.isModal()) {
+      openVizSearchModal(context);
+      return;
+    }
+    state.vizSearchSessionOpen = true;
+    VizSearchVariant.mountTo(context);
+    const shell = document.getElementById('viz-add-shell');
+    if (shell) {
+      shell.dataset.title = VizSearchVariant.contextTitle(context);
+    }
+    VizSearchVariant.updateOpenState(true);
+    SmartSearchBar.syncAll();
+    refreshSearchResults();
+    requestAnimationFrame(() => els.vizSearchInput?.focus());
+  }
+
   function openVizSearchModal(context) {
     state.vizSearchModalOpen = true;
     state.vizSearchContext = context;
@@ -833,11 +889,32 @@
   }
 
   function collapseMapSearch() {
-    closeVizSearchModal({ clearSearch: true });
+    finishVizSearchSession({ clearSearch: true });
   }
 
   function collapseGraphSearch() {
-    closeVizSearchModal({ clearSearch: true });
+    finishVizSearchSession({ clearSearch: true });
+  }
+
+  function activateVizSearchForView(viewName) {
+    if (viewName !== 'map' && viewName !== 'graph') {
+      return;
+    }
+    if (VizSearchVariant.isModal()) {
+      return;
+    }
+    state.vizSearchContext = viewName;
+    VizSearchVariant.mountTo(viewName);
+    const shell = document.getElementById('viz-add-shell');
+    if (shell) {
+      shell.dataset.title = VizSearchVariant.contextTitle(viewName);
+    }
+    if (!VizSearchVariant.needsExplicitOpen()) {
+      state.vizSearchSessionOpen = true;
+      VizSearchVariant.updateOpenState(true);
+    } else {
+      VizSearchVariant.updateOpenState(state.vizSearchSessionOpen);
+    }
   }
 
   function pruneFiltersForSelectedTypes(filters) {
@@ -941,13 +1018,13 @@
 
     if (context === 'map') {
       pinEntityOnMap(entityId, { stayOnMap: true });
-      collapseMapSearch();
+      afterVizAdd('map');
       return;
     }
 
     if (context === 'graph') {
       addToGraph(entityId, { openDetails: false });
-      collapseGraphSearch();
+      afterVizAdd('graph');
     }
   }
 
@@ -1664,10 +1741,23 @@
     refreshSearchResults();
   }
 
+  function shouldShowVizResultsPanel() {
+    if (state.activeView !== 'map' && state.activeView !== 'graph') {
+      return false;
+    }
+    if (VizSearchVariant.isModal()) {
+      return state.vizSearchModalOpen;
+    }
+    if (VizSearchVariant.needsExplicitOpen()) {
+      return state.vizSearchSessionOpen;
+    }
+    return true;
+  }
+
   function refreshSearchResults() {
     const items = runSearch(state.searchTerm);
     renderSearchResults(items, els.searchResults, 'search');
-    if (state.vizSearchModalOpen && state.vizSearchContext) {
+    if (shouldShowVizResultsPanel() && state.vizSearchContext) {
       renderSearchResults(items, els.vizSearchResults, state.vizSearchContext);
     } else if (els.vizSearchResults) {
       els.vizSearchResults.innerHTML = '';
@@ -1675,7 +1765,7 @@
 
     if (!hasSearchCriteria()) {
       els.searchResults.innerHTML = EmptyStates.render('search-idle');
-      if (state.vizSearchModalOpen) {
+      if (shouldShowVizResultsPanel()) {
         els.vizSearchResults.innerHTML = EmptyStates.render('search-viz', {
           context: state.vizSearchContext,
         });
@@ -1705,7 +1795,8 @@
   function switchView(viewName) {
     state.activeView = viewName;
     if (viewName !== 'map' && viewName !== 'graph') {
-      closeVizSearchModal();
+      finishVizSearchSession({ clearSearch: false });
+      state.vizSearchContext = null;
     }
     if (viewName !== 'map') {
       hideMapContextMenu();
@@ -1728,9 +1819,11 @@
       if (state.pinnedIds.size > 0) {
         renderMapPins();
       }
+      activateVizSearchForView('map');
     }
     if (viewName === 'graph') {
       renderGraphView();
+      activateVizSearchForView('graph');
     }
     if (els.instancePanel.classList.contains('open')) {
       updateInspectorPanelContext();
@@ -1739,24 +1832,31 @@
     refreshSearchResults();
   }
 
-  els.btnOpenMapSearch?.addEventListener('click', () => openVizSearchModal('map'));
-  els.btnOpenGraphSearch?.addEventListener('click', () => openVizSearchModal('graph'));
-  els.btnCloseVizSearch?.addEventListener('click', () => closeVizSearchModal({ clearSearch: true }));
-  els.vizSearchBackdrop?.addEventListener('click', () => closeVizSearchModal({ clearSearch: true }));
+  els.btnOpenMapSearch?.addEventListener('click', () => openVizSearch('map'));
+  els.btnOpenGraphSearch?.addEventListener('click', () => openVizSearch('graph'));
+  els.btnCloseVizSearch?.addEventListener('click', () => finishVizSearchSession({ clearSearch: true }));
+  els.vizSearchBackdrop?.addEventListener('click', () => finishVizSearchSession({ clearSearch: true }));
 
   document.addEventListener('keydown', (event) => {
     if ((event.metaKey || event.ctrlKey) && event.key === '/') {
       if (state.activeView === 'map') {
         event.preventDefault();
-        openVizSearchModal('map');
+        openVizSearch('map');
       } else if (state.activeView === 'graph') {
         event.preventDefault();
-        openVizSearchModal('graph');
+        openVizSearch('graph');
       }
     }
-    if (event.key === 'Escape' && state.vizSearchModalOpen) {
-      event.preventDefault();
-      closeVizSearchModal({ clearSearch: true });
+    if (event.key === 'Escape') {
+      if (VizSearchVariant.isModal() && state.vizSearchModalOpen) {
+        event.preventDefault();
+        finishVizSearchSession({ clearSearch: true });
+        return;
+      }
+      if (!VizSearchVariant.isModal() && state.vizSearchSessionOpen) {
+        event.preventDefault();
+        finishVizSearchSession({ clearSearch: false });
+      }
     }
   });
 
@@ -1982,6 +2082,16 @@
   document.querySelectorAll('.explorer-tab').forEach((tab) => {
     tab.addEventListener('click', () => switchView(tab.dataset.view));
   });
+
+  VizSearchVariant.init({
+    onDone: () => finishVizSearchSession({ clearSearch: false }),
+    focusInput: () => els.vizSearchInput?.focus(),
+  });
+
+  const collapseBtn = document.getElementById('btn-viz-search-collapse');
+  if (collapseBtn) {
+    collapseBtn.classList.toggle('hidden', VizSearchVariant.get() !== 'strip');
+  }
 
   const smartSearchOptions = {
     getState: () => ({ searchTerm: state.searchTerm, searchFilters: state.searchFilters }),

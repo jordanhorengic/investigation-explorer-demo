@@ -11,6 +11,7 @@
       crossorigin=""
     />
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./variant-styles.css" />
   </head>
   <body>
     <div class="app-shell">
@@ -80,6 +81,11 @@
             </div>
           </div>
 
+          <div id="variant-banner" class="variant-banner hidden">
+            <span class="variant-banner__label">Layout prototype: <strong data-variant-label>—</strong></span>
+            <a class="variant-banner__link" href="./variants.html">Compare all layouts</a>
+          </div>
+
           <div id="explorer-layout" class="explorer-layout">
             <section class="explorer-main">
               <div id="view-search" class="view active">
@@ -103,7 +109,9 @@
               </div>
 
               <div id="view-map" class="view">
-                <div class="map-frame">
+                <div id="map-frame" class="map-frame">
+                  <div id="viz-search-host-map" class="viz-search-host"></div>
+                  <div class="map-frame__body">
                   <div class="viz-chrome">
                     <button id="btn-open-map-search" class="viz-search-trigger" type="button" aria-label="Search objects to add to map">
                       <span class="viz-search-trigger__label">Search</span>
@@ -137,11 +145,14 @@
                     <button id="map-context-related" type="button" role="menuitem">Show related objects</button>
                     <button id="map-context-graph" type="button" role="menuitem">Add to graph</button>
                   </div>
+                  </div>
                 </div>
               </div>
 
               <div id="view-graph" class="view">
-                <div class="graph-frame">
+                <div id="graph-frame" class="graph-frame">
+                  <div id="viz-search-host-graph" class="viz-search-host"></div>
+                  <div class="graph-frame__body">
                   <div class="viz-chrome">
                     <button id="btn-open-graph-search" class="viz-search-trigger" type="button" aria-label="Search objects to add to graph">
                       <span class="viz-search-trigger__label">Search</span>
@@ -170,6 +181,7 @@
                     <button id="btn-graph-zoom-in" class="graph-controls__btn" type="button" aria-label="Zoom in">+</button>
                   </div>
                   <p class="graph-hint">Drag to pan · Scroll to zoom</p>
+                  </div>
                 </div>
               </div>
 
@@ -241,27 +253,34 @@
             <div id="viz-search-modal" class="viz-search-modal hidden" aria-hidden="true">
               <div id="viz-search-backdrop" class="viz-search-modal__backdrop"></div>
               <div class="viz-search-modal__panel" role="dialog" aria-modal="true" aria-labelledby="viz-search-modal-title">
-                <div class="viz-search-modal__header">
-                  <h2 id="viz-search-modal-title" class="viz-search-modal__title">Add to map</h2>
-                  <button id="btn-close-viz-search" class="viz-search-modal__close" type="button" aria-label="Close search">×</button>
-                </div>
-                <div id="viz-search-toolbar" class="viz-search-modal__toolbar search-toolbar">
-                  <div class="smart-search" id="viz-smart-search">
-                    <div class="smart-search__surface">
-                      <div class="smart-search__pills" id="viz-search-pills"></div>
-                      <input
-                        id="viz-search-input"
-                        class="smart-search__input"
-                        type="text"
-                        placeholder="Search…"
-                        autocomplete="off"
-                        spellcheck="false"
-                      />
+                <div id="viz-add-shell" class="viz-add-shell viz-add-shell--modal">
+                  <div class="viz-add-shell__modal-header" data-modal-only>
+                    <h2 id="viz-search-modal-title" class="viz-search-modal__title">Add to map</h2>
+                    <button id="btn-close-viz-search" class="viz-search-modal__close" type="button" aria-label="Close search">×</button>
+                  </div>
+                  <div id="viz-search-toolbar" class="viz-add-shell__search search-toolbar">
+                    <div class="smart-search" id="viz-smart-search">
+                      <div class="smart-search__surface">
+                        <div class="smart-search__pills" id="viz-search-pills"></div>
+                        <input
+                          id="viz-search-input"
+                          class="smart-search__input"
+                          type="text"
+                          placeholder="Search…"
+                          autocomplete="off"
+                          spellcheck="false"
+                        />
+                      </div>
+                      <div id="viz-search-menu" class="smart-search__menu hidden" role="listbox" aria-label="Search commands"></div>
                     </div>
-                    <div id="viz-search-menu" class="smart-search__menu hidden" role="listbox" aria-label="Search commands"></div>
+                    <button id="btn-viz-search-collapse" class="viz-add-shell__collapse hidden" type="button" aria-label="Toggle results" title="Toggle results">▾</button>
+                  </div>
+                  <div id="viz-search-results" class="search-results search-results--list viz-add-shell__results"></div>
+                  <div class="viz-add-shell__footer" data-persistent-only>
+                    <p class="viz-add-shell__hint">Search stays open — add multiple objects, then click Done.</p>
+                    <button id="btn-viz-search-done" class="btn btn-outline btn-sm" type="button">Done</button>
                   </div>
                 </div>
-                <div id="viz-search-results" class="search-results search-results--list viz-search-modal__results"></div>
               </div>
             </div>
 
@@ -389,6 +408,7 @@
     <script src="./js/map-heatmap.js"></script>
     <script src="./js/search-filters.js"></script>
     <script src="./js/smart-search.js"></script>
+    <script src="./js/viz-search-variant.js"></script>
     <script src="./js/empty-states.js"></script>
     <script src="./js/graph-view.js"></script>
     <script src="./js/new-object.js"></script>

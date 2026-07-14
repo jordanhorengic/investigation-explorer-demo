@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Map/Graph Search Layouts — Object Explorer</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./variant-styles.css" />
+  </head>
+  <body>
+    <main class="variants-page">
+      <div class="variants-page__inner">
+        <h1>Map &amp; Graph search layouts</h1>
+        <p class="variants-page__intro">
+          Compare six ways to add multiple objects without leaving the canvas. Each link opens the same demo with a
+          different add-to-map / add-to-graph experience. Open <strong>Map</strong> or <strong>Graph</strong>, then try
+          adding several objects in one session.
+        </p>
+        <ul class="variants-list">
+          <li class="variants-list__item">
+            <span class="variants-list__tag variants-list__tag--current">Baseline</span>
+            <div>
+              <a href="./index.html?variant=modal">Modal (current)</a>
+              <p class="variants-list__desc">Full-screen dialog. Closes and clears search after each add.</p>
+            </div>
+          </li>
+          <li class="variants-list__item">
+            <span class="variants-list__tag">A</span>
+            <div>
+              <a href="./index.html?variant=strip">Expandable strip</a>
+              <p class="variants-list__desc">Search bar and results drop down from the top of the canvas.</p>
+            </div>
+          </li>
+          <li class="variants-list__item">
+            <span class="variants-list__tag">B</span>
+            <div>
+              <a href="./index.html?variant=dock">Side dock</a>
+              <p class="variants-list__desc">Fixed left panel for search and results while the canvas stays visible.</p>
+            </div>
+          </li>
+          <li class="variants-list__item">
+            <span class="variants-list__tag">C</span>
+            <div>
+              <a href="./index.html?variant=drawer">Bottom drawer</a>
+              <p class="variants-list__desc">Click Search or press ⌘/ to open a bottom sheet; canvas stays in view.</p>
+            </div>
+          </li>
+          <li class="variants-list__item">
+            <span class="variants-list__tag">D</span>
+            <div>
+              <a href="./index.html?variant=split">Split view</a>
+              <p class="variants-list__desc">Search list and map/graph permanently side by side.</p>
+            </div>
+          </li>
+          <li class="variants-list__item">
+            <span class="variants-list__tag">E</span>
+            <div>
+              <a href="./index.html?variant=spotlight">Spotlight palette</a>
+              <p class="variants-list__desc">Centered floating search palette without dimming the canvas.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </main>
+  </body>
+</html>
