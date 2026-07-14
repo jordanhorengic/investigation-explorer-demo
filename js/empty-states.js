@@ -80,12 +80,32 @@
     const icon = icons[options.icon || base.icon] || icons.search;
     const tone = options.tone || base.tone || 'accent';
     const compact = options.compact ?? base.compact ?? false;
+    const layout = options.layout || null;
 
     const vizContext = options.context === 'map' ? 'map' : options.context === 'graph' ? 'graph' : null;
+    let resolvedTitle = title;
     let resolvedMessage = message;
     let resolvedTips = tips;
+    let resolvedCompact = compact;
+    let layoutClass = '';
 
-    if (variant === 'search-viz' && vizContext === 'map') {
+    if (layout === 'dropdown') {
+      layoutClass = ' empty-state--dropdown';
+      resolvedCompact = true;
+      if (variant === 'search-no-results') {
+        resolvedTitle = 'Nothing matched';
+        resolvedMessage = 'Try a shorter keyword or remove a filter.';
+        resolvedTips = [];
+      } else if (vizContext === 'map') {
+        resolvedTitle = 'Add to map';
+        resolvedMessage = 'Search by name, place, or <code>type:</code> filter.';
+        resolvedTips = [];
+      } else if (vizContext === 'graph') {
+        resolvedTitle = 'Add to graph';
+        resolvedMessage = 'Search by name, place, or <code>type:</code> filter.';
+        resolvedTips = [];
+      }
+    } else if (variant === 'search-viz' && vizContext === 'map') {
       resolvedMessage = 'Look up people, organisations, locations, and case objects to pin on the map.';
       resolvedTips = [
         'Type a name, place, or keyword to start',
@@ -115,9 +135,9 @@
       : '';
 
     return `
-      <div class="empty-state${compact ? ' empty-state--compact' : ''}" data-variant="${variant}">
+      <div class="empty-state${resolvedCompact ? ' empty-state--compact' : ''}${layoutClass}" data-variant="${variant}">
         <div class="empty-state__visual empty-state__visual--${tone}">${icon}</div>
-        <h3 class="empty-state__title">${title}</h3>
+        <h3 class="empty-state__title">${resolvedTitle}</h3>
         ${messageHtml}
         ${renderTips(resolvedTips)}
       </div>

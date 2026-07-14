@@ -1248,6 +1248,14 @@
     return card;
   }
 
+  function getVizEmptyStateOptions(context) {
+    const options = { context };
+    if (VizSearchVariant.get() === 'dropdown') {
+      options.layout = 'dropdown';
+    }
+    return options;
+  }
+
   function renderGroupedSearchResults(items, container, context) {
     const isVizResults = container.id === 'viz-search-results';
     const keepHidden = isVizResults && container.classList.contains('hidden');
@@ -1265,7 +1273,9 @@
 
     if (items.length === 0) {
       const variant = hasSearchCriteria() ? 'search-no-results' : 'search-idle';
-      container.innerHTML = EmptyStates.render(variant, { context });
+      const emptyOptions =
+        container.id === 'viz-search-results' ? getVizEmptyStateOptions(context) : { context };
+      container.innerHTML = EmptyStates.render(variant, emptyOptions);
       return;
     }
 
@@ -1983,9 +1993,10 @@
     if (!hasSearchCriteria()) {
       els.searchResults.innerHTML = EmptyStates.render('search-idle');
       if (shouldShowVizResultsPanel()) {
-        els.vizSearchResults.innerHTML = EmptyStates.render('search-viz', {
-          context: vizContext,
-        });
+        els.vizSearchResults.innerHTML = EmptyStates.render(
+          'search-viz',
+          getVizEmptyStateOptions(vizContext)
+        );
       }
     }
   }
