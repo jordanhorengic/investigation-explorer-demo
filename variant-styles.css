@@ -153,7 +153,8 @@
   max-height: none;
 }
 
-.viz-add-shell__results.search-results {
+.viz-add-shell__results.search-results,
+.viz-strip-results-panel .search-results {
   min-height: 0;
 }
 
@@ -341,7 +342,11 @@ html[data-viz-variant='strip'] .viz-strip-results-panel {
   background: rgb(255 255 255 / 92%);
   backdrop-filter: blur(12px);
   box-shadow: 0 2px 8px rgb(16 24 40 / 10%), 0 8px 24px rgb(16 24 40 / 8%);
-  overflow: hidden;
+  max-height: min(420px, calc(100vh - 200px));
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 html[data-viz-variant='strip'] .viz-strip-results-panel[hidden],
@@ -349,11 +354,12 @@ html[data-viz-variant='strip'] .viz-strip-results-panel.hidden {
   display: none !important;
 }
 
-html[data-viz-variant='strip'] .viz-strip-results-panel .viz-add-shell__results {
-  max-height: min(340px, 42vh);
-  overflow: auto;
+html[data-viz-variant='strip'] .viz-strip-results-panel .viz-add-shell__results,
+html[data-viz-variant='strip'] .viz-strip-results-panel #viz-search-results {
+  max-height: none;
+  overflow: visible;
   min-height: 0;
-  flex: 0 1 auto;
+  flex: none;
 }
 
 html[data-viz-variant='strip'] .viz-strip-results-panel .empty-state {
@@ -378,16 +384,21 @@ html[data-viz-variant='strip'] .graph-frame--viz-strip .viz-chrome {
 html[data-viz-variant='dock'] .map-frame--viz-dock,
 html[data-viz-variant='dock'] .graph-frame--viz-dock {
   flex-direction: row;
+  min-height: 0;
 }
 
 html[data-viz-variant='dock'] .viz-search-host {
   display: flex;
   flex-direction: column;
+  align-self: stretch;
   width: min(320px, 34vw);
   flex-shrink: 0;
+  min-height: 0;
+  max-height: 100%;
   border-right: 1px solid var(--border);
   background: var(--bg-panel);
   z-index: 10;
+  overflow: hidden;
   transition: width 180ms ease;
 }
 
@@ -397,8 +408,34 @@ html[data-viz-variant='dock'] .viz-search-host--collapsed {
 }
 
 html[data-viz-variant='dock'] .viz-add-shell--dock {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
+}
+
+html[data-viz-variant='dock'] .viz-add-shell--dock .viz-add-shell__search {
+  flex-shrink: 0;
+}
+
+html[data-viz-variant='dock'] .viz-strip-results-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+html[data-viz-variant='dock'] .viz-strip-results-panel .viz-add-shell__results,
+html[data-viz-variant='dock'] .viz-strip-results-panel #viz-search-results {
+  flex: none;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
 }
 
 html[data-viz-variant='dock'] .viz-add-shell--dock::before {

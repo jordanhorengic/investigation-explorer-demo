@@ -1108,7 +1108,8 @@ code {
   padding: 0;
 }
 
-.viz-add-shell .search-results {
+.viz-add-shell .search-results,
+.viz-strip-results-panel .search-results {
   min-height: 0;
 }
 
