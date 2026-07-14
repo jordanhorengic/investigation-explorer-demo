@@ -383,9 +383,9 @@ code {
   box-sizing: border-box;
 }
 
-/* Full-width search in map/graph add panels (all variants) */
-.viz-add-shell__search .smart-search,
-.viz-add-shell__search .smart-search__surface {
+/* Full-width search in map/graph add panels (strip, dock, modal — not dropdown chrome) */
+.viz-add-shell__search:not(.viz-add-shell__search--dropdown-chrome) .smart-search,
+.viz-add-shell__search:not(.viz-add-shell__search--dropdown-chrome) .smart-search__surface {
   width: 100%;
   max-width: none;
   box-sizing: border-box;

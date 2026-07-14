@@ -482,8 +482,8 @@ html[data-viz-variant='dropdown'] .viz-search-host {
   top: 58px;
   left: 12px;
   z-index: 520;
-  width: min(420px, calc(100% - 140px));
-  max-width: 420px;
+  width: 300px;
+  max-width: 300px;
   pointer-events: none;
 }
 
@@ -493,7 +493,8 @@ html[data-viz-variant='dropdown'] .viz-search-host--active {
 
 html[data-viz-variant='dropdown'] .viz-chrome-search {
   display: block;
-  flex: 1;
+  flex: 0 0 auto;
+  width: 300px;
   min-width: 0;
   max-width: 300px;
 }
@@ -540,6 +541,8 @@ html[data-viz-variant='dropdown'] .viz-add-shell__search--dropdown-chrome {
 
 html[data-viz-variant='dropdown'] .viz-add-shell--dropdown {
   pointer-events: auto;
+  width: 300px;
+  max-width: 300px;
   border: 1px solid rgb(255 255 255 / 88%);
   border-radius: 12px;
   background: rgb(255 255 255 / 94%);
@@ -557,11 +560,37 @@ html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-strip-results-pa
 }
 
 html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results {
+  width: 100%;
+  max-width: 300px;
   max-height: min(360px, 44vh);
   overflow: auto;
 }
 
-html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results .empty-state,
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results .empty-state {
+  min-height: 0;
+  padding: 20px 16px;
+  flex: 0 1 auto;
+}
+
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results .empty-state__visual {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+}
+
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results .empty-state__title {
+  font-size: 15px;
+}
+
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results .empty-state__message {
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results .empty-state__tips {
+  width: 100%;
+}
+
 html[data-viz-variant='dock'] .viz-add-shell--dock .viz-add-shell__results .empty-state {
   min-height: 0;
   padding: 28px 20px;
