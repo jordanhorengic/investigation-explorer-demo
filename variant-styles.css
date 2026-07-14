@@ -481,10 +481,9 @@ html[data-viz-variant='dropdown'] .viz-search-host {
   position: absolute;
   top: 58px;
   left: 12px;
-  right: 12px;
   z-index: 520;
-  width: auto;
-  max-width: none;
+  width: min(420px, calc(100% - 140px));
+  max-width: 420px;
   pointer-events: none;
 }
 
@@ -496,17 +495,22 @@ html[data-viz-variant='dropdown'] .viz-chrome-search {
   display: block;
   flex: 1;
   min-width: 0;
-  max-width: none;
+  max-width: 300px;
 }
 
 html[data-viz-variant='dropdown'] .viz-chrome-search.hidden {
   display: none !important;
 }
 
-html[data-viz-variant='dropdown'] .viz-chrome-search .smart-search,
+html[data-viz-variant='dropdown'] .viz-chrome-search .smart-search {
+  width: 100%;
+  max-width: 300px;
+  box-sizing: border-box;
+}
+
 html[data-viz-variant='dropdown'] .viz-chrome-search .smart-search__surface {
   width: 100%;
-  max-width: none;
+  max-width: 300px;
   box-sizing: border-box;
 }
 
@@ -567,11 +571,6 @@ html[data-viz-variant='dock'] .viz-add-shell--dock .viz-add-shell__results .empt
 html[data-viz-variant='dropdown'] .map-frame--viz-dropdown .viz-chrome .viz-search-trigger,
 html[data-viz-variant='dropdown'] .graph-frame--viz-dropdown .viz-chrome .viz-search-trigger {
   display: none;
-}
-
-html[data-viz-variant='dropdown'] .map-frame--viz-dropdown .viz-chrome,
-html[data-viz-variant='dropdown'] .graph-frame--viz-dropdown .viz-chrome {
-  right: 12px;
 }
 
 /* Launcher page */
