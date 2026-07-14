@@ -220,6 +220,44 @@
   display: none !important;
 }
 
+/* Scrollable viz search results (strip + dock) */
+html[data-viz-variant='strip'] .map-frame--viz-strip,
+html[data-viz-variant='strip'] .graph-frame--viz-strip,
+html[data-viz-variant='dock'] .map-frame--viz-dock,
+html[data-viz-variant='dock'] .graph-frame--viz-dock {
+  overflow: visible;
+}
+
+html[data-viz-variant='strip'] .map-frame--viz-strip .map-frame__body,
+html[data-viz-variant='strip'] .graph-frame--viz-strip .graph-frame__body,
+html[data-viz-variant='dock'] .map-frame--viz-dock .map-frame__body,
+html[data-viz-variant='dock'] .graph-frame--viz-dock .graph-frame__body {
+  overflow: hidden;
+  min-height: 0;
+}
+
+html[data-viz-variant='strip'] #viz-search-results,
+html[data-viz-variant='dock'] #viz-search-results {
+  display: block;
+  max-height: min(360px, 50vh);
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+html[data-viz-variant='strip'] #viz-search-results {
+  flex: none;
+}
+
+html[data-viz-variant='dock'] #viz-search-results {
+  max-height: none;
+  flex: 1 1 0;
+  height: 0;
+  min-height: 0;
+}
+
 /* --- Strip --- */
 html[data-viz-variant='strip'] .map-frame--viz-strip,
 html[data-viz-variant='strip'] .graph-frame--viz-strip {
@@ -342,11 +380,7 @@ html[data-viz-variant='strip'] .viz-strip-results-panel {
   background: rgb(255 255 255 / 92%);
   backdrop-filter: blur(12px);
   box-shadow: 0 2px 8px rgb(16 24 40 / 10%), 0 8px 24px rgb(16 24 40 / 8%);
-  max-height: min(420px, calc(100vh - 200px));
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
 }
 
 html[data-viz-variant='strip'] .viz-strip-results-panel[hidden],
@@ -356,8 +390,6 @@ html[data-viz-variant='strip'] .viz-strip-results-panel.hidden {
 
 html[data-viz-variant='strip'] .viz-strip-results-panel .viz-add-shell__results,
 html[data-viz-variant='strip'] .viz-strip-results-panel #viz-search-results {
-  max-height: none;
-  overflow: visible;
   min-height: 0;
   flex: none;
 }
@@ -394,6 +426,7 @@ html[data-viz-variant='dock'] .viz-search-host {
   width: min(320px, 34vw);
   flex-shrink: 0;
   min-height: 0;
+  height: 100%;
   max-height: 100%;
   border-right: 1px solid var(--border);
   background: var(--bg-panel);
@@ -410,7 +443,8 @@ html[data-viz-variant='dock'] .viz-search-host--collapsed {
 html[data-viz-variant='dock'] .viz-add-shell--dock {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: 1 1 0;
+  height: 0;
   min-height: 0;
   overflow: hidden;
 }
@@ -422,20 +456,17 @@ html[data-viz-variant='dock'] .viz-add-shell--dock .viz-add-shell__search {
 html[data-viz-variant='dock'] .viz-strip-results-panel {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: 1 1 0;
+  height: 0;
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
 }
 
 html[data-viz-variant='dock'] .viz-strip-results-panel .viz-add-shell__results,
 html[data-viz-variant='dock'] .viz-strip-results-panel #viz-search-results {
-  flex: none;
+  flex: 1 1 0;
+  height: 0;
   min-height: 0;
-  max-height: none;
-  overflow: visible;
 }
 
 html[data-viz-variant='dock'] .viz-add-shell--dock::before {

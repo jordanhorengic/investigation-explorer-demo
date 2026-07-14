@@ -386,6 +386,16 @@
     return false;
   }
 
+  function attachVizResultsScrollGuard() {
+    const panel = document.getElementById('viz-strip-results-panel');
+    const results = document.getElementById('viz-search-results');
+    const stopWheel = (event) => {
+      event.stopPropagation();
+    };
+    panel?.addEventListener('wheel', stopWheel, { passive: true });
+    results?.addEventListener('wheel', stopWheel, { passive: true });
+  }
+
   function init(options = {}) {
     current = readVariantFromUrl();
     document.documentElement.dataset.vizVariant = current;
@@ -501,6 +511,8 @@
 
     updateBanner();
     updateVariantControls();
+
+    attachVizResultsScrollGuard();
 
     if (!isModal()) {
       mountTo('map');
