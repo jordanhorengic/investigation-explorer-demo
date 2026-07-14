@@ -133,8 +133,7 @@
 }
 
 #view-search .search-toolbar .smart-search {
-  flex: none;
-  max-width: 920px;
+  max-width: none;
   width: 100%;
 }
 

@@ -372,7 +372,7 @@ code {
 }
 
 #view-search .search-toolbar > .smart-search {
-  max-width: 920px;
+  max-width: none;
   width: 100%;
 }
 
