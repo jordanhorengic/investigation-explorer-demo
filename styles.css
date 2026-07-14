@@ -1512,37 +1512,39 @@ code {
   gap: 4px;
 }
 
-.map-frame .leaflet-top.leaflet-left {
-  top: 58px;
-  left: 12px;
-}
-
-.map-frame .leaflet-control-zoom {
-  border: 1px solid rgb(255 255 255 / 80%) !important;
-  border-radius: 10px !important;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgb(16 24 40 / 8%), 0 4px 14px rgb(16 24 40 / 6%) !important;
-}
-
-.map-frame .leaflet-control-zoom a {
-  width: 30px !important;
-  height: 30px !important;
-  line-height: 30px !important;
-  background: rgb(255 255 255 / 92%) !important;
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--border) !important;
-}
-
-.map-frame .leaflet-control-zoom a:last-child {
-  border-bottom: 0 !important;
-}
-
-.map-frame .leaflet-bottom.leaflet-right {
+.graph-controls,
+.map-controls {
+  position: absolute;
   right: 12px;
+  bottom: 12px;
+  z-index: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid rgb(255 255 255 / 80%);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 88%);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1px 3px rgb(16 24 40 / 8%), 0 4px 14px rgb(16 24 40 / 6%);
+  overflow: hidden;
+  transition: right 180ms ease;
+}
+
+.map-frame:has(.map-status-bar:not(.hidden)) .map-controls {
+  bottom: 58px;
+}
+
+.explorer-layout:has(.instance-panel.open) .graph-controls,
+.explorer-layout:has(.instance-panel.open) .map-controls {
+  right: calc(min(420px, 92vw) + 12px);
+}
+
+.map-frame .leaflet-bottom.leaflet-left {
+  left: 12px;
   bottom: 12px;
 }
 
-.map-frame:has(.map-status-bar:not(.hidden)) .leaflet-bottom.leaflet-right {
+.map-frame:has(.map-status-bar:not(.hidden)) .leaflet-bottom.leaflet-left {
   bottom: 58px;
 }
 
@@ -1707,27 +1709,6 @@ code {
 .legend-dot--indirect {
   background: transparent;
   border: 2px dashed #6b7785;
-}
-
-.graph-controls {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  z-index: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 0;
-  border: 1px solid rgb(255 255 255 / 80%);
-  border-radius: 10px;
-  background: rgb(255 255 255 / 88%);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 1px 3px rgb(16 24 40 / 8%), 0 4px 14px rgb(16 24 40 / 6%);
-  overflow: hidden;
-  transition: right 180ms ease;
-}
-
-.explorer-layout:has(.instance-panel.open) .graph-controls {
-  right: calc(min(420px, 92vw) + 12px);
 }
 
 .graph-controls__btn,
@@ -2000,7 +1981,7 @@ code {
 .instance-backdrop {
   position: absolute;
   inset: 0;
-  z-index: 90;
+  z-index: 490;
   background: rgb(15 23 42 / 18%);
 }
 
@@ -2013,7 +1994,7 @@ code {
   top: 0;
   right: 0;
   bottom: 0;
-  z-index: 100;
+  z-index: 550;
   display: flex;
   flex-direction: column;
   width: min(420px, 92vw);
@@ -2626,10 +2607,6 @@ code {
   font-size: 13px;
 }
 
-.leaflet-control-zoom a {
-  color: var(--text) !important;
-}
-
 .new-object-view {
   flex: 1;
   min-height: 0;
@@ -2941,7 +2918,8 @@ code {
 
   .explorer-layout:has(.instance-panel.open) .viz-chrome,
   .explorer-layout:has(.instance-panel.open) .map-status-bar,
-  .explorer-layout:has(.instance-panel.open) .graph-controls {
+  .explorer-layout:has(.instance-panel.open) .graph-controls,
+  .explorer-layout:has(.instance-panel.open) .map-controls {
     right: 16px;
   }
 }

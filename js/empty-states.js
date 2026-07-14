@@ -46,10 +46,7 @@
       tone: 'accent',
       title: 'Start building the graph',
       message: 'Explore connections by adding objects from search.',
-      tips: [
-        'Open search with <kbd>⌘</kbd><kbd>/</kbd>',
-        'Pick results to add nodes and expand relationships',
-      ],
+      tips: [],
       compact: true,
     },
     'map-empty': {
@@ -57,10 +54,7 @@
       tone: 'accent',
       title: 'No locations pinned yet',
       message: 'Search for objects with addresses or coordinates, then pin them here.',
-      tips: [
-        'Open search with <kbd>⌘</kbd><kbd>/</kbd>',
-        'Select a result to drop it on the map',
-      ],
+      tips: [],
       compact: true,
     },
   };
@@ -98,12 +92,22 @@
         resolvedTips = [];
       } else if (vizContext === 'map') {
         resolvedTitle = 'Add to map';
-        resolvedMessage = 'Search by name, place, or <code>type:</code> filter.';
-        resolvedTips = [];
+        resolvedMessage = '';
+        resolvedTips = [
+          'Type a name, place, or keyword to start',
+          'Add filters with <code>type:Person</code> or <code>BRANCHE = value</code>',
+          'Scope a field with <code>in:</code> then pick an attribute',
+          'Select a result to pin it on the map',
+        ];
       } else if (vizContext === 'graph') {
         resolvedTitle = 'Add to graph';
-        resolvedMessage = 'Search by name, place, or <code>type:</code> filter.';
-        resolvedTips = [];
+        resolvedMessage = '';
+        resolvedTips = [
+          'Type a name, place, or keyword to start',
+          'Add filters with <code>type:Person</code> or <code>BRANCHE = value</code>',
+          'Scope a field with <code>in:</code> then pick an attribute',
+          'Select a result to add it to the graph',
+        ];
       }
     } else if (variant === 'search-viz' && vizContext === 'map') {
       resolvedMessage = 'Look up people, organisations, locations, and case objects to pin on the map.';

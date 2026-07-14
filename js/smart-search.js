@@ -55,7 +55,7 @@
       return false;
     }
 
-    if (/^type:/i.test(trimmed)) {
+    if (/^type(?::|$)/i.test(trimmed)) {
       return true;
     }
 
@@ -260,8 +260,8 @@
       return [];
     }
 
-    if (/^type:/i.test(trimmed)) {
-      const partial = trimmed.slice(5).trim().toLowerCase();
+    if (/^type(?::|$)/i.test(trimmed)) {
+      const partial = trimmed.replace(/^type:?/i, '').trim().toLowerCase();
       return objectTypes
         .filter((type) => !partial || type.id.toLowerCase().includes(partial))
         .map((type) => ({
@@ -460,12 +460,26 @@
       input.value = getState().searchTerm || '';
     }
 
+    function syncDropdownFilterMode() {
+      if (input.id !== 'viz-search-input') {
+        return;
+      }
+      if (document.documentElement.dataset.vizVariant !== 'dropdown') {
+        document.documentElement.classList.remove('viz-filter-command-active');
+        return;
+      }
+      const active =
+        isFilterCommandInput(input.value) || !menuEl.classList.contains('hidden');
+      document.documentElement.classList.toggle('viz-filter-command-active', active);
+    }
+
     function hideMenu() {
       menuEl.classList.add('hidden');
       menuEl.innerHTML = '';
       menuEntries = [];
       selectableItems = [];
       activeIndex = 0;
+      syncDropdownFilterMode();
     }
 
     function renderMenu() {
@@ -522,6 +536,7 @@
 
       menuEl.classList.remove('hidden');
       menuEl.querySelector('.smart-search-menu__item--active')?.scrollIntoView({ block: 'nearest' });
+      syncDropdownFilterMode();
     }
 
     function selectSuggestion(index) {
@@ -566,6 +581,7 @@
         hideMenu();
         setSearchTerm(value);
       }
+      syncDropdownFilterMode();
       onChange();
     });
 
@@ -661,5 +677,9 @@
     parseCommand,
     applyParsedCommand,
     removePill,
+    isFilterCommandInput,
+    isCommandMenuOpen(menuEl) {
+      return Boolean(menuEl && !menuEl.classList.contains('hidden'));
+    },
   };
 })();

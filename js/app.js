@@ -46,13 +46,15 @@
   let markerLayer = null;
   let areaLayer = null;
   let heatLayer = null;
+  const MAP_BASE_ZOOM = 13;
 
   function ensureMap() {
     if (map) {
       return map;
     }
 
-    map = L.map('map', { zoomControl: true }).setView([48.139, 11.565], 13);
+    map = L.map('map', { zoomControl: false }).setView([48.139, 11.565], MAP_BASE_ZOOM);
+    map.attributionControl.setPosition('bottomleft');
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
       subdomains: 'abcd',
@@ -73,7 +75,26 @@
         refreshSearchResults();
       }
     });
+    map.on('zoomend', updateMapZoomLabel);
+    updateMapZoomLabel();
     return map;
+  }
+
+  function updateMapZoomLabel() {
+    if (!map || !els.mapZoom) {
+      return;
+    }
+    const percent = Math.round(100 * 2 ** (map.getZoom() - MAP_BASE_ZOOM));
+    els.mapZoom.textContent = `${percent}%`;
+  }
+
+  function zoomMap(delta) {
+    ensureMap();
+    if (delta > 0) {
+      map.zoomIn();
+      return;
+    }
+    map.zoomOut();
   }
 
   function refreshMapSize() {
@@ -136,6 +157,9 @@
     btnGraphZoomIn: document.getElementById('btn-graph-zoom-in'),
     btnGraphZoomOut: document.getElementById('btn-graph-zoom-out'),
     graphZoom: document.getElementById('graph-zoom'),
+    btnMapZoomIn: document.getElementById('btn-map-zoom-in'),
+    btnMapZoomOut: document.getElementById('btn-map-zoom-out'),
+    mapZoom: document.getElementById('map-zoom'),
     mapLegend: document.getElementById('map-legend'),
     mapStatusBar: document.querySelector('.map-status-bar'),
     mapFrame: document.querySelector('.map-frame'),
@@ -490,6 +514,87 @@
     }
   }
 
+  function getLinkedPlacementIds(entityId) {
+    const ids = new Set([entityId]);
+    const entity = lookup.get(entityId);
+    if (!entity?.attributes) {
+      return ids;
+    }
+    const personId = entity.attributes.PERSON_ID;
+    const identityId = entity.attributes.IDENTITY_RECORD_ID;
+    if (personId) {
+      ids.add(personId);
+    }
+    if (identityId) {
+      ids.add(identityId);
+    }
+    return ids;
+  }
+
+  function buildMapPresenceIndex() {
+    const visible = new Set();
+    for (const pinnedId of state.pinnedIds) {
+      for (const id of getLinkedPlacementIds(pinnedId)) {
+        visible.add(id);
+      }
+    }
+    for (const pin of collectMapPins()) {
+      visible.add(pin.sourceEntity.id);
+      for (const id of getLinkedPlacementIds(pin.sourceEntity.id)) {
+        visible.add(id);
+      }
+    }
+    return visible;
+  }
+
+  function buildGraphPresenceIndex() {
+    const visible = new Set();
+    for (const nodeId of graphState.nodeIds) {
+      for (const id of getLinkedPlacementIds(nodeId)) {
+        visible.add(id);
+      }
+    }
+    return visible;
+  }
+
+  function getMapPinToggleId(entityId) {
+    if (state.pinnedIds.has(entityId)) {
+      return entityId;
+    }
+    for (const linkedId of getLinkedPlacementIds(entityId)) {
+      if (state.pinnedIds.has(linkedId)) {
+        return linkedId;
+      }
+    }
+    return null;
+  }
+
+  function getGraphToggleId(entityId) {
+    if (graphState.nodeIds.has(entityId)) {
+      return entityId;
+    }
+    for (const linkedId of getLinkedPlacementIds(entityId)) {
+      if (graphState.nodeIds.has(linkedId)) {
+        return linkedId;
+      }
+    }
+    return null;
+  }
+
+  function isEntityOnMap(entityId, mapPresence = null) {
+    if (mapPresence) {
+      return mapPresence.has(entityId);
+    }
+    return buildMapPresenceIndex().has(entityId);
+  }
+
+  function isEntityOnGraph(entityId, graphPresence = null) {
+    if (graphPresence) {
+      return graphPresence.has(entityId);
+    }
+    return buildGraphPresenceIndex().has(entityId);
+  }
+
   function pinEntityOnMap(entityId, options = {}) {
     if (!lookup.has(entityId)) {
       return false;
@@ -595,7 +700,8 @@
       return false;
     }
 
-    if (!graphState.nodeIds.has(entityId)) {
+    const wasNew = !graphState.nodeIds.has(entityId);
+    if (wasNew) {
       const anchorId =
         options.anchorId ||
         (graphState.seedId && graphState.nodeIds.has(graphState.seedId) ? graphState.seedId : null) ||
@@ -866,6 +972,21 @@
     return SearchFilters.hasActiveCriteria(state.searchTerm, state.searchFilters, objectTypes.length);
   }
 
+  function isVizDropdownCommandActive() {
+    if (VizSearchVariant.get() !== 'dropdown') {
+      return false;
+    }
+    if (document.documentElement.classList.contains('viz-filter-command-active')) {
+      return true;
+    }
+    const menu = document.getElementById('viz-search-menu');
+    if (SmartSearchBar.isCommandMenuOpen(menu)) {
+      return true;
+    }
+    const input = els.vizSearchInput;
+    return Boolean(input && SmartSearchBar.isFilterCommandInput(input.value));
+  }
+
   function shouldShowContextResults(context) {
     if (!hasSearchCriteria()) {
       return false;
@@ -878,6 +999,9 @@
         return state.vizSearchModalOpen && state.vizSearchContext === context;
       }
       if (state.activeView !== context) {
+        return false;
+      }
+      if (isVizDropdownCommandActive()) {
         return false;
       }
       if (VizSearchVariant.get() === 'strip') {
@@ -1031,6 +1155,17 @@
 
   function handleSmartSearchChange() {
     SmartSearchBar.syncAll();
+    if (VizSearchVariant.get() === 'dropdown') {
+      const ctx = getVizSearchContext();
+      if (ctx) {
+        if (isVizDropdownCommandActive()) {
+          VizSearchVariant.updateOpenState(false, ctx);
+        } else if (state.vizSearchSessionOpen && hasSearchCriteria()) {
+          VizSearchVariant.updateOpenState(true, ctx);
+        }
+      }
+      VizSearchVariant.syncDropdownHostPosition(ctx || state.vizSearchContext);
+    }
     refreshSearchResults();
   }
 
@@ -1114,9 +1249,12 @@
     }
 
     if (context === 'map') {
-      if (state.pinnedIds.has(entityId)) {
-        unpinEntityFromMap(entityId);
-        afterVizRemove('map');
+      if (isEntityOnMap(entityId)) {
+        const pinnedId = getMapPinToggleId(entityId);
+        if (pinnedId) {
+          unpinEntityFromMap(pinnedId);
+          afterVizRemove('map');
+        }
       } else {
         pinEntityOnMap(entityId, { stayOnMap: true });
         afterVizAdd('map');
@@ -1125,9 +1263,12 @@
     }
 
     if (context === 'graph') {
-      if (graphState.nodeIds.has(entityId)) {
-        removeEntityFromGraph(entityId);
-        afterVizRemove('graph');
+      if (isEntityOnGraph(entityId)) {
+        const graphId = getGraphToggleId(entityId);
+        if (graphId) {
+          removeEntityFromGraph(graphId);
+          afterVizRemove('graph');
+        }
       } else {
         addToGraph(entityId, { openDetails: false });
         afterVizAdd('graph');
@@ -1162,24 +1303,26 @@
     const highlighted = isSelectionHighlighted(entity.id);
     const card = document.createElement('div');
     const match = SearchFilters.resolveResultMatch(entity, state.searchTerm, state.searchFilters, lookup);
-    const onMap = state.pinnedIds.has(entity.id);
-    const onGraph = graphState.nodeIds.has(entity.id);
+    const onMap = isEntityOnMap(entity.id, options.mapPresence);
+    const onGraph = isEntityOnGraph(entity.id, options.graphPresence);
     const color = typeColors[entity.type] || '#1b44b1';
 
     if (groupedList) {
       let status = '';
       let onViz = false;
-      if (context === 'map' && onMap) {
+      const showMapTag = (context === 'map' || options.mapPresence) && onMap;
+      const showGraphTag = (context === 'graph' || options.graphPresence) && onGraph;
+      if (showMapTag) {
         status = '<span class="result-row__status">On map</span>';
         onViz = true;
-      } else if (context === 'graph' && onGraph) {
+      } else if (showGraphTag) {
         status = '<span class="result-row__status">On graph</span>';
         onViz = true;
       }
 
       card.className = `result-row${highlighted ? ' result-row--selected' : ''}${
-        context === 'map' && onMap ? ' result-row--on-map' : ''
-      }${context === 'graph' && onGraph ? ' result-row--on-graph' : ''}`;
+        showMapTag ? ' result-row--on-map' : ''
+      }${showGraphTag ? ' result-row--on-graph' : ''}`;
       if (onViz) {
         card.title = 'Click to remove';
       }
@@ -1216,9 +1359,9 @@
           <button class="btn btn-outline btn-sm result-card__add-graph" type="button">Add to graph</button>
         </div>
       `;
-    } else if (context === 'map' && onMap) {
+    } else if ((context === 'map' || options.mapPresence) && onMap) {
       footer = '<span class="result-card__status">On map</span>';
-    } else if (context === 'graph' && onGraph) {
+    } else if ((context === 'graph' || options.graphPresence) && onGraph) {
       footer = '<span class="result-card__status">On graph</span>';
     }
 
@@ -1279,6 +1422,15 @@
       return;
     }
 
+    const mapPresence =
+      context === 'map' || (context === 'search' && state.activeView === 'map')
+        ? buildMapPresenceIndex()
+        : null;
+    const graphPresence =
+      context === 'graph' || (context === 'search' && state.activeView === 'graph')
+        ? buildGraphPresenceIndex()
+        : null;
+
     for (const group of groupResultsByType(items)) {
       const section = document.createElement('section');
       section.className = 'search-result-group';
@@ -1302,7 +1454,9 @@
       body.hidden = collapsed;
 
       for (const entity of group.items) {
-        body.appendChild(buildResultCard(entity, context, { groupedList: true }));
+        body.appendChild(
+          buildResultCard(entity, context, { groupedList: true, mapPresence, graphPresence })
+        );
       }
 
       section.appendChild(header);
@@ -1965,6 +2119,9 @@
     if (state.activeView !== 'map' && state.activeView !== 'graph') {
       return false;
     }
+    if (isVizDropdownCommandActive()) {
+      return false;
+    }
     if (VizSearchVariant.isModal()) {
       return state.vizSearchModalOpen;
     }
@@ -2322,6 +2479,8 @@
 
   els.btnGraphZoomIn.addEventListener('click', () => zoomGraph(0.12));
   els.btnGraphZoomOut.addEventListener('click', () => zoomGraph(-0.12));
+  els.btnMapZoomIn?.addEventListener('click', () => zoomMap(1));
+  els.btnMapZoomOut?.addEventListener('click', () => zoomMap(-1));
 
   els.graphSvg.addEventListener('click', (event) => {
     hideGraphContextMenu();

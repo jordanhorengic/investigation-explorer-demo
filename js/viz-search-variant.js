@@ -43,6 +43,8 @@
   let onDropdownFocusCallback = null;
   let resultsExpanded = false;
   let dockCollapsed = false;
+  let dropdownHostResizeObserver = null;
+  let dropdownHostWindowResizeHandler = null;
 
   function get() {
     return current;
@@ -259,6 +261,73 @@
     }
   }
 
+  function syncDropdownHostPosition(context) {
+    if (current !== 'dropdown') {
+      return;
+    }
+
+    const ctx = context || shell?.dataset.context;
+    if (!ctx) {
+      return;
+    }
+
+    const frame = frames[ctx];
+    const host = hosts[ctx];
+    const chromeSlot = document.getElementById(`viz-chrome-search-${ctx}`);
+    if (!frame || !host || !chromeSlot || chromeSlot.classList.contains('hidden')) {
+      return;
+    }
+
+    const frameRect = frame.getBoundingClientRect();
+    const searchRect = chromeSlot.getBoundingClientRect();
+    const top = Math.max(0, Math.round(searchRect.bottom - frameRect.top + 6));
+    host.style.setProperty('--viz-dropdown-host-top', `${top}px`);
+  }
+
+  function detachDropdownHostSync() {
+    dropdownHostResizeObserver?.disconnect();
+    dropdownHostResizeObserver = null;
+    if (dropdownHostWindowResizeHandler) {
+      window.removeEventListener('resize', dropdownHostWindowResizeHandler);
+      dropdownHostWindowResizeHandler = null;
+    }
+  }
+
+  function attachDropdownHostSync() {
+    if (current !== 'dropdown') {
+      detachDropdownHostSync();
+      return;
+    }
+
+    detachDropdownHostSync();
+
+    const smartSearch = document.getElementById('viz-smart-search');
+    const pills = document.getElementById('viz-search-pills');
+    const surface = smartSearch?.querySelector('.smart-search__surface');
+    const targets = [chromeSlotForContext(shell?.dataset.context), smartSearch, surface, pills].filter(
+      Boolean
+    );
+
+    dropdownHostResizeObserver = new ResizeObserver(() => {
+      syncDropdownHostPosition();
+    });
+
+    for (const target of targets) {
+      dropdownHostResizeObserver.observe(target);
+    }
+
+    dropdownHostWindowResizeHandler = () => syncDropdownHostPosition();
+    window.addEventListener('resize', dropdownHostWindowResizeHandler);
+    requestAnimationFrame(() => syncDropdownHostPosition());
+  }
+
+  function chromeSlotForContext(context) {
+    if (!context) {
+      return null;
+    }
+    return document.getElementById(`viz-chrome-search-${context}`);
+  }
+
   function layoutDropdownChrome(context) {
     const bar = chrome[context];
     const slot = document.getElementById(`viz-chrome-search-${context}`);
@@ -289,6 +358,9 @@
     if (toolbar) {
       toolbar.classList.add('viz-add-shell__search--dropdown-chrome');
     }
+
+    attachDropdownHostSync();
+    syncDropdownHostPosition(context);
   }
 
   function restoreSearchToolbarFromChrome() {
@@ -414,6 +486,7 @@
         host.classList.toggle('viz-search-host--active', sessionOpen);
       }
       updateVariantControls();
+      requestAnimationFrame(() => syncDropdownHostPosition(ctx));
       return;
     }
 
@@ -552,13 +625,23 @@
 
     const vizInput = document.getElementById('viz-search-input');
     vizInput?.addEventListener('input', () => {
-      if (current === 'dropdown' && shell?.classList.contains('viz-add-shell--closed')) {
-        const ctx = shell?.dataset.context;
-        if (ctx) {
-          updateOpenState(true, ctx);
-          onDropdownFocusCallback?.();
-          onResultsChangeCallback?.();
-        }
+      if (current !== 'dropdown') {
+        return;
+      }
+      const ctx = shell?.dataset.context;
+      if (!ctx) {
+        return;
+      }
+      if (SmartSearchBar.isFilterCommandInput(vizInput.value)) {
+        updateOpenState(false, ctx);
+        onDropdownFocusCallback?.();
+        onResultsChangeCallback?.();
+        return;
+      }
+      if (shell?.classList.contains('viz-add-shell--closed')) {
+        updateOpenState(true, ctx);
+        onDropdownFocusCallback?.();
+        onResultsChangeCallback?.();
       }
     });
 
@@ -574,7 +657,9 @@
       if (current === 'dropdown') {
         const ctx = shell?.dataset.context;
         if (ctx) {
-          updateOpenState(true, ctx);
+          if (!SmartSearchBar.isFilterCommandInput(vizInput.value)) {
+            updateOpenState(true, ctx);
+          }
           onDropdownFocusCallback?.();
           onResultsChangeCallback?.();
         }
@@ -585,6 +670,9 @@
     updateVariantControls();
 
     attachVizResultsScrollGuard();
+    if (current === 'dropdown') {
+      attachDropdownHostSync();
+    }
 
     if (!isModal()) {
       mountTo('map');
@@ -613,5 +701,6 @@
     showToast,
     contextTitle,
     readVariantFromUrl,
+    syncDropdownHostPosition,
   };
 })();

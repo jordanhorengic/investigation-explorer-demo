@@ -342,17 +342,6 @@ html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__close-resul
   line-height: 1;
 }
 
-html[data-viz-variant='strip'] .map-frame--viz-strip .leaflet-top.leaflet-left {
-  top: auto !important;
-  left: 12px !important;
-  right: auto !important;
-  bottom: 58px !important;
-}
-
-html[data-viz-variant='strip'] .map-frame--viz-strip:has(.map-status-bar.hidden) .leaflet-top.leaflet-left {
-  bottom: 12px !important;
-}
-
 html[data-viz-variant='strip'] .map-frame--viz-strip .viz-chrome {
   left: auto;
   right: 12px;
@@ -479,7 +468,7 @@ html[data-viz-variant='dropdown'] .graph-frame--viz-dropdown {
 html[data-viz-variant='dropdown'] .viz-search-host {
   display: none;
   position: absolute;
-  top: 58px;
+  top: var(--viz-dropdown-host-top, 58px);
   left: 12px;
   z-index: 520;
   width: 300px;
@@ -532,6 +521,16 @@ html[data-viz-variant='dropdown'] .viz-chrome-search .smart-search__surface:focu
 
 html[data-viz-variant='dropdown'] .viz-chrome-search .smart-search__menu {
   z-index: 530;
+}
+
+html[data-viz-variant='dropdown'].viz-filter-command-active .viz-search-host {
+  display: none !important;
+  pointer-events: none;
+}
+
+html[data-viz-variant='dropdown'].viz-filter-command-active .map-frame--viz-dropdown .viz-chrome,
+html[data-viz-variant='dropdown'].viz-filter-command-active .graph-frame--viz-dropdown .viz-chrome {
+  z-index: 560;
 }
 
 html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__search,
@@ -597,7 +596,34 @@ html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__resul
 }
 
 html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results .empty-state__tips {
-  display: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  margin: 8px 0 0;
+  text-align: left;
+}
+
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results .empty-state__tips li {
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results .empty-state__tips code {
+  padding: 0 3px;
+  font-size: 10px;
+}
+
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .result-row {
+  gap: 8px;
+  padding: 10px 12px 10px 36px;
+}
+
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .result-row__status {
+  align-self: center;
+  white-space: nowrap;
 }
 
 html[data-viz-variant='dock'] .viz-add-shell--dock .viz-add-shell__results .empty-state {
