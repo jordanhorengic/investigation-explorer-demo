@@ -129,12 +129,6 @@
 .viz-add-shell__search .smart-search {
   flex: 1;
   min-width: 0;
-  max-width: none;
-}
-
-#view-search .search-toolbar .smart-search {
-  max-width: none;
-  width: 100%;
 }
 
 .viz-add-shell__collapse {

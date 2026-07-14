@@ -371,14 +371,24 @@ code {
   background: linear-gradient(180deg, rgb(255 255 255 / 100%) 0%, rgb(248 249 251 / 60%) 100%);
 }
 
-#view-search .search-toolbar > .smart-search {
-  max-width: none;
-  width: 100%;
-}
-
 .smart-search {
   position: relative;
-  max-width: 920px;
+}
+
+/* Full-width search in the main Object Search tab */
+#view-search .search-toolbar .smart-search,
+#view-search .search-toolbar .smart-search__surface {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+/* Full-width search in map/graph add panels (all variants) */
+.viz-add-shell__search .smart-search,
+.viz-add-shell__search .smart-search__surface {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
 }
 
 .smart-search__surface {
@@ -615,8 +625,11 @@ code {
   font-size: 11px;
 }
 
-.viz-search-modal__toolbar .smart-search {
+.viz-search-modal__toolbar .smart-search,
+.viz-search-modal__toolbar .smart-search__surface {
+  width: 100%;
   max-width: none;
+  box-sizing: border-box;
 }
 
 .viz-search-modal__toolbar .smart-search__surface {
