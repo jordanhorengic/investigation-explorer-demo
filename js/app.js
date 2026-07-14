@@ -1196,11 +1196,11 @@
       if (context === 'map' || context === 'graph') {
         card.addEventListener('contextmenu', (event) => {
           event.preventDefault();
-          const selectionSnapshot = captureSelectionSnapshot(entity.id);
+          const menuOptions = { detailsOnly: true };
           if (context === 'map') {
-            showMapContextMenu(entity.id, event.clientX, event.clientY, selectionSnapshot);
+            showMapContextMenu(entity.id, event.clientX, event.clientY, null, menuOptions);
           } else {
-            showGraphContextMenu(entity.id, event.clientX, event.clientY, selectionSnapshot);
+            showGraphContextMenu(entity.id, event.clientX, event.clientY, null, menuOptions);
           }
         });
       }
@@ -1789,12 +1789,21 @@
     menu.style.top = `${Math.max(padding, top)}px`;
   }
 
-  function showGraphContextMenu(entityId, clientX, clientY, selectionSnapshot = null) {
+  function setContextMenuItemsVisibility(menu, itemIds, dividerHidden) {
+    for (const id of itemIds) {
+      document.getElementById(id)?.classList.toggle('hidden', dividerHidden);
+    }
+    menu?.querySelector('.context-menu__divider')?.classList.toggle('hidden', dividerHidden);
+  }
+
+  function showGraphContextMenu(entityId, clientX, clientY, selectionSnapshot = null, options = {}) {
+    const detailsOnly = options.detailsOnly === true;
     hideMapContextMenu();
     prepareContextSelection(entityId);
     graphContextEntityId = entityId;
-    graphContextSelectionIds =
-      selectionSnapshot && selectionSnapshot.length > 1
+    graphContextSelectionIds = detailsOnly
+      ? [entityId]
+      : selectionSnapshot && selectionSnapshot.length > 1
         ? resolveBulkEntityIds(selectionSnapshot)
         : getContextSelectionIds();
     const count = graphContextSelectionIds.length;
@@ -1802,17 +1811,24 @@
     setContextMenuLabel(els.graphContextMap, 'Add to map', count);
     setContextMenuLabel(els.graphContextDetails, 'Open object details', count);
     setContextMenuLabel(els.graphContextRemove, 'Remove object', count);
-    els.graphContextExpand.classList.toggle('hidden', count > 1);
+    els.graphContextExpand.classList.toggle('hidden', detailsOnly || count > 1);
+    setContextMenuItemsVisibility(
+      els.graphContextMenu,
+      ['graph-context-map', 'graph-context-remove'],
+      detailsOnly
+    );
 
     openContextMenu(els.graphContextMenu, clientX, clientY);
   }
 
-  function showMapContextMenu(entityId, clientX, clientY, selectionSnapshot = null) {
+  function showMapContextMenu(entityId, clientX, clientY, selectionSnapshot = null, options = {}) {
+    const detailsOnly = options.detailsOnly === true;
     hideGraphContextMenu();
     prepareContextSelection(entityId);
     mapContextEntityId = entityId;
-    mapContextSelectionIds =
-      selectionSnapshot && selectionSnapshot.length > 1
+    mapContextSelectionIds = detailsOnly
+      ? [entityId]
+      : selectionSnapshot && selectionSnapshot.length > 1
         ? resolveBulkEntityIds(selectionSnapshot)
         : getContextSelectionIds();
     const count = mapContextSelectionIds.length;
@@ -1826,7 +1842,12 @@
       settings.showRelated ? 'Hide related objects' : 'Show related objects',
       1
     );
-    els.mapContextRelated.classList.toggle('hidden', count > 1);
+    els.mapContextRelated.classList.toggle('hidden', detailsOnly || count > 1);
+    setContextMenuItemsVisibility(
+      els.mapContextMenu,
+      ['map-context-graph', 'map-context-remove'],
+      detailsOnly
+    );
 
     openContextMenu(els.mapContextMenu, clientX, clientY);
   }
