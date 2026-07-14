@@ -40,6 +40,7 @@
   let onDoneCallback = null;
   let focusInputCallback = null;
   let onResultsChangeCallback = null;
+  let onClearSearchCallback = null;
   let resultsExpanded = false;
   let dockCollapsed = false;
 
@@ -133,6 +134,7 @@
 
     collapseBtn?.classList.toggle('hidden', current !== 'strip');
     closeResultsBtn?.classList.toggle('hidden', current !== 'strip');
+    document.querySelector('.viz-strip-actions')?.classList.toggle('hidden', current !== 'strip');
     dockHeader?.classList.toggle('hidden', current !== 'dock' || dockCollapsed);
     dockToggle?.classList.toggle('hidden', current !== 'dock' || !dockCollapsed);
     footer?.classList.toggle('hidden', current === 'strip' || current === 'dropdown' || !isResultsExpanded());
@@ -191,10 +193,15 @@
       shell.setAttribute('aria-expanded', open ? 'true' : 'false');
       updateStripResultsVisibility(open);
       const collapseBtn = document.getElementById('btn-viz-search-collapse');
+      const closeResultsBtn = document.getElementById('btn-viz-search-close-results');
       if (collapseBtn) {
         collapseBtn.textContent = open ? '▴' : '▾';
         collapseBtn.setAttribute('aria-label', open ? 'Collapse results' : 'Expand results');
         collapseBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      if (closeResultsBtn) {
+        closeResultsBtn.setAttribute('aria-label', open ? 'Close results' : 'Clear search');
+        closeResultsBtn.setAttribute('title', open ? 'Close results' : 'Clear search');
       }
       if (!open) {
         document.getElementById('viz-search-input')?.blur();
@@ -385,6 +392,7 @@
     onDoneCallback = options.onDone || null;
     focusInputCallback = options.focusInput || null;
     onResultsChangeCallback = options.onResultsChange || null;
+    onClearSearchCallback = options.onClearSearch || null;
 
     shell = document.getElementById('viz-add-shell');
     hosts.map = document.getElementById('viz-search-host-map');
@@ -416,6 +424,10 @@
       onDoneCallback?.({ clearSearch: false });
     });
 
+    document.getElementById('btn-viz-search-collapse')?.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+    });
+
     document.getElementById('btn-viz-search-collapse')?.addEventListener('click', (event) => {
       event.stopPropagation();
       if (current === 'strip') {
@@ -426,11 +438,20 @@
       }
     });
 
+    document.getElementById('btn-viz-search-close-results')?.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+    });
+
     document.getElementById('btn-viz-search-close-results')?.addEventListener('click', (event) => {
       event.stopPropagation();
-      if (current === 'strip') {
+      if (current !== 'strip') {
+        return;
+      }
+      if (resultsExpanded) {
         setResultsExpanded(false);
       }
+      onClearSearchCallback?.();
+      document.getElementById('viz-search-input')?.blur();
     });
 
     document.getElementById('btn-viz-dock-collapse')?.addEventListener('click', (event) => {

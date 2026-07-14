@@ -233,7 +233,8 @@ html[data-viz-variant='strip'] .viz-search-host {
   position: absolute;
   top: 12px;
   left: 12px;
-  right: 132px;
+  width: min(480px, calc(100% - 120px));
+  max-width: 480px;
   z-index: 520;
   pointer-events: none;
 }
@@ -249,10 +250,79 @@ html[data-viz-variant='strip'] .viz-add-shell--strip {
   overflow: hidden;
 }
 
+html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__search {
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 10px;
+  border-bottom: 0;
+}
+
 html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__search.search-toolbar {
-  padding: 8px 10px;
+  padding: 6px 8px 6px 10px;
   border-bottom: 0;
   background: transparent;
+}
+
+html[data-viz-variant='strip'] .viz-add-shell--strip .smart-search {
+  display: flex;
+  align-items: center;
+}
+
+html[data-viz-variant='strip'] .viz-add-shell--strip .smart-search__surface {
+  min-height: 40px;
+  height: 40px;
+  padding: 0 10px 0 36px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+html[data-viz-variant='strip'] .viz-add-shell--strip .smart-search__input {
+  height: 38px;
+  line-height: 38px;
+}
+
+html[data-viz-variant='strip'] .viz-add-shell--strip .smart-search__pills {
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+html[data-viz-variant='strip'] .viz-strip-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  height: 40px;
+}
+
+html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__collapse,
+html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__close-results {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+html[data-viz-variant='strip'] .map-frame--viz-strip .leaflet-top.leaflet-left {
+  top: auto !important;
+  left: 12px !important;
+  right: auto !important;
+  bottom: 58px !important;
+}
+
+html[data-viz-variant='strip'] .map-frame--viz-strip:has(.map-status-bar.hidden) .leaflet-top.leaflet-left {
+  bottom: 12px !important;
+}
+
+html[data-viz-variant='strip'] .map-frame--viz-strip .viz-chrome {
+  left: auto;
+  right: 12px;
+  width: auto;
+  justify-content: flex-end;
 }
 
 html[data-viz-variant='strip'] .viz-strip-results-panel {
@@ -287,21 +357,11 @@ html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed {
   height: auto;
 }
 
-html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__search {
-  border-bottom: 0;
-  padding: 8px 10px;
-}
-
-html[data-viz-variant='strip'] .viz-add-shell--strip:not(.viz-add-shell--closed) .viz-add-shell__search {
-  border-bottom: 0;
-}
-
 html[data-viz-variant='strip'] .map-frame--viz-strip .viz-search-trigger,
 html[data-viz-variant='strip'] .graph-frame--viz-strip .viz-search-trigger {
   display: none;
 }
 
-html[data-viz-variant='strip'] .map-frame--viz-strip .viz-chrome,
 html[data-viz-variant='strip'] .graph-frame--viz-strip .viz-chrome {
   justify-content: flex-end;
 }

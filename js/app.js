@@ -2127,6 +2127,12 @@
   VizSearchVariant.init({
     onDone: () => finishVizSearchSession({ clearSearch: false }),
     focusInput: () => els.vizSearchInput?.focus(),
+    onClearSearch: () => {
+      state.searchTerm = '';
+      state.searchFilters = SearchFilters.createDefault(objectTypes);
+      SmartSearchBar.syncAll();
+      refreshSearchResults();
+    },
     onResultsChange: () => {
       refreshSearchResults();
       if (VizSearchVariant.get() === 'dock') {
