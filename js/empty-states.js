@@ -33,9 +33,13 @@
     'search-viz': {
       icon: 'search',
       tone: 'accent',
-      title: 'Find objects to add',
-      message: null,
-      tips: null,
+      title: 'Start the investigation',
+      message: 'Look up people, organisations, locations, and case objects in one place.',
+      tips: [
+        'Type a name, place, or keyword to start',
+        'Add filters with <code>type:Person</code> or <code>BRANCHE = value</code>',
+        'Scope a field with <code>in:</code> then pick an attribute',
+      ],
     },
     'graph-empty': {
       icon: 'graph',
@@ -82,20 +86,28 @@
     let resolvedTips = tips;
 
     if (variant === 'search-viz' && vizContext === 'map') {
-      resolvedMessage = 'Search for objects, then pin them on the map.';
+      resolvedMessage = 'Look up people, organisations, locations, and case objects to pin on the map.';
       resolvedTips = [
-        'Use <kbd>⌘</kbd><kbd>/</kbd> to open search',
-        'Select a result to add a location pin',
+        'Type a name, place, or keyword to start',
+        'Add filters with <code>type:Person</code> or <code>BRANCHE = value</code>',
+        'Scope a field with <code>in:</code> then pick an attribute',
+        'Select a result to drop it on the map',
       ];
     } else if (variant === 'search-viz' && vizContext === 'graph') {
-      resolvedMessage = 'Search for objects, then add them to the graph.';
+      resolvedMessage = 'Look up people, organisations, locations, and case objects to add to the graph.';
       resolvedTips = [
-        'Use <kbd>⌘</kbd><kbd>/</kbd> to open search',
-        'Select a result to create a node',
+        'Type a name, place, or keyword to start',
+        'Add filters with <code>type:Person</code> or <code>BRANCHE = value</code>',
+        'Scope a field with <code>in:</code> then pick an attribute',
+        'Select a result to create a node and expand relationships',
       ];
     } else if (variant === 'search-viz' && !vizContext) {
-      resolvedMessage = 'Search for objects to add to the current view.';
-      resolvedTips = ['Type a keyword or apply a filter, then pick a result'];
+      resolvedMessage = 'Look up people, organisations, locations, and case objects in one place.';
+      resolvedTips = [
+        'Type a name, place, or keyword to start',
+        'Add filters with <code>type:Person</code> or <code>BRANCHE = value</code>',
+        'Scope a field with <code>in:</code> then pick an attribute',
+      ];
     }
 
     const messageHtml = resolvedMessage

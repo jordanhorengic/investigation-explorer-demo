@@ -1,10 +1,10 @@
 (function () {
   const VARIANTS = {
     modal: {
-      label: 'Modal (current)',
+      label: 'Modal (original)',
       persistent: false,
       explicitOpen: true,
-      description: 'Full-screen dialog; closes after each add.',
+      description: 'The original full-screen dialog; closes after each add.',
     },
     strip: {
       label: 'Expandable strip',
@@ -138,6 +138,17 @@
     footer?.classList.toggle('hidden', current === 'strip' || current === 'dropdown' || !isResultsExpanded());
   }
 
+  function updateStripResultsVisibility(open) {
+    if (current !== 'strip' || !shell) {
+      return;
+    }
+    const results = document.getElementById('viz-search-results');
+    const footer = shell.querySelector('[data-persistent-only]');
+    results?.classList.toggle('hidden', !open);
+    results?.setAttribute('aria-hidden', open ? 'false' : 'true');
+    footer?.classList.add('hidden');
+  }
+
   function setShellOpen(open) {
     if (!shell) {
       return;
@@ -146,10 +157,19 @@
     shell.classList.toggle('viz-add-shell--closed', !open);
     if (current === 'strip') {
       resultsExpanded = open;
+      const ctx = shell.dataset.context;
+      const host = hosts[ctx];
+      host?.classList.toggle('viz-search-host--strip-expanded', open);
+      shell.setAttribute('aria-expanded', open ? 'true' : 'false');
+      updateStripResultsVisibility(open);
       const collapseBtn = document.getElementById('btn-viz-search-collapse');
       if (collapseBtn) {
         collapseBtn.textContent = open ? '▴' : '▾';
         collapseBtn.setAttribute('aria-label', open ? 'Collapse results' : 'Expand results');
+        collapseBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      if (!open) {
+        document.getElementById('viz-search-input')?.blur();
       }
     }
     updateVariantControls();
@@ -222,7 +242,13 @@
 
     shell.dataset.context = context;
     shell.dataset.title = contextTitle(context);
-    shell.className = `viz-add-shell viz-add-shell--${current}`;
+    shell.classList.remove(
+      'viz-add-shell--modal',
+      'viz-add-shell--strip',
+      'viz-add-shell--dock',
+      'viz-add-shell--dropdown'
+    );
+    shell.classList.add(`viz-add-shell--${current}`);
 
     if (current === 'dropdown') {
       const body = frame?.querySelector('.map-frame__body, .graph-frame__body');

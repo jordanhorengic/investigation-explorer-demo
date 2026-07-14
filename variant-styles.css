@@ -149,9 +149,13 @@
 }
 
 .viz-add-shell__results {
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
   max-height: none;
+}
+
+.viz-add-shell__results.search-results {
+  min-height: 0;
 }
 
 .viz-add-shell__footer {
@@ -242,22 +246,47 @@ html[data-viz-variant='strip'] .viz-add-shell--strip {
   overflow: hidden;
 }
 
+html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed {
+  height: auto;
+  align-self: flex-start;
+  width: 100%;
+}
+
+html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed .viz-add-shell__search {
+  border-bottom: 0;
+}
+
+html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed #viz-search-results,
+html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed .viz-add-shell__results,
+html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed .viz-add-shell__footer {
+  display: none !important;
+  flex: 0 0 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+}
+
 html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__search {
   border-bottom: 0;
   padding: 8px 10px;
-}
-
-html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed .viz-add-shell__results,
-html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed .viz-add-shell__footer {
-  display: none;
 }
 
 html[data-viz-variant='strip'] .viz-add-shell--strip:not(.viz-add-shell--closed) .viz-add-shell__search {
   border-bottom: 1px solid rgb(16 24 40 / 6%);
 }
 
-html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__results {
+html[data-viz-variant='strip'] .viz-add-shell--strip:not(.viz-add-shell--closed) .viz-add-shell__results {
   max-height: min(340px, 42vh);
+  overflow: auto;
+}
+
+html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__results .empty-state {
+  min-height: 0;
+  padding: 28px 20px;
+  flex: 0 1 auto;
 }
 
 html[data-viz-variant='strip'] .map-frame--viz-strip .viz-search-trigger,
@@ -358,6 +387,14 @@ html[data-viz-variant='dropdown'] .viz-add-shell--dropdown:not(.viz-add-shell--c
 
 html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results {
   max-height: min(360px, 44vh);
+  overflow: auto;
+}
+
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results .empty-state,
+html[data-viz-variant='dock'] .viz-add-shell--dock .viz-add-shell__results .empty-state {
+  min-height: 0;
+  padding: 28px 20px;
+  flex: 0 1 auto;
 }
 
 html[data-viz-variant='dropdown'] .map-frame--viz-dropdown .viz-chrome .viz-search-trigger,
