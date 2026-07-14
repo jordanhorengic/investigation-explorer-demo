@@ -227,7 +227,9 @@ html[data-viz-variant='strip'] .graph-frame--viz-strip {
 }
 
 html[data-viz-variant='strip'] .viz-search-host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   position: absolute;
   top: 12px;
   left: 12px;
@@ -238,6 +240,7 @@ html[data-viz-variant='strip'] .viz-search-host {
 
 html[data-viz-variant='strip'] .viz-add-shell--strip {
   pointer-events: auto;
+  flex-shrink: 0;
   border: 1px solid rgb(255 255 255 / 85%);
   border-radius: 12px;
   background: rgb(255 255 255 / 92%);
@@ -246,27 +249,42 @@ html[data-viz-variant='strip'] .viz-add-shell--strip {
   overflow: hidden;
 }
 
+html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__search.search-toolbar {
+  padding: 8px 10px;
+  border-bottom: 0;
+  background: transparent;
+}
+
+html[data-viz-variant='strip'] .viz-strip-results-panel {
+  pointer-events: auto;
+  margin-top: 6px;
+  border: 1px solid rgb(255 255 255 / 85%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 92%);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 8px rgb(16 24 40 / 10%), 0 8px 24px rgb(16 24 40 / 8%);
+  overflow: hidden;
+}
+
+html[data-viz-variant='strip'] .viz-strip-results-panel[hidden],
+html[data-viz-variant='strip'] .viz-strip-results-panel.hidden {
+  display: none !important;
+}
+
+html[data-viz-variant='strip'] .viz-strip-results-panel .viz-add-shell__results {
+  max-height: min(340px, 42vh);
+  overflow: auto;
+  min-height: 0;
+  flex: 0 1 auto;
+}
+
+html[data-viz-variant='strip'] .viz-strip-results-panel .empty-state {
+  min-height: 0;
+  padding: 28px 20px;
+}
+
 html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed {
   height: auto;
-  align-self: flex-start;
-  width: 100%;
-}
-
-html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed .viz-add-shell__search {
-  border-bottom: 0;
-}
-
-html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed #viz-search-results,
-html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed .viz-add-shell__results,
-html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed .viz-add-shell__footer {
-  display: none !important;
-  flex: 0 0 0 !important;
-  min-height: 0 !important;
-  max-height: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-  border: 0 !important;
 }
 
 html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__search {
@@ -275,18 +293,7 @@ html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__search {
 }
 
 html[data-viz-variant='strip'] .viz-add-shell--strip:not(.viz-add-shell--closed) .viz-add-shell__search {
-  border-bottom: 1px solid rgb(16 24 40 / 6%);
-}
-
-html[data-viz-variant='strip'] .viz-add-shell--strip:not(.viz-add-shell--closed) .viz-add-shell__results {
-  max-height: min(340px, 42vh);
-  overflow: auto;
-}
-
-html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__results .empty-state {
-  min-height: 0;
-  padding: 28px 20px;
-  flex: 0 1 auto;
+  border-bottom: 0;
 }
 
 html[data-viz-variant='strip'] .map-frame--viz-strip .viz-search-trigger,

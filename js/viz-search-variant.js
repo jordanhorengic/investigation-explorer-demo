@@ -129,7 +129,7 @@
     const closeResultsBtn = document.getElementById('btn-viz-search-close-results');
     const dockHeader = shell?.querySelector('[data-dock-only]');
     const dockToggle = document.getElementById('btn-viz-dock-toggle');
-    const footer = shell?.querySelector('[data-persistent-only]');
+    const footer = document.querySelector('[data-persistent-only]');
 
     collapseBtn?.classList.toggle('hidden', current !== 'strip');
     closeResultsBtn?.classList.toggle('hidden', current !== 'strip');
@@ -142,11 +142,39 @@
     if (current !== 'strip' || !shell) {
       return;
     }
+    const panel = document.getElementById('viz-strip-results-panel');
     const results = document.getElementById('viz-search-results');
-    const footer = shell.querySelector('[data-persistent-only]');
+    panel?.classList.toggle('hidden', !open);
+    panel?.setAttribute('aria-hidden', open ? 'false' : 'true');
+    if (panel) {
+      panel.hidden = !open;
+    }
     results?.classList.toggle('hidden', !open);
     results?.setAttribute('aria-hidden', open ? 'false' : 'true');
+    const footer = document.querySelector('[data-persistent-only]');
     footer?.classList.add('hidden');
+  }
+
+  function layoutStripHost(host) {
+    if (!host || !shell) {
+      return;
+    }
+    const panel = document.getElementById('viz-strip-results-panel');
+    host.appendChild(shell);
+    if (panel) {
+      host.appendChild(panel);
+    }
+  }
+
+  function layoutDefaultHost(host) {
+    if (!host || !shell) {
+      return;
+    }
+    const panel = document.getElementById('viz-strip-results-panel');
+    if (panel && !shell.contains(panel)) {
+      shell.appendChild(panel);
+    }
+    host.appendChild(shell);
   }
 
   function setShellOpen(open) {
@@ -257,7 +285,11 @@
       }
     }
 
-    host.appendChild(shell);
+    if (current === 'strip') {
+      layoutStripHost(host);
+    } else {
+      layoutDefaultHost(host);
+    }
 
     if (current === 'dock') {
       const dockToggle = document.getElementById('btn-viz-dock-toggle');
@@ -367,7 +399,7 @@
 
     const modal = document.getElementById('viz-search-modal');
     const modalHeader = shell?.querySelector('[data-modal-only]');
-    const persistentFooter = shell?.querySelector('[data-persistent-only]');
+    const persistentFooter = document.querySelector('[data-persistent-only]');
     const doneButton = document.getElementById('btn-viz-search-done');
 
     if (isModal()) {

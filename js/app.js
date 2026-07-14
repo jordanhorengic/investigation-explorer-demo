@@ -1150,7 +1150,14 @@
   }
 
   function renderGroupedSearchResults(items, container, context) {
-    container.className = 'search-results search-results--grouped';
+    const isVizResults = container.id === 'viz-search-results';
+    const keepHidden = isVizResults && container.classList.contains('hidden');
+    container.className = isVizResults
+      ? 'search-results search-results--grouped viz-add-shell__results'
+      : 'search-results search-results--grouped';
+    if (keepHidden) {
+      container.classList.add('hidden');
+    }
     container.innerHTML = '';
 
     if (!shouldShowContextResults(context)) {
