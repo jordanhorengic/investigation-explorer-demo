@@ -479,15 +479,59 @@ html[data-viz-variant='dropdown'] .graph-frame--viz-dropdown {
 html[data-viz-variant='dropdown'] .viz-search-host {
   display: none;
   position: absolute;
-  top: 52px;
+  top: 58px;
   left: 12px;
+  right: 12px;
   z-index: 520;
-  width: min(420px, calc(100% - 140px));
+  width: auto;
+  max-width: none;
   pointer-events: none;
 }
 
 html[data-viz-variant='dropdown'] .viz-search-host--active {
   display: block;
+}
+
+html[data-viz-variant='dropdown'] .viz-chrome-search {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  max-width: none;
+}
+
+html[data-viz-variant='dropdown'] .viz-chrome-search.hidden {
+  display: none !important;
+}
+
+html[data-viz-variant='dropdown'] .viz-chrome-search .smart-search,
+html[data-viz-variant='dropdown'] .viz-chrome-search .smart-search__surface {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+html[data-viz-variant='dropdown'] .viz-chrome-search .smart-search__surface {
+  min-height: 40px;
+  border: 1px solid rgb(255 255 255 / 80%);
+  background: rgb(255 255 255 / 88%);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1px 3px rgb(16 24 40 / 8%), 0 4px 14px rgb(16 24 40 / 6%);
+}
+
+html[data-viz-variant='dropdown'] .viz-chrome-search--open .smart-search__surface,
+html[data-viz-variant='dropdown'] .viz-chrome-search .smart-search__surface:focus-within {
+  border-color: rgb(27 68 177 / 28%);
+  background: rgb(255 255 255 / 98%);
+  box-shadow: 0 2px 8px rgb(16 24 40 / 10%), 0 8px 24px rgb(16 24 40 / 10%);
+}
+
+html[data-viz-variant='dropdown'] .viz-chrome-search .smart-search__menu {
+  z-index: 530;
+}
+
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__search,
+html[data-viz-variant='dropdown'] .viz-add-shell__search--dropdown-chrome {
+  display: none !important;
 }
 
 html[data-viz-variant='dropdown'] .viz-add-shell--dropdown {
@@ -504,13 +548,8 @@ html[data-viz-variant='dropdown'] .viz-add-shell--dropdown.viz-add-shell--closed
   display: none;
 }
 
-html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__search {
-  border-bottom: 0;
-  padding: 8px 10px;
-}
-
-html[data-viz-variant='dropdown'] .viz-add-shell--dropdown:not(.viz-add-shell--closed) .viz-add-shell__search {
-  border-bottom: 1px solid rgb(16 24 40 / 6%);
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-strip-results-panel {
+  display: block;
 }
 
 html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results {
@@ -527,17 +566,12 @@ html[data-viz-variant='dock'] .viz-add-shell--dock .viz-add-shell__results .empt
 
 html[data-viz-variant='dropdown'] .map-frame--viz-dropdown .viz-chrome .viz-search-trigger,
 html[data-viz-variant='dropdown'] .graph-frame--viz-dropdown .viz-chrome .viz-search-trigger {
-  max-width: 300px;
+  display: none;
 }
 
-html[data-viz-variant='dropdown'] .viz-search-trigger--open {
-  border-color: rgb(27 68 177 / 28%);
-  background: rgb(255 255 255 / 98%);
-  box-shadow: 0 2px 8px rgb(16 24 40 / 10%), 0 8px 24px rgb(16 24 40 / 10%);
-}
-
-html[data-viz-variant='dropdown'] .viz-search-trigger--open .viz-search-trigger__label {
-  color: var(--text);
+html[data-viz-variant='dropdown'] .map-frame--viz-dropdown .viz-chrome,
+html[data-viz-variant='dropdown'] .graph-frame--viz-dropdown .viz-chrome {
+  right: 12px;
 }
 
 /* Launcher page */

@@ -40,6 +40,7 @@
   let onResultsChangeCallback = null;
   let focusInputCallback = null;
   let onClearSearchCallback = null;
+  let onDropdownFocusCallback = null;
   let resultsExpanded = false;
   let dockCollapsed = false;
 
@@ -246,11 +247,66 @@
       const hideTrigger = !isModal() && (current === 'strip' || current === 'dock');
       trigger.classList.toggle('hidden', hideTrigger);
       if (current === 'dropdown') {
+        const isActiveContext = shell?.dataset.context === key;
+        const chromeSlot = document.getElementById(`viz-chrome-search-${key}`);
+        trigger.classList.toggle('hidden', isActiveContext);
+        chromeSlot?.classList.toggle('hidden', !isActiveContext);
         const isOpen =
-          shell?.dataset.context === key && !shell.classList.contains('viz-add-shell--closed');
-        trigger.classList.toggle('viz-search-trigger--open', isOpen);
+          isActiveContext && !shell.classList.contains('viz-add-shell--closed');
+        chromeSlot?.classList.toggle('viz-chrome-search--open', isOpen);
         trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       }
+    }
+  }
+
+  function layoutDropdownChrome(context) {
+    const bar = chrome[context];
+    const slot = document.getElementById(`viz-chrome-search-${context}`);
+    const smartSearch = document.getElementById('viz-smart-search');
+    const toolbar = document.getElementById('viz-search-toolbar');
+
+    if (!bar || !slot || !smartSearch) {
+      return;
+    }
+
+    slot.appendChild(smartSearch);
+    slot.classList.remove('hidden');
+
+    for (const key of ['map', 'graph']) {
+      const trigger = chrome[key]?.querySelector('.viz-search-trigger');
+      const chromeSlot = document.getElementById(`viz-chrome-search-${key}`);
+      const isActive = key === context;
+      trigger?.classList.toggle('hidden', isActive);
+      chromeSlot?.classList.toggle('hidden', !isActive);
+    }
+
+    const input = document.getElementById('viz-search-input');
+    if (input) {
+      input.placeholder =
+        context === 'map' ? 'Search objects to add to map…' : 'Search objects to add to graph…';
+    }
+
+    if (toolbar) {
+      toolbar.classList.add('viz-add-shell__search--dropdown-chrome');
+    }
+  }
+
+  function restoreSearchToolbarFromChrome() {
+    const smartSearch = document.getElementById('viz-smart-search');
+    const toolbar = document.getElementById('viz-search-toolbar');
+    if (smartSearch && toolbar && !toolbar.contains(smartSearch)) {
+      toolbar.insertBefore(smartSearch, toolbar.firstChild);
+    }
+    toolbar?.classList.remove('viz-add-shell__search--dropdown-chrome');
+
+    for (const key of ['map', 'graph']) {
+      chrome[key]?.querySelector('.viz-search-trigger')?.classList.remove('hidden');
+      document.getElementById(`viz-chrome-search-${key}`)?.classList.add('hidden');
+    }
+
+    const input = document.getElementById('viz-search-input');
+    if (input) {
+      input.placeholder = 'Search…';
     }
   }
 
@@ -285,6 +341,9 @@
       if (body && host.parentElement !== body) {
         body.insertBefore(host, body.firstChild);
       }
+      layoutDropdownChrome(context);
+    } else {
+      restoreSearchToolbarFromChrome();
     }
 
     if (current === 'strip') {
@@ -397,6 +456,7 @@
     onResultsChangeCallback = options.onResultsChange || null;
     focusInputCallback = options.focusInput || null;
     onClearSearchCallback = options.onClearSearch || null;
+    onDropdownFocusCallback = options.onDropdownFocus || null;
 
     shell = document.getElementById('viz-add-shell');
     hosts.map = document.getElementById('viz-search-host-map');
@@ -480,6 +540,9 @@
       if (event.target.closest('.viz-search-trigger')) {
         return;
       }
+      if (event.target.closest('.viz-chrome-search')) {
+        return;
+      }
       if (current === 'strip' && resultsExpanded) {
         setResultsExpanded(false);
       } else if (current === 'dropdown' && shell && !shell.classList.contains('viz-add-shell--closed')) {
@@ -488,6 +551,17 @@
     });
 
     const vizInput = document.getElementById('viz-search-input');
+    vizInput?.addEventListener('input', () => {
+      if (current === 'dropdown' && shell?.classList.contains('viz-add-shell--closed')) {
+        const ctx = shell?.dataset.context;
+        if (ctx) {
+          updateOpenState(true, ctx);
+          onDropdownFocusCallback?.();
+          onResultsChangeCallback?.();
+        }
+      }
+    });
+
     vizInput?.addEventListener('focus', () => {
       if (current === 'strip' && !resultsExpanded) {
         setResultsExpanded(true);
@@ -496,6 +570,14 @@
       if (current === 'dock' && dockCollapsed) {
         setDockCollapsed(false);
         onResultsChangeCallback?.();
+      }
+      if (current === 'dropdown') {
+        const ctx = shell?.dataset.context;
+        if (ctx) {
+          updateOpenState(true, ctx);
+          onDropdownFocusCallback?.();
+          onResultsChangeCallback?.();
+        }
       }
     });
 

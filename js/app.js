@@ -2341,6 +2341,9 @@
         refreshMapSize();
       }
     },
+    onDropdownFocus: () => {
+      state.vizSearchSessionOpen = true;
+    },
   });
 
   const smartSearchOptions = {
