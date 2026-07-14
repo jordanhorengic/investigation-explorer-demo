@@ -131,6 +131,7 @@
     graphContextDetails: document.getElementById('graph-context-details'),
     graphContextExpand: document.getElementById('graph-context-expand'),
     graphContextMap: document.getElementById('graph-context-map'),
+    graphContextRemove: document.getElementById('graph-context-remove'),
     btnGraphClear: document.getElementById('btn-graph-clear'),
     btnGraphZoomIn: document.getElementById('btn-graph-zoom-in'),
     btnGraphZoomOut: document.getElementById('btn-graph-zoom-out'),
@@ -145,6 +146,7 @@
     mapContextDetails: document.getElementById('map-context-details'),
     mapContextRelated: document.getElementById('map-context-related'),
     mapContextGraph: document.getElementById('map-context-graph'),
+    mapContextRemove: document.getElementById('map-context-remove'),
   };
 
   function defaultPinSettings() {
@@ -531,6 +533,60 @@
       refreshSearchResults();
     }
     return true;
+  }
+
+  function removeEntitiesFromMap(entityIds) {
+    const ids = [...new Set(entityIds)];
+    let removed = 0;
+
+    for (const entityId of ids) {
+      if (unpinEntityFromMap(entityId, { skipRender: true })) {
+        removed += 1;
+      }
+    }
+
+    if (removed === 0) {
+      return;
+    }
+
+    for (const entityId of ids) {
+      state.multiSelectedIds.delete(entityId);
+    }
+
+    if (state.selectedId && ids.includes(state.selectedId)) {
+      state.selectedId = null;
+      closeInstancePanel();
+    }
+
+    renderMapPins({ preserveView: true });
+    afterVizRemove('map');
+  }
+
+  function removeEntitiesFromGraph(entityIds) {
+    const ids = [...new Set(entityIds)];
+    let removed = 0;
+
+    for (const entityId of ids) {
+      if (removeEntityFromGraph(entityId, { skipRender: true })) {
+        removed += 1;
+      }
+    }
+
+    if (removed === 0) {
+      return;
+    }
+
+    for (const entityId of ids) {
+      state.multiSelectedIds.delete(entityId);
+    }
+
+    if (state.selectedId && ids.includes(state.selectedId)) {
+      state.selectedId = null;
+      closeInstancePanel();
+    }
+
+    renderGraphView();
+    afterVizRemove('graph');
   }
 
   function appendEntityToGraph(entityId, options = {}) {
@@ -1689,6 +1745,13 @@
     return count > 1 ? `${singular} (${count})` : singular;
   }
 
+  function setContextMenuLabel(button, singular, count) {
+    const label = button?.querySelector('.context-menu__label');
+    if (label) {
+      label.textContent = formatBulkActionLabel(singular, count);
+    }
+  }
+
   function showGraphContextMenu(entityId, clientX, clientY, selectionSnapshot = null) {
     hideMapContextMenu();
     prepareContextSelection(entityId);
@@ -1699,10 +1762,10 @@
         : getContextSelectionIds();
     const count = graphContextSelectionIds.length;
 
-    els.graphContextMap.textContent = formatBulkActionLabel('Add to map', count);
+    setContextMenuLabel(els.graphContextMap, 'Add to map', count);
+    setContextMenuLabel(els.graphContextDetails, 'Open object details', count);
+    setContextMenuLabel(els.graphContextRemove, 'Remove object', count);
     els.graphContextExpand.classList.toggle('hidden', count > 1);
-    els.graphContextDetails.textContent =
-      count > 1 ? `Open object details (${count})` : 'Open object details';
 
     els.graphContextMenu.style.position = 'fixed';
     els.graphContextMenu.style.left = `${clientX}px`;
@@ -1721,13 +1784,15 @@
     const count = mapContextSelectionIds.length;
     const settings = getPinSettings(entityId);
 
-    els.mapContextGraph.textContent = formatBulkActionLabel('Add to graph', count);
-    els.mapContextRelated.textContent = settings.showRelated
-      ? 'Hide related objects'
-      : 'Show related objects';
+    setContextMenuLabel(els.mapContextGraph, 'Add to graph', count);
+    setContextMenuLabel(els.mapContextDetails, 'Open object details', count);
+    setContextMenuLabel(els.mapContextRemove, 'Remove object', count);
+    setContextMenuLabel(
+      els.mapContextRelated,
+      settings.showRelated ? 'Hide related objects' : 'Show related objects',
+      1
+    );
     els.mapContextRelated.classList.toggle('hidden', count > 1);
-    els.mapContextDetails.textContent =
-      count > 1 ? `Open object details (${count})` : 'Open object details';
 
     els.mapContextMenu.style.position = 'fixed';
     els.mapContextMenu.style.left = `${clientX}px`;
@@ -2033,6 +2098,14 @@
     }
   });
 
+  els.graphContextRemove.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const ids = takeGraphContextSelectionIds();
+    if (ids.length > 0) {
+      removeEntitiesFromGraph(ids);
+    }
+  });
+
   els.mapContextDetails.addEventListener('click', (event) => {
     event.stopPropagation();
     const entityId = takeMapContextEntityId();
@@ -2054,6 +2127,14 @@
     const ids = takeMapContextSelectionIds();
     if (ids.length > 0) {
       addEntitiesToGraph(ids, { switchView: true });
+    }
+  });
+
+  els.mapContextRemove.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const ids = takeMapContextSelectionIds();
+    if (ids.length > 0) {
+      removeEntitiesFromMap(ids);
     }
   });
 
