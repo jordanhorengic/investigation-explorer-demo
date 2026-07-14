@@ -493,6 +493,10 @@
         setResultsExpanded(true);
         onResultsChangeCallback?.();
       }
+      if (current === 'dock' && dockCollapsed) {
+        setDockCollapsed(false);
+        onResultsChangeCallback?.();
+      }
     });
 
     updateBanner();

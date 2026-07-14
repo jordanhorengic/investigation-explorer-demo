@@ -236,9 +236,14 @@ html[data-viz-variant='strip'] #viz-search-results {
 
 html[data-viz-variant='dock'] #viz-search-results {
   max-height: none;
-  flex: 1 1 0;
-  height: 0;
+  flex: 1 1 auto;
   min-height: 0;
+  overflow-y: auto !important;
+}
+
+html[data-viz-variant='dock'] #viz-search-results .empty-state {
+  min-height: 200px;
+  flex: none;
 }
 
 /* --- Strip --- */
@@ -426,8 +431,7 @@ html[data-viz-variant='dock'] .viz-search-host--collapsed {
 html[data-viz-variant='dock'] .viz-add-shell--dock {
   display: flex;
   flex-direction: column;
-  flex: 1 1 0;
-  height: 0;
+  flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
 }
@@ -439,16 +443,14 @@ html[data-viz-variant='dock'] .viz-add-shell--dock .viz-add-shell__search {
 html[data-viz-variant='dock'] .viz-strip-results-panel {
   display: flex;
   flex-direction: column;
-  flex: 1 1 0;
-  height: 0;
+  flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
 }
 
 html[data-viz-variant='dock'] .viz-strip-results-panel .viz-add-shell__results,
 html[data-viz-variant='dock'] .viz-strip-results-panel #viz-search-results {
-  flex: 1 1 0;
-  height: 0;
+  flex: 1 1 auto;
   min-height: 0;
 }
 

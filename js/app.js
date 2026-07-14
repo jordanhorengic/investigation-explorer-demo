@@ -944,6 +944,7 @@
       return;
     }
     state.vizSearchContext = viewName;
+    state.vizSearchSessionOpen = true;
     VizSearchVariant.mountTo(viewName);
     const shell = document.getElementById('viz-add-shell');
     if (shell) {
@@ -955,8 +956,6 @@
       VizSearchVariant.updateOpenState(false, viewName);
       return;
     }
-
-    state.vizSearchSessionOpen = true;
   }
 
   function pruneFiltersForSelectedTypes(filters) {
@@ -1823,6 +1822,18 @@
     refreshSearchResults();
   }
 
+  function getVizSearchContext() {
+    if (state.vizSearchContext) {
+      return state.vizSearchContext;
+    }
+    if (state.activeView === 'map' || state.activeView === 'graph') {
+      return state.activeView;
+    }
+    const shell = document.getElementById('viz-add-shell');
+    const shellContext = shell?.dataset?.context;
+    return shellContext === 'map' || shellContext === 'graph' ? shellContext : null;
+  }
+
   function shouldShowVizResultsPanel() {
     if (state.activeView !== 'map' && state.activeView !== 'graph') {
       return false;
@@ -1844,9 +1855,10 @@
 
   function refreshSearchResults() {
     const items = runSearch(state.searchTerm);
+    const vizContext = getVizSearchContext();
     renderSearchResults(items, els.searchResults, 'search');
-    if (shouldShowVizResultsPanel() && state.vizSearchContext) {
-      renderSearchResults(items, els.vizSearchResults, state.vizSearchContext);
+    if (shouldShowVizResultsPanel() && vizContext) {
+      renderSearchResults(items, els.vizSearchResults, vizContext);
     } else if (els.vizSearchResults) {
       els.vizSearchResults.innerHTML = '';
     }
@@ -1855,7 +1867,7 @@
       els.searchResults.innerHTML = EmptyStates.render('search-idle');
       if (shouldShowVizResultsPanel()) {
         els.vizSearchResults.innerHTML = EmptyStates.render('search-viz', {
-          context: state.vizSearchContext,
+          context: vizContext,
         });
       }
     }
