@@ -809,8 +809,14 @@
       if (state.activeView !== context) {
         return false;
       }
+      if (VizSearchVariant.get() === 'strip') {
+        return VizSearchVariant.isResultsExpanded();
+      }
+      if (VizSearchVariant.get() === 'dock') {
+        return !VizSearchVariant.isDockCollapsed();
+      }
       if (VizSearchVariant.needsExplicitOpen()) {
-        return state.vizSearchSessionOpen;
+        return state.vizSearchSessionOpen && VizSearchVariant.isResultsExpanded();
       }
       return true;
     }
@@ -824,7 +830,7 @@
       return;
     }
     state.vizSearchSessionOpen = false;
-    VizSearchVariant.updateOpenState(false);
+    VizSearchVariant.updateOpenState(false, state.vizSearchContext);
     if (clearSearch) {
       state.searchTerm = '';
       SmartSearchBar.syncAll();
@@ -865,13 +871,22 @@
       openVizSearchModal(context);
       return;
     }
+
     state.vizSearchSessionOpen = true;
     VizSearchVariant.mountTo(context);
     const shell = document.getElementById('viz-add-shell');
     if (shell) {
       shell.dataset.title = VizSearchVariant.contextTitle(context);
     }
-    VizSearchVariant.updateOpenState(true);
+
+    if (VizSearchVariant.get() === 'strip') {
+      VizSearchVariant.setResultsExpanded(true);
+    } else if (VizSearchVariant.get() === 'dock' && VizSearchVariant.isDockCollapsed()) {
+      VizSearchVariant.setDockCollapsed(false);
+    } else {
+      VizSearchVariant.updateOpenState(true, context);
+    }
+
     SmartSearchBar.syncAll();
     refreshSearchResults();
     requestAnimationFrame(() => els.vizSearchInput?.focus());
@@ -909,12 +924,14 @@
     if (shell) {
       shell.dataset.title = VizSearchVariant.contextTitle(viewName);
     }
-    if (!VizSearchVariant.needsExplicitOpen()) {
-      state.vizSearchSessionOpen = true;
-      VizSearchVariant.updateOpenState(true);
-    } else {
-      VizSearchVariant.updateOpenState(state.vizSearchSessionOpen);
+
+    if (VizSearchVariant.get() === 'dropdown') {
+      state.vizSearchSessionOpen = false;
+      VizSearchVariant.updateOpenState(false, viewName);
+      return;
     }
+
+    state.vizSearchSessionOpen = true;
   }
 
   function pruneFiltersForSelectedTypes(filters) {
@@ -1748,8 +1765,14 @@
     if (VizSearchVariant.isModal()) {
       return state.vizSearchModalOpen;
     }
+    if (VizSearchVariant.get() === 'strip') {
+      return VizSearchVariant.isResultsExpanded();
+    }
+    if (VizSearchVariant.get() === 'dock') {
+      return !VizSearchVariant.isDockCollapsed();
+    }
     if (VizSearchVariant.needsExplicitOpen()) {
-      return state.vizSearchSessionOpen;
+      return state.vizSearchSessionOpen && VizSearchVariant.isResultsExpanded();
     }
     return true;
   }
@@ -1832,8 +1855,14 @@
     refreshSearchResults();
   }
 
-  els.btnOpenMapSearch?.addEventListener('click', () => openVizSearch('map'));
-  els.btnOpenGraphSearch?.addEventListener('click', () => openVizSearch('graph'));
+  els.btnOpenMapSearch?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    openVizSearch('map');
+  });
+  els.btnOpenGraphSearch?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    openVizSearch('graph');
+  });
   els.btnCloseVizSearch?.addEventListener('click', () => finishVizSearchSession({ clearSearch: true }));
   els.vizSearchBackdrop?.addEventListener('click', () => finishVizSearchSession({ clearSearch: true }));
 
@@ -1848,12 +1877,17 @@
       }
     }
     if (event.key === 'Escape') {
+      if (VizSearchVariant.collapseActivePanel()) {
+        event.preventDefault();
+        refreshSearchResults();
+        return;
+      }
       if (VizSearchVariant.isModal() && state.vizSearchModalOpen) {
         event.preventDefault();
         finishVizSearchSession({ clearSearch: true });
         return;
       }
-      if (!VizSearchVariant.isModal() && state.vizSearchSessionOpen) {
+      if (!VizSearchVariant.isModal() && state.vizSearchSessionOpen && VizSearchVariant.needsExplicitOpen()) {
         event.preventDefault();
         finishVizSearchSession({ clearSearch: false });
       }
@@ -2086,12 +2120,13 @@
   VizSearchVariant.init({
     onDone: () => finishVizSearchSession({ clearSearch: false }),
     focusInput: () => els.vizSearchInput?.focus(),
+    onResultsChange: () => {
+      refreshSearchResults();
+      if (VizSearchVariant.get() === 'dock') {
+        refreshMapSize();
+      }
+    },
   });
-
-  const collapseBtn = document.getElementById('btn-viz-search-collapse');
-  if (collapseBtn) {
-    collapseBtn.classList.toggle('hidden', VizSearchVariant.get() !== 'strip');
-  }
 
   const smartSearchOptions = {
     getState: () => ({ searchTerm: state.searchTerm, searchFilters: state.searchFilters }),

@@ -36,6 +36,87 @@
   background: var(--bg-panel);
 }
 
+.viz-add-shell__dock-header {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 12px 12px 8px;
+}
+
+.viz-add-shell__dock-header:not(.hidden) {
+  display: flex;
+}
+
+.viz-add-shell__dock-title {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.viz-dock-collapse,
+.viz-add-shell__close-results {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-panel);
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.viz-dock-collapse:hover,
+.viz-add-shell__close-results:hover {
+  background: var(--bg-subtle);
+  color: var(--text);
+}
+
+.viz-dock-toggle {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  min-height: 120px;
+  padding: 12px 8px;
+  border: 0;
+  border-right: 1px solid var(--border);
+  background: var(--bg-panel);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.viz-dock-toggle:not(.hidden) {
+  display: flex;
+}
+
+.viz-dock-toggle:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.viz-dock-toggle__icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.viz-dock-toggle__label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
 .viz-add-shell__search {
   flex-shrink: 0;
   display: flex;
@@ -131,12 +212,11 @@
   min-height: 0;
 }
 
-/* Modal variant stays as-is */
 .viz-search-modal--disabled {
   display: none !important;
 }
 
-/* --- Strip: dropdown below top search --- */
+/* --- Strip --- */
 html[data-viz-variant='strip'] .map-frame--viz-strip,
 html[data-viz-variant='strip'] .graph-frame--viz-strip {
   position: relative;
@@ -167,24 +247,17 @@ html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__search {
   padding: 8px 10px;
 }
 
-html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__collapse {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
 html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed .viz-add-shell__results,
 html[data-viz-variant='strip'] .viz-add-shell--strip.viz-add-shell--closed .viz-add-shell__footer {
   display: none;
 }
 
-html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__results {
-  max-height: min(340px, 42vh);
-  border-top: 1px solid rgb(16 24 40 / 6%);
+html[data-viz-variant='strip'] .viz-add-shell--strip:not(.viz-add-shell--closed) .viz-add-shell__search {
+  border-bottom: 1px solid rgb(16 24 40 / 6%);
 }
 
-html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__footer {
-  display: none;
+html[data-viz-variant='strip'] .viz-add-shell--strip .viz-add-shell__results {
+  max-height: min(340px, 42vh);
 }
 
 html[data-viz-variant='strip'] .map-frame--viz-strip .viz-search-trigger,
@@ -197,7 +270,7 @@ html[data-viz-variant='strip'] .graph-frame--viz-strip .viz-chrome {
   justify-content: flex-end;
 }
 
-/* --- Dock: left panel --- */
+/* --- Dock --- */
 html[data-viz-variant='dock'] .map-frame--viz-dock,
 html[data-viz-variant='dock'] .graph-frame--viz-dock {
   flex-direction: row;
@@ -211,6 +284,12 @@ html[data-viz-variant='dock'] .viz-search-host {
   border-right: 1px solid var(--border);
   background: var(--bg-panel);
   z-index: 10;
+  transition: width 180ms ease;
+}
+
+html[data-viz-variant='dock'] .viz-search-host--collapsed {
+  width: 44px;
+  min-width: 44px;
 }
 
 html[data-viz-variant='dock'] .viz-add-shell--dock {
@@ -219,12 +298,7 @@ html[data-viz-variant='dock'] .viz-add-shell--dock {
 }
 
 html[data-viz-variant='dock'] .viz-add-shell--dock::before {
-  content: attr(data-title);
-  display: block;
-  padding: 14px 14px 0;
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 600;
+  content: none;
 }
 
 html[data-viz-variant='dock'] .map-frame--viz-dock .map-frame__body,
@@ -239,126 +313,66 @@ html[data-viz-variant='dock'] .graph-frame--viz-dock .viz-chrome {
   justify-content: flex-end;
 }
 
-/* --- Drawer: bottom sheet --- */
-html[data-viz-variant='drawer'] .map-frame--viz-drawer,
-html[data-viz-variant='drawer'] .graph-frame--viz-drawer {
+/* --- Dropdown --- */
+html[data-viz-variant='dropdown'] .map-frame--viz-dropdown,
+html[data-viz-variant='dropdown'] .graph-frame--viz-dropdown {
   position: relative;
 }
 
-html[data-viz-variant='drawer'] .viz-search-host {
-  display: block;
+html[data-viz-variant='dropdown'] .viz-search-host {
+  display: none;
   position: absolute;
-  right: 12px;
-  bottom: 52px;
+  top: 52px;
   left: 12px;
   z-index: 520;
+  width: min(420px, calc(100% - 140px));
   pointer-events: none;
 }
 
-html[data-viz-variant='drawer'] .viz-add-shell--drawer {
-  pointer-events: auto;
-  border: 1px solid rgb(16 24 40 / 8%);
-  border-radius: 12px 12px 0 0;
-  background: var(--bg-panel);
-  box-shadow: 0 -8px 32px rgb(16 24 40 / 12%);
-  max-height: min(52vh, 420px);
+html[data-viz-variant='dropdown'] .viz-search-host--active {
+  display: block;
 }
 
-html[data-viz-variant='drawer'] .viz-add-shell--drawer.viz-add-shell--closed {
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown {
+  pointer-events: auto;
+  border: 1px solid rgb(255 255 255 / 88%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 94%);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgb(16 24 40 / 12%), 0 12px 32px rgb(16 24 40 / 10%);
+  overflow: hidden;
+}
+
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown.viz-add-shell--closed {
   display: none;
 }
 
-html[data-viz-variant='drawer'] .viz-add-shell--drawer .viz-add-shell__results {
-  max-height: min(36vh, 300px);
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__search {
+  border-bottom: 0;
+  padding: 8px 10px;
 }
 
-html[data-viz-variant='drawer'] .map-frame--viz-drawer .viz-chrome .viz-search-trigger,
-html[data-viz-variant='drawer'] .graph-frame--viz-drawer .viz-chrome .viz-search-trigger {
-  max-width: none;
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown:not(.viz-add-shell--closed) .viz-add-shell__search {
+  border-bottom: 1px solid rgb(16 24 40 / 6%);
 }
 
-/* --- Split: permanent sidebar --- */
-html[data-viz-variant='split'] .map-frame--viz-split,
-html[data-viz-variant='split'] .graph-frame--viz-split {
-  flex-direction: row;
+html[data-viz-variant='dropdown'] .viz-add-shell--dropdown .viz-add-shell__results {
+  max-height: min(360px, 44vh);
 }
 
-html[data-viz-variant='split'] .viz-search-host {
-  display: flex;
-  flex-direction: column;
-  width: min(380px, 38vw);
-  flex-shrink: 0;
-  border-right: 1px solid var(--border);
-  background: var(--bg-subtle);
+html[data-viz-variant='dropdown'] .map-frame--viz-dropdown .viz-chrome .viz-search-trigger,
+html[data-viz-variant='dropdown'] .graph-frame--viz-dropdown .viz-chrome .viz-search-trigger {
+  max-width: 300px;
 }
 
-html[data-viz-variant='split'] .viz-add-shell--split {
-  flex: 1;
-  min-height: 0;
+html[data-viz-variant='dropdown'] .viz-search-trigger--open {
+  border-color: rgb(27 68 177 / 28%);
+  background: rgb(255 255 255 / 98%);
+  box-shadow: 0 2px 8px rgb(16 24 40 / 10%), 0 8px 24px rgb(16 24 40 / 10%);
 }
 
-html[data-viz-variant='split'] .viz-add-shell--split::before {
-  content: attr(data-title);
-  display: block;
-  padding: 16px 16px 8px;
+html[data-viz-variant='dropdown'] .viz-search-trigger--open .viz-search-trigger__label {
   color: var(--text);
-  font-size: 15px;
-  font-weight: 600;
-}
-
-html[data-viz-variant='split'] .viz-add-shell--split .viz-add-shell__footer {
-  display: none;
-}
-
-html[data-viz-variant='split'] .map-frame--viz-split .map-frame__body,
-html[data-viz-variant='split'] .graph-frame--viz-split .graph-frame__body {
-  flex: 1;
-}
-
-html[data-viz-variant='split'] .map-frame--viz-split .viz-chrome,
-html[data-viz-variant='split'] .graph-frame--viz-split .viz-chrome {
-  left: auto;
-  width: auto;
-  justify-content: flex-end;
-}
-
-/* --- Spotlight: centered palette --- */
-html[data-viz-variant='spotlight'] .map-frame--viz-spotlight,
-html[data-viz-variant='spotlight'] .graph-frame--viz-spotlight {
-  position: relative;
-}
-
-html[data-viz-variant='spotlight'] .viz-search-host {
-  display: block;
-  position: absolute;
-  top: 18%;
-  left: 50%;
-  z-index: 520;
-  width: min(520px, calc(100% - 48px));
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
-html[data-viz-variant='spotlight'] .viz-add-shell--spotlight {
-  pointer-events: auto;
-  border: 1px solid rgb(16 24 40 / 10%);
-  border-radius: 14px;
-  background: rgb(255 255 255 / 96%);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 16px 48px rgb(16 24 40 / 16%), 0 4px 12px rgb(16 24 40 / 8%);
-}
-
-html[data-viz-variant='spotlight'] .viz-add-shell--spotlight.viz-add-shell--closed {
-  display: none;
-}
-
-html[data-viz-variant='spotlight'] .viz-add-shell--spotlight .viz-add-shell__results {
-  max-height: min(320px, 40vh);
-}
-
-html[data-viz-variant='spotlight'] .map-frame--viz-spotlight .viz-chrome .viz-search-trigger,
-html[data-viz-variant='spotlight'] .graph-frame--viz-spotlight .viz-chrome .viz-search-trigger {
-  max-width: 220px;
 }
 
 /* Launcher page */

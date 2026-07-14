@@ -10,31 +10,24 @@
       label: 'Expandable strip',
       persistent: true,
       explicitOpen: false,
-      description: 'Search bar + results drop down from the top chrome.',
+      mountOnView: true,
+      startResultsCollapsed: true,
+      description: 'Search bar always visible; click to expand results over the map.',
     },
     dock: {
       label: 'Side dock',
       persistent: true,
       explicitOpen: false,
-      description: 'Dedicated left panel for search and results.',
+      mountOnView: true,
+      dockCollapsible: true,
+      startDockCollapsed: true,
+      description: 'Left panel for search; collapse when you need more canvas space.',
     },
-    drawer: {
-      label: 'Bottom drawer',
+    dropdown: {
+      label: 'Floating dropdown',
       persistent: true,
       explicitOpen: true,
-      description: 'Results slide up from the bottom; search stays on top.',
-    },
-    split: {
-      label: 'Split view',
-      persistent: true,
-      explicitOpen: false,
-      description: 'Search list and canvas side by side.',
-    },
-    spotlight: {
-      label: 'Spotlight palette',
-      persistent: true,
-      explicitOpen: true,
-      description: 'Lightweight centered palette without dimming the canvas.',
+      description: 'Search button in the corner; opens a floating panel over the map.',
     },
   };
 
@@ -46,6 +39,9 @@
   let toastTimer = null;
   let onDoneCallback = null;
   let focusInputCallback = null;
+  let onResultsChangeCallback = null;
+  let resultsExpanded = false;
+  let dockCollapsed = false;
 
   function get() {
     return current;
@@ -65,6 +61,27 @@
 
   function needsExplicitOpen() {
     return getMeta().explicitOpen;
+  }
+
+  function mountsOnView() {
+    return getMeta().mountOnView === true;
+  }
+
+  function isResultsExpanded() {
+    if (current === 'strip') {
+      return resultsExpanded;
+    }
+    if (needsExplicitOpen()) {
+      return shell && !shell.classList.contains('viz-add-shell--closed');
+    }
+    if (current === 'dock') {
+      return !dockCollapsed;
+    }
+    return true;
+  }
+
+  function isDockCollapsed() {
+    return current === 'dock' && dockCollapsed;
   }
 
   function readVariantFromUrl() {
@@ -100,12 +117,25 @@
     if (!banner) {
       return;
     }
-    const meta = getMeta();
     banner.classList.toggle('hidden', isModal());
     const label = banner.querySelector('[data-variant-label]');
     if (label) {
-      label.textContent = meta.label;
+      label.textContent = getMeta().label;
     }
+  }
+
+  function updateVariantControls() {
+    const collapseBtn = document.getElementById('btn-viz-search-collapse');
+    const closeResultsBtn = document.getElementById('btn-viz-search-close-results');
+    const dockHeader = shell?.querySelector('[data-dock-only]');
+    const dockToggle = document.getElementById('btn-viz-dock-toggle');
+    const footer = shell?.querySelector('[data-persistent-only]');
+
+    collapseBtn?.classList.toggle('hidden', current !== 'strip');
+    closeResultsBtn?.classList.toggle('hidden', current !== 'strip');
+    dockHeader?.classList.toggle('hidden', current !== 'dock' || dockCollapsed);
+    dockToggle?.classList.toggle('hidden', current !== 'dock' || !dockCollapsed);
+    footer?.classList.toggle('hidden', current === 'strip' || current === 'dropdown' || !isResultsExpanded());
   }
 
   function setShellOpen(open) {
@@ -114,10 +144,46 @@
     }
     shell.classList.toggle('viz-add-shell--open', open);
     shell.classList.toggle('viz-add-shell--closed', !open);
+    if (current === 'strip') {
+      resultsExpanded = open;
+      const collapseBtn = document.getElementById('btn-viz-search-collapse');
+      if (collapseBtn) {
+        collapseBtn.textContent = open ? '▴' : '▾';
+        collapseBtn.setAttribute('aria-label', open ? 'Collapse results' : 'Expand results');
+      }
+    }
+    updateVariantControls();
+    onResultsChangeCallback?.();
+    if (current === 'dropdown') {
+      updateChromeTriggers();
+    }
   }
 
-  function updateChromeTriggers(context) {
-    const active = context || null;
+  function setResultsExpanded(open) {
+    if (current === 'strip') {
+      setShellOpen(open);
+      return;
+    }
+    setShellOpen(open);
+  }
+
+  function setDockCollapsed(collapsed) {
+    if (current !== 'dock') {
+      return;
+    }
+    dockCollapsed = collapsed;
+    hosts.map?.classList.toggle('viz-search-host--collapsed', collapsed);
+    hosts.graph?.classList.toggle('viz-search-host--collapsed', collapsed);
+    if (shell) {
+      shell.classList.toggle('hidden', collapsed);
+    }
+    const dockToggle = document.getElementById('btn-viz-dock-toggle');
+    dockToggle?.classList.toggle('hidden', !collapsed);
+    updateVariantControls();
+    onResultsChangeCallback?.();
+  }
+
+  function updateChromeTriggers() {
     for (const key of ['map', 'graph']) {
       const bar = chrome[key];
       if (!bar) {
@@ -127,8 +193,14 @@
       if (!trigger) {
         continue;
       }
-      const hideTrigger = !isModal() && (current === 'strip' || current === 'split' || current === 'dock');
+      const hideTrigger = !isModal() && (current === 'strip' || current === 'dock');
       trigger.classList.toggle('hidden', hideTrigger);
+      if (current === 'dropdown') {
+        const isOpen =
+          shell?.dataset.context === key && !shell.classList.contains('viz-add-shell--closed');
+        trigger.classList.toggle('viz-search-trigger--open', isOpen);
+        trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      }
     }
   }
 
@@ -140,26 +212,42 @@
     const host = hosts[context];
     const frame = frames[context];
     const title = document.getElementById('viz-search-modal-title');
+    const dockTitle = shell.querySelector('[data-dock-title]');
     if (title) {
       title.textContent = contextTitle(context);
     }
+    if (dockTitle) {
+      dockTitle.textContent = contextTitle(context);
+    }
 
     shell.dataset.context = context;
+    shell.dataset.title = contextTitle(context);
     shell.className = `viz-add-shell viz-add-shell--${current}`;
+
+    if (current === 'dropdown') {
+      const body = frame?.querySelector('.map-frame__body, .graph-frame__body');
+      if (body && host.parentElement !== body) {
+        body.insertBefore(host, body.firstChild);
+      }
+    }
+
     host.appendChild(shell);
+
+    if (current === 'dock') {
+      const dockToggle = document.getElementById('btn-viz-dock-toggle');
+      if (dockToggle && dockToggle.parentElement !== host) {
+        host.insertBefore(dockToggle, host.firstChild);
+      }
+    }
 
     if (frame) {
       frame.classList.remove(
         'map-frame--viz-strip',
         'map-frame--viz-dock',
-        'map-frame--viz-drawer',
-        'map-frame--viz-split',
-        'map-frame--viz-spotlight',
+        'map-frame--viz-dropdown',
         'graph-frame--viz-strip',
         'graph-frame--viz-dock',
-        'graph-frame--viz-drawer',
-        'graph-frame--viz-split',
-        'graph-frame--viz-spotlight'
+        'graph-frame--viz-dropdown'
       );
       const prefix = frame.classList.contains('map-frame') ? 'map-frame' : 'graph-frame';
       if (!isModal()) {
@@ -167,33 +255,70 @@
       }
     }
 
-    updateChromeTriggers(context);
-    const collapseBtn = document.getElementById('btn-viz-search-collapse');
-    if (collapseBtn) {
-      collapseBtn.classList.toggle('hidden', current !== 'strip');
-    }
+    updateChromeTriggers();
+    updateVariantControls();
 
     if (isModal()) {
       setShellOpen(true);
       return;
     }
 
+    if (current === 'strip') {
+      setShellOpen(false);
+      return;
+    }
+
+    if (current === 'dock') {
+      setDockCollapsed(dockCollapsed);
+      setShellOpen(!dockCollapsed);
+      return;
+    }
+
     if (needsExplicitOpen()) {
+      setShellOpen(false);
       return;
     }
 
     setShellOpen(true);
   }
 
-  function updateOpenState(sessionOpen) {
+  function updateOpenState(sessionOpen, context) {
     if (isModal()) {
       return;
     }
-    setShellOpen(sessionOpen);
-    const footer = shell?.querySelector('[data-persistent-only]');
-    if (footer) {
-      footer.classList.toggle('hidden', !sessionOpen || current === 'strip' || current === 'split');
+
+    if (current === 'dropdown') {
+      setShellOpen(sessionOpen);
+      const ctx = context || shell?.dataset.context;
+      const host = hosts[ctx];
+      if (host) {
+        host.classList.toggle('viz-search-host--active', sessionOpen);
+      }
+      updateVariantControls();
+      return;
     }
+
+    if (current === 'strip') {
+      return;
+    }
+
+    setShellOpen(sessionOpen);
+  }
+
+  function collapseActivePanel() {
+    if (current === 'strip') {
+      setResultsExpanded(false);
+      return true;
+    }
+    if (current === 'dropdown') {
+      updateOpenState(false, shell?.dataset.context);
+      return true;
+    }
+    if (current === 'dock' && !dockCollapsed) {
+      setDockCollapsed(true);
+      return true;
+    }
+    return false;
   }
 
   function init(options = {}) {
@@ -201,6 +326,7 @@
     document.documentElement.dataset.vizVariant = current;
     onDoneCallback = options.onDone || null;
     focusInputCallback = options.focusInput || null;
+    onResultsChangeCallback = options.onResultsChange || null;
 
     shell = document.getElementById('viz-add-shell');
     hosts.map = document.getElementById('viz-search-host-map');
@@ -210,6 +336,9 @@
     chrome.map = document.querySelector('#view-map .viz-chrome');
     chrome.graph = document.querySelector('#view-graph .viz-chrome');
 
+    dockCollapsed = getMeta().startDockCollapsed === true;
+    resultsExpanded = false;
+
     const modal = document.getElementById('viz-search-modal');
     const modalHeader = shell?.querySelector('[data-modal-only]');
     const persistentFooter = shell?.querySelector('[data-persistent-only]');
@@ -217,41 +346,87 @@
 
     if (isModal()) {
       document.body.classList.add('viz-variant-modal');
-      if (persistentFooter) {
-        persistentFooter.classList.add('hidden');
-      }
+      persistentFooter?.classList.add('hidden');
     } else {
       document.body.classList.add('viz-variant-alt');
-      if (modal) {
-        modal.classList.add('viz-search-modal--disabled');
-      }
-      if (modalHeader) {
-        modalHeader.classList.add('hidden');
-      }
-      if (persistentFooter) {
-        persistentFooter.classList.remove('hidden');
-      }
-      if (shell && modal?.querySelector('.viz-search-modal__panel')) {
-        // Shell is moved out of modal on first mount.
-      }
+      modal?.classList.add('viz-search-modal--disabled');
+      modalHeader?.classList.add('hidden');
+      persistentFooter?.classList.remove('hidden');
     }
 
     doneButton?.addEventListener('click', () => {
       onDoneCallback?.({ clearSearch: false });
     });
 
-    const collapseStrip = document.getElementById('btn-viz-search-collapse');
-    collapseStrip?.addEventListener('click', () => {
+    document.getElementById('btn-viz-search-collapse')?.addEventListener('click', (event) => {
+      event.stopPropagation();
       if (current === 'strip') {
-        const open = shell?.classList.contains('viz-add-shell--closed');
-        setShellOpen(open);
-        if (open) {
+        setResultsExpanded(!resultsExpanded);
+        if (resultsExpanded) {
           focusInputCallback?.();
         }
       }
     });
 
+    document.getElementById('btn-viz-search-close-results')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (current === 'strip') {
+        setResultsExpanded(false);
+      }
+    });
+
+    document.getElementById('btn-viz-dock-collapse')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (current === 'dock') {
+        setDockCollapsed(true);
+      }
+    });
+
+    document.getElementById('btn-viz-dock-toggle')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (current === 'dock') {
+        setDockCollapsed(false);
+        focusInputCallback?.();
+      }
+    });
+
+    shell?.querySelector('.viz-add-shell__search')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+
+    shell?.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+
+    document.addEventListener('click', (event) => {
+      if (shell?.contains(event.target)) {
+        return;
+      }
+      if (event.target.closest('.viz-search-trigger')) {
+        return;
+      }
+      if (current === 'strip' && resultsExpanded) {
+        setResultsExpanded(false);
+      } else if (current === 'dropdown' && shell && !shell.classList.contains('viz-add-shell--closed')) {
+        updateOpenState(false, shell.dataset.context);
+      }
+    });
+
+    const vizInput = document.getElementById('viz-search-input');
+    vizInput?.addEventListener('focus', () => {
+      if (current === 'strip' && !resultsExpanded) {
+        setResultsExpanded(true);
+        onResultsChangeCallback?.();
+      }
+    });
+
     updateBanner();
+    updateVariantControls();
+
+    if (!isModal()) {
+      mountTo('map');
+    }
+
     return current;
   }
 
@@ -262,10 +437,16 @@
     isModal,
     isPersistent,
     needsExplicitOpen,
+    mountsOnView,
+    isResultsExpanded,
+    isDockCollapsed,
     init,
     mountTo,
     updateOpenState,
     setShellOpen,
+    setResultsExpanded,
+    setDockCollapsed,
+    collapseActivePanel,
     showToast,
     contextTitle,
     readVariantFromUrl,
