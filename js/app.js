@@ -963,9 +963,24 @@
     refreshSelectionViews();
   }
 
-  function syncMapGeographicSearch() {
+  function syncMapGeographicSearchOnInput() {
     if (state.activeView !== 'map') {
       clearMapAreaHighlight();
+      return;
+    }
+
+    const term = state.searchTerm.trim();
+    if (
+      !state.activeGeographicArea ||
+      !term ||
+      term.toLowerCase() !== state.activeGeographicArea.term.toLowerCase()
+    ) {
+      clearMapAreaHighlight();
+    }
+  }
+
+  function submitMapGeographicSearch() {
+    if (state.activeView !== 'map') {
       return;
     }
 
@@ -978,10 +993,6 @@
     const area = MapLocations.findGeographicArea(term, lookup);
     if (!area) {
       clearMapAreaHighlight();
-      return;
-    }
-
-    if (state.activeGeographicArea?.id === area.id && state.activeGeographicArea?.term === term) {
       return;
     }
 
@@ -1467,7 +1478,7 @@
     }
     refreshSearchResults();
     if (state.activeView === 'map') {
-      syncMapGeographicSearch();
+      syncMapGeographicSearchOnInput();
     }
   }
 
@@ -2522,7 +2533,6 @@
         renderMapPins();
       }
       activateVizSearchForView('map');
-      syncMapGeographicSearch();
     }
     if (viewName === 'graph') {
       renderGraphView();
@@ -2862,6 +2872,11 @@
     objectTypes,
     attributeCatalog,
     onChange: handleSmartSearchChange,
+    onSubmit: () => {
+      if (state.activeView === 'map') {
+        submitMapGeographicSearch();
+      }
+    },
   };
 
   SmartSearchBar.init({

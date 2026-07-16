@@ -407,6 +407,7 @@
       objectTypes,
       attributeCatalog,
       onChange,
+      onSubmit,
     } = options;
 
     let activeIndex = 0;
@@ -617,6 +618,7 @@
         }
         hideMenu();
         onChange();
+        onSubmit?.();
         return;
       }
 

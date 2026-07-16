@@ -746,12 +746,12 @@
 
   function findGeographicArea(term, lookup) {
     const normalized = term.trim().toLowerCase();
-    if (!normalized) {
+    if (!normalized || normalized.length < 3) {
       return null;
     }
 
     for (const area of GEO_AREAS) {
-      if (area.names.some((name) => normalized.includes(name) || name.includes(normalized))) {
+      if (area.names.some((name) => normalized === name)) {
         return area;
       }
     }
@@ -761,8 +761,10 @@
       if (!isLocationEntity(entity)) {
         continue;
       }
-      const city = (readAttr(entity, 'ORTSNAME') || readAttr(entity, 'REGION') || '').toLowerCase();
-      if (city && (city.includes(normalized) || normalized.includes(city))) {
+      const city = (readAttr(entity, 'ORTSNAME') || readAttr(entity, 'REGION') || '')
+        .trim()
+        .toLowerCase();
+      if (city && normalized === city) {
         matchingLocations.push(entity);
       }
     }
