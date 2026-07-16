@@ -19,12 +19,21 @@
     vizSearchSessionOpen: false,
     vizSearchContext: null,
     activeView: 'search',
+    activeAsset: 'object-explorer',
+    openWorkbenchAssets: new Set(['object-explorer', 'new-object']),
     collapsedResultGroups: new Set(),
     mapHeatmap: {
       enabled: false,
       typeFilters: null,
     },
     activeGeographicArea: null,
+    mapDrawMode: null,
+    placeSearchResults: [],
+    placeSearchTimer: null,
+    placeSearchRequestId: 0,
+    areaSuggestionResults: [],
+    areaSuggestionTimer: null,
+    areaSuggestionRequestId: 0,
   };
 
   const graphState = GraphView.createGraphState();
@@ -41,6 +50,7 @@
     viewportStart: null,
     nodeOffset: null,
     dragMoved: false,
+    boxSelectStart: null,
   };
 
   let map = null;
@@ -49,12 +59,22 @@
   let selectionLayer = null;
   let heatLayer = null;
   const MAP_BASE_ZOOM = 13;
+  const AREA_HIGHLIGHT_FILL_OPACITY = 0.05;
   const mapBoxSelect = {
     active: false,
     startLatLng: null,
     startPoint: null,
     rectangle: null,
   };
+  const mapDrawState = {
+    mode: null,
+    polygonPoints: [],
+    linePoints: [],
+    lassoPoints: [],
+    lassoActive: false,
+    preview: null,
+  };
+  const GEOGRAPHIC_AREAS_GROUP_ID = '__geographic_areas__';
 
   function ensureMap() {
     if (map) {
@@ -72,9 +92,17 @@
     areaLayer = L.layerGroup().addTo(map);
     selectionLayer = L.layerGroup().addTo(map);
     mountMapBoxSelection();
+    map.on('mousedown', (event) => {
+      if (event.originalEvent.button === 0) {
+        hideMapContextMenu();
+      }
+    });
+
     map.on('click', (event) => {
-      hideMapContextMenu();
       if (event.originalEvent?.button !== 0) {
+        return;
+      }
+      if (mapDrawState.mode) {
         return;
       }
       if (state.multiSelectedIds.size > 0) {
@@ -131,6 +159,10 @@
     vizSearchModalTitle: document.getElementById('viz-search-modal-title'),
     btnCloseVizSearch: document.getElementById('btn-close-viz-search'),
     objectTypeNav: document.getElementById('object-type-nav'),
+    workbenchAssetExplorer: document.getElementById('workbench-asset-explorer'),
+    workbenchAssetNewObject: document.getElementById('workbench-asset-new-object'),
+    workbenchTabExplorer: document.getElementById('workbench-tab-explorer'),
+    workbenchTabNewObject: document.getElementById('workbench-tab-new-object'),
     instancePanel: document.getElementById('instance-panel'),
     instancePanelActions: document.getElementById('instance-panel-actions'),
     instancePanelRelatedOptions: document.getElementById('instance-panel-related-options'),
@@ -157,6 +189,7 @@
     relatedTimePeriod: document.getElementById('related-time-period'),
     graphCaption: document.getElementById('graph-caption'),
     graphSvg: document.getElementById('graph-svg'),
+    graphBoxSelect: document.getElementById('graph-box-select'),
     graphNodeTooltip: document.getElementById('graph-node-tooltip'),
     graphContextMenu: document.getElementById('graph-context-menu'),
     graphContextDetails: document.getElementById('graph-context-details'),
@@ -172,27 +205,53 @@
     mapZoom: document.getElementById('map-zoom'),
     mapLegend: document.getElementById('map-legend'),
     mapStatusBar: document.querySelector('.map-status-bar'),
-    mapFrame: document.querySelector('.map-frame'),
+    mapFrame: document.getElementById('map-frame'),
+    mapAreaTools: document.getElementById('map-area-tools'),
+    btnDrawArea: document.getElementById('btn-draw-area'),
+    mapAreaToolsMenu: document.getElementById('map-area-tools-menu'),
+    mapAreaToolsLabel: document.getElementById('map-area-tools-label'),
+    btnFinishAreaShape: document.getElementById('btn-finish-area-shape'),
+    btnCancelAreaDraw: document.getElementById('btn-cancel-area-draw'),
+    btnShareArea: document.getElementById('btn-share-area'),
+    mapSelectionHint: document.getElementById('map-selection-hint'),
     mapShowHeatmap: document.getElementById('map-show-heatmap'),
     mapHeatmapFilters: document.getElementById('map-heatmap-filters'),
     mapHeatmapTypeFilters: document.getElementById('map-heatmap-type-filters'),
     mapContextMenu: document.getElementById('map-context-menu'),
     mapContextDetails: document.getElementById('map-context-details'),
-    mapContextRelated: document.getElementById('map-context-related'),
+    mapContextRelatedSection: document.getElementById('map-context-related-section'),
+    mapContextRelatedLabel: document.getElementById('map-context-related-label'),
+    mapContextRelatedDivider: document.getElementById('map-context-related-divider'),
+    menuShowRelated: document.getElementById('menu-show-related'),
+    menuRelatedRow: document.getElementById('menu-related-row'),
+    menuRelatedTypeFilters: document.getElementById('menu-related-type-filters'),
+    menuRelatedFiltersFlyout: document.getElementById('menu-related-filters-flyout'),
+    menuRelatedTimePeriod: document.getElementById('menu-related-time-period'),
+    menuRelatedDistance: document.getElementById('menu-related-distance'),
     mapContextGraph: document.getElementById('map-context-graph'),
     mapContextRemove: document.getElementById('map-context-remove'),
-    mapRelatedPopover: document.getElementById('map-related-popover'),
-    popoverShowRelated: document.getElementById('popover-show-related'),
-    popoverRelatedFilters: document.getElementById('popover-related-filters'),
-    popoverRelatedTypeFilters: document.getElementById('popover-related-type-filters'),
-    popoverRelatedTimePeriod: document.getElementById('popover-related-time-period'),
-    popoverRelatedDistance: document.getElementById('popover-related-distance'),
-    popoverRelatedCancel: document.getElementById('popover-related-cancel'),
-    popoverRelatedApply: document.getElementById('popover-related-apply'),
     relatedDistance: document.getElementById('related-distance'),
   };
 
-  let relatedPopoverEntityId = null;
+  function getRelatedUiElements(source = 'panel') {
+    if (source === 'menu') {
+      return {
+        showRelated: els.menuShowRelated,
+        relatedRow: els.menuRelatedRow,
+        typeFilters: els.menuRelatedTypeFilters,
+        timePeriod: els.menuRelatedTimePeriod,
+        distance: els.menuRelatedDistance,
+      };
+    }
+
+    return {
+      showRelated: els.showRelatedObjects,
+      filters: els.relatedObjectFilters,
+      typeFilters: els.relatedTypeFilters,
+      timePeriod: els.relatedTimePeriod,
+      distance: els.relatedDistance,
+    };
+  }
 
   function defaultPinSettings() {
     return {
@@ -351,7 +410,7 @@
   function normalizePinTypeFilters(settings) {
     if (settings.typeFilters instanceof Set) {
       const optionCount = getMapRelatedTypeOptions().length;
-      if (settings.typeFilters.size === 0 || settings.typeFilters.size >= optionCount) {
+      if (settings.typeFilters.size >= optionCount) {
         return null;
       }
       return new Set(settings.typeFilters);
@@ -365,15 +424,228 @@
   function readRelatedTypeFiltersFromContainer(container) {
     const options = getMapRelatedTypeOptions();
     const selected = new Set();
-    for (const input of container.querySelectorAll('input[type="checkbox"]')) {
+    for (const input of container.querySelectorAll('input[type="checkbox"][data-type-id]')) {
       if (input.checked) {
         selected.add(input.value);
       }
     }
-    if (selected.size === 0 || selected.size === options.length) {
+    if (selected.size === options.length) {
       return null;
     }
     return selected;
+  }
+
+  function formatRelatedTypeFilterLabel(activeFilters) {
+    const options = getMapRelatedTypeOptions();
+    const active = activeFilters instanceof Set ? activeFilters : null;
+    if (!active) {
+      return 'All object types';
+    }
+    if (active.size === 0) {
+      return 'No object types';
+    }
+    if (active.size === 1) {
+      return [...active][0];
+    }
+    return `${active.size} object types`;
+  }
+
+  const relatedTypeMultiselectState = new WeakMap();
+
+  function getRelatedTypeMultiselectUi(container) {
+    return relatedTypeMultiselectState.get(container) || null;
+  }
+
+  function syncRelatedTypeMultiselectLabel(container, activeFilters = null) {
+    const ui = getRelatedTypeMultiselectUi(container);
+    if (!ui?.label) {
+      return;
+    }
+    const filters =
+      activeFilters === null ? readRelatedTypeFiltersFromContainer(container) : activeFilters;
+    ui.label.textContent = formatRelatedTypeFilterLabel(filters);
+  }
+
+  function closeRelatedTypeMultiselect(container) {
+    const ui = getRelatedTypeMultiselectUi(container);
+    if (!ui) {
+      return;
+    }
+    ui.panel?.classList.add('hidden');
+    ui.trigger?.setAttribute('aria-expanded', 'false');
+  }
+
+  function renderRelatedTypeMultiselect(container, activeFilters, config = {}) {
+    const options = getMapRelatedTypeOptions();
+    const active = activeFilters instanceof Set ? activeFilters : null;
+    const allActive = !active;
+    const { idPrefix, onChange, onOpen, stopPropagation = false } = config;
+
+    if (!container.dataset.mounted) {
+      container.dataset.mounted = 'true';
+      container.innerHTML = `
+        <button type="button" class="type-multiselect-trigger" id="${idPrefix}-trigger" aria-haspopup="listbox" aria-expanded="false">
+          <span class="type-multiselect-label" id="${idPrefix}-label"></span>
+          <span class="type-multiselect-chevron" aria-hidden="true">▾</span>
+        </button>
+        <div class="type-multiselect-panel hidden" id="${idPrefix}-panel" role="listbox">
+          <div class="type-multiselect-actions">
+            <button type="button" class="type-multiselect-action" id="${idPrefix}-select-all">Select all</button>
+            <button type="button" class="type-multiselect-action" id="${idPrefix}-clear-all">Clear all</button>
+          </div>
+          <div class="type-multiselect-options" id="${idPrefix}-options"></div>
+        </div>
+      `;
+
+      const ui = {
+        trigger: document.getElementById(`${idPrefix}-trigger`),
+        label: document.getElementById(`${idPrefix}-label`),
+        panel: document.getElementById(`${idPrefix}-panel`),
+        options: document.getElementById(`${idPrefix}-options`),
+        selectAll: document.getElementById(`${idPrefix}-select-all`),
+        clearAll: document.getElementById(`${idPrefix}-clear-all`),
+      };
+      relatedTypeMultiselectState.set(container, ui);
+
+      ui.trigger.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const open = ui.panel.classList.contains('hidden');
+        closeMenuRelatedFlyouts();
+        closeRelatedTypeMultiselect(els.menuRelatedTypeFilters);
+        closeRelatedTypeMultiselect(els.relatedTypeFilters);
+        ui.panel.classList.toggle('hidden', !open);
+        ui.trigger.setAttribute('aria-expanded', String(open));
+        if (open) {
+          onOpen?.();
+        }
+      });
+
+      ui.selectAll.addEventListener('click', (event) => {
+        event.stopPropagation();
+        for (const input of ui.options.querySelectorAll('input[type="checkbox"]')) {
+          input.checked = true;
+        }
+        syncRelatedTypeMultiselectLabel(container);
+        onChange?.();
+      });
+
+      ui.clearAll.addEventListener('click', (event) => {
+        event.stopPropagation();
+        for (const input of ui.options.querySelectorAll('input[type="checkbox"]')) {
+          input.checked = false;
+        }
+        syncRelatedTypeMultiselectLabel(container);
+        onChange?.();
+      });
+
+      if (stopPropagation) {
+        container.addEventListener('mousedown', (event) => event.stopPropagation());
+        container.addEventListener('click', (event) => event.stopPropagation());
+      }
+    }
+
+    const ui = getRelatedTypeMultiselectUi(container);
+    ui.options.innerHTML = '';
+    for (const type of options) {
+      const checked = allActive || active.has(type.id);
+      const row = document.createElement('label');
+      row.className = 'type-multiselect-option';
+      row.innerHTML = `
+        <input type="checkbox" data-type-id="${type.id}" value="${type.id}" ${checked ? 'checked' : ''} />
+        <span>${type.id}</span>
+      `;
+      row.querySelector('input').addEventListener('change', () => {
+        syncRelatedTypeMultiselectLabel(container);
+        onChange?.();
+      });
+      ui.options.appendChild(row);
+    }
+
+    syncRelatedTypeMultiselectLabel(container, activeFilters);
+    closeRelatedTypeMultiselect(container);
+  }
+
+  function renderMenuRelatedTypeFilters(activeFilters) {
+    renderRelatedTypeMultiselect(els.menuRelatedTypeFilters, activeFilters, {
+      idPrefix: 'menu-related-type',
+      onChange: applyContextMenuRelatedOptions,
+      onOpen: () => requestAnimationFrame(() => positionMenuRelatedFlyout()),
+      stopPropagation: true,
+    });
+  }
+
+  function syncMenuRelatedFiltersFlyout(settings) {
+    renderMenuRelatedTypeFilters(normalizePinTypeFilters(settings));
+    els.menuRelatedTimePeriod.value = settings.timePeriod || 'all';
+    els.menuRelatedDistance.value = formatDistanceMiles(settings.distanceMiles);
+
+    if (openMenuRelatedFlyout) {
+      requestAnimationFrame(() => positionMenuRelatedFlyout());
+    }
+  }
+
+  let openMenuRelatedFlyout = false;
+
+  function positionMenuRelatedFlyout() {
+    const flyout = els.menuRelatedFiltersFlyout;
+    const anchor = els.menuRelatedRow;
+    const menu = els.mapContextMenu;
+    if (!flyout || !anchor || !menu) {
+      return;
+    }
+
+    flyout.style.position = 'fixed';
+    flyout.style.right = 'auto';
+    flyout.style.bottom = 'auto';
+    flyout.style.zIndex = '10001';
+
+    const padding = 8;
+    const gap = 4;
+    const menuRect = menu.getBoundingClientRect();
+    const anchorRect = anchor.getBoundingClientRect();
+    flyout.classList.remove('hidden');
+
+    const flyoutRect = flyout.getBoundingClientRect();
+    let left = menuRect.right + gap;
+    let top = anchorRect.top - 6;
+
+    if (left + flyoutRect.width > window.innerWidth - padding) {
+      left = menuRect.left - flyoutRect.width - gap;
+    }
+    left = Math.max(padding, Math.min(left, window.innerWidth - flyoutRect.width - padding));
+
+    if (top + flyoutRect.height > window.innerHeight - padding) {
+      top = Math.max(padding, window.innerHeight - flyoutRect.height - padding);
+    }
+    top = Math.max(padding, top);
+
+    flyout.style.left = `${left}px`;
+    flyout.style.top = `${top}px`;
+  }
+
+  function closeMenuRelatedFlyouts() {
+    closeRelatedTypeMultiselect(els.menuRelatedTypeFilters);
+    els.menuRelatedFiltersFlyout?.classList.add('hidden');
+    els.menuRelatedRow?.classList.remove('is-open');
+    openMenuRelatedFlyout = false;
+  }
+
+  function openMenuRelatedFlyoutPanel() {
+    if (!els.menuRelatedFiltersFlyout || !els.menuShowRelated.checked) {
+      return;
+    }
+
+    openMenuRelatedFlyout = true;
+    els.menuRelatedRow?.classList.add('is-open');
+    positionMenuRelatedFlyout();
+    requestAnimationFrame(() => positionMenuRelatedFlyout());
+  }
+
+  function renderRelatedTypeFilters(activeFilters) {
+    renderRelatedTypeMultiselect(els.relatedTypeFilters, activeFilters, {
+      idPrefix: 'panel-related-type',
+      onChange: applyRelatedOptionsForSelection,
+    });
   }
 
   function readRelatedTypeFiltersFromUI() {
@@ -381,70 +653,43 @@
   }
 
   function readRelatedSettingsFromUI(source = 'panel') {
-    const isPopover = source === 'popover';
+    const ui = getRelatedUiElements(source);
     return {
-      showRelated: isPopover ? els.popoverShowRelated.checked : els.showRelatedObjects.checked,
-      typeFilters: readRelatedTypeFiltersFromContainer(
-        isPopover ? els.popoverRelatedTypeFilters : els.relatedTypeFilters
-      ),
-      timePeriod: isPopover ? els.popoverRelatedTimePeriod.value : els.relatedTimePeriod.value,
-      distanceMiles: parseDistanceMiles(
-        isPopover ? els.popoverRelatedDistance.value : els.relatedDistance.value
-      ),
+      showRelated: ui.showRelated.checked,
+      typeFilters: readRelatedTypeFiltersFromContainer(ui.typeFilters),
+      timePeriod: ui.timePeriod.value,
+      distanceMiles: parseDistanceMiles(ui.distance.value),
     };
   }
 
-  function renderRelatedTypeFiltersInto(container, activeFilters, onChange) {
-    const options = getMapRelatedTypeOptions();
-    const active = activeFilters instanceof Set ? activeFilters : null;
-    const allActive = !active;
-
-    container.innerHTML = '';
-    for (const type of options) {
-      const checked = allActive || active.has(type.id);
-      const label = document.createElement('label');
-      label.className = `search-filter-chip${checked ? ' search-filter-chip--active' : ''}`;
-      label.innerHTML = `
-        <input type="checkbox" value="${type.id}" ${checked ? 'checked' : ''} />
-        <span>${type.id}</span>
-      `;
-      label.querySelector('input').addEventListener('change', (event) => {
-        label.classList.toggle('search-filter-chip--active', event.target.checked);
-        onChange?.();
-      });
-      container.appendChild(label);
-    }
-  }
-
-  function renderRelatedTypeFilters(activeFilters) {
-    renderRelatedTypeFiltersInto(els.relatedTypeFilters, activeFilters, applyRelatedOptionsForSelection);
-  }
-
-  function renderPopoverRelatedTypeFilters(activeFilters) {
-    renderRelatedTypeFiltersInto(els.popoverRelatedTypeFilters, activeFilters, updatePopoverRelatedFilterVisibility);
-  }
-
   function writeRelatedSettingsToUI(settings, target = 'panel') {
-    const isPopover = target === 'popover';
-    const showRelatedEl = isPopover ? els.popoverShowRelated : els.showRelatedObjects;
-    const timePeriodEl = isPopover ? els.popoverRelatedTimePeriod : els.relatedTimePeriod;
-    const distanceEl = isPopover ? els.popoverRelatedDistance : els.relatedDistance;
+    const ui = getRelatedUiElements(target);
 
-    showRelatedEl.checked = settings.showRelated;
-    timePeriodEl.value = settings.timePeriod || 'all';
-    distanceEl.value = formatDistanceMiles(settings.distanceMiles);
+    ui.showRelated.checked = settings.showRelated;
+    ui.timePeriod.value = settings.timePeriod || 'all';
+    ui.distance.value = formatDistanceMiles(settings.distanceMiles);
 
-    if (isPopover) {
-      renderPopoverRelatedTypeFilters(normalizePinTypeFilters(settings));
-      updatePopoverRelatedFilterVisibility();
-    } else {
-      renderRelatedTypeFilters(normalizePinTypeFilters(settings));
-      updateRelatedFilterVisibility();
+    if (target === 'menu') {
+      syncMenuRelatedFiltersFlyout(settings);
+      updateMenuRelatedFilterVisibility();
+      return;
     }
+
+    renderRelatedTypeFilters(normalizePinTypeFilters(settings));
+    updateRelatedFilterVisibility();
   }
 
-  function updatePopoverRelatedFilterVisibility() {
-    els.popoverRelatedFilters.classList.toggle('hidden', !els.popoverShowRelated.checked);
+  function updateMenuRelatedFilterVisibility() {
+    const enabled = els.menuShowRelated.checked;
+    els.menuRelatedRow?.classList.toggle('is-enabled', enabled);
+    els.menuRelatedRow?.classList.toggle('is-checked', enabled);
+
+    if (enabled) {
+      openMenuRelatedFlyoutPanel();
+      return;
+    }
+
+    closeMenuRelatedFlyouts();
   }
 
   function getPinSettings(entityId) {
@@ -464,7 +709,7 @@
     writeRelatedSettingsToUI(getPinSettings(state.selectedId), 'panel');
   }
 
-  function applyRelatedSettingsForEntity(entityId, settings) {
+  function applyRelatedSettingsForEntity(entityId, settings, options = {}) {
     if (!entityId || !lookup.has(entityId)) {
       return;
     }
@@ -477,7 +722,9 @@
       distanceMiles: settings.distanceMiles,
     });
 
-    writeRelatedSettingsToUI(settings, 'panel');
+    if (!options.skipPanelSync) {
+      writeRelatedSettingsToUI(settings, 'panel');
+    }
 
     if (state.activeView === 'map') {
       if (!state.pinnedIds.has(entityId)) {
@@ -487,7 +734,9 @@
         return;
       }
 
-      renderMapPins();
+      if (!options.skipRender) {
+        renderMapPins();
+      }
       return;
     }
 
@@ -504,8 +753,27 @@
         state.graphRoots.add(entityId);
       }
 
-      syncGraphRelatedObjects();
+      if (!options.skipRender) {
+        syncGraphRelatedObjects();
+      }
     }
+  }
+
+  function getBulkRelatedSettings(entityIds) {
+    if (entityIds.length === 0) {
+      return defaultPinSettings();
+    }
+
+    const settingsList = entityIds.map((entityId) => getPinSettings(entityId));
+    const anyShowRelated = settingsList.some((settings) => settings.showRelated);
+    const first = settingsList[0];
+
+    return {
+      showRelated: anyShowRelated,
+      typeFilters: first.typeFilters,
+      timePeriod: first.timePeriod,
+      distanceMiles: first.distanceMiles,
+    };
   }
 
   function findGraphAnchorForEntity(entityId) {
@@ -707,10 +975,13 @@
     syncRelatedOptionsFromSelection();
     ensureMap();
     if (!options.skipRender) {
-      renderMapPins(options);
+      if (!options.stayOnMap && state.activeView !== 'map') {
+        switchView('map', { mapRenderOptions: { fitAll: true } });
+      } else {
+        renderMapPins(options);
+      }
       refreshSearchResults();
-    }
-    if (!options.stayOnMap && !options.skipRender) {
+    } else if (!options.stayOnMap && state.activeView !== 'map') {
       switchView('map');
     }
     return true;
@@ -847,10 +1118,489 @@
     }
   }
 
+  function syncShareAreaUi() {
+    const area = state.searchFilters.geographicArea;
+    const showShare = Boolean(area && state.activeAsset === 'object-explorer' && state.activeView === 'map');
+    els.btnShareArea?.classList.toggle('hidden', !showShare);
+  }
+
+  function syncGeographicAreaToUrl() {
+    const area = state.searchFilters.geographicArea;
+    const url = new URL(window.location.href);
+    if (area) {
+      const encoded = MapLocations.encodeAreaShareParam(area);
+      if (encoded) {
+        url.searchParams.set('area', encoded);
+      }
+    } else {
+      url.searchParams.delete('area');
+    }
+    window.history.replaceState({}, '', url);
+  }
+
+  async function shareGeographicAreaLink() {
+    const area = state.searchFilters.geographicArea;
+    if (!area) {
+      return;
+    }
+
+    const shareUrl = MapLocations.buildAreaShareUrl(area);
+    syncGeographicAreaToUrl();
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+      } else {
+        window.prompt('Copy this link to share the geographic area:', shareUrl);
+        return;
+      }
+      VizSearchVariant.showToast('Area link copied to clipboard');
+    } catch {
+      window.prompt('Copy this link to share the geographic area:', shareUrl);
+    }
+  }
+
+  async function loadGeographicAreaFromUrl() {
+    const encoded = new URLSearchParams(window.location.search).get('area');
+    if (!encoded) {
+      return;
+    }
+
+    const area = MapLocations.decodeAreaShareParam(encoded);
+    if (!area) {
+      return;
+    }
+
+    await applyGeographicAreaFilter(area, { openSearch: false, clearSearchTerm: false });
+    switchAsset('object-explorer');
+    switchView('map');
+  }
+
   function clearMapAreaHighlight() {
     ensureMap();
     areaLayer?.clearLayers();
     state.activeGeographicArea = null;
+  }
+
+  function renderAreaShapeOnMap(area) {
+    if (!area) {
+      return false;
+    }
+
+    ensureMap();
+    areaLayer.clearLayers();
+
+    if (area.shape === 'polygon' && area.polygon?.length >= 3) {
+      const latlngs = area.polygon.map((point) => [point.lat, point.lon]);
+      L.polygon(latlngs, {
+        color: '#1b44b1',
+        weight: 2,
+        fillColor: '#1b44b1',
+        fillOpacity: AREA_HIGHLIGHT_FILL_OPACITY,
+      })
+        .bindPopup(
+          `<strong>${area.label}</strong><br><span style="font-size:11px;color:#6b7785">Custom area</span>`
+        )
+        .addTo(areaLayer);
+    } else if (area.shape === 'line' && area.line?.length >= 2) {
+      const latlngs = area.line.map((point) => [point.lat, point.lon]);
+      L.polyline(latlngs, {
+        color: '#1b44b1',
+        weight: 4,
+      })
+        .bindPopup(
+          `<strong>${area.label}</strong><br><span style="font-size:11px;color:#6b7785">Custom area</span>`
+        )
+        .addTo(areaLayer);
+    } else if (area.shape === 'circle' && area.center && area.radiusMeters > 0) {
+      L.circle([area.center.lat, area.center.lon], {
+        radius: area.radiusMeters,
+        color: '#1b44b1',
+        weight: 2,
+        fillColor: '#1b44b1',
+        fillOpacity: AREA_HIGHLIGHT_FILL_OPACITY,
+      })
+        .bindPopup(
+          `<strong>${area.label}</strong><br><span style="font-size:11px;color:#6b7785">Custom area</span>`
+        )
+        .addTo(areaLayer);
+    } else if (area.bounds) {
+      L.rectangle(area.bounds, {
+        color: '#1b44b1',
+        weight: 2,
+        fillColor: '#1b44b1',
+        fillOpacity: AREA_HIGHLIGHT_FILL_OPACITY,
+      })
+        .bindPopup(
+          `<strong>${area.label}</strong><br><span style="font-size:11px;color:#6b7785">Geographic area</span>`
+        )
+        .addTo(areaLayer);
+    } else {
+      return false;
+    }
+
+    map.fitBounds(area.bounds, { padding: [24, 24] });
+    refreshMapSize();
+    return true;
+  }
+
+  function syncGeographicAreaHighlight() {
+    const area = state.searchFilters.geographicArea;
+    if (!area || state.activeView !== 'map') {
+      clearMapAreaHighlight();
+      return;
+    }
+
+    state.activeGeographicArea = { id: area.id, term: area.label, label: area.label };
+    renderAreaShapeOnMap(area);
+  }
+
+  async function applyGeographicAreaFilter(area, options = {}) {
+    if (!area) {
+      return;
+    }
+
+    let resolved = area;
+    if (!(area.polygon?.length >= 3) && area.source !== 'drawn') {
+      resolved = await PlaceSearch.resolveAreaBoundary(area);
+    }
+    if (!resolved) {
+      return;
+    }
+
+    const next = SearchFilters.clone(state.searchFilters);
+    next.geographicArea = MapLocations.cloneArea(resolved);
+    state.searchFilters = next;
+    if (options.clearSearchTerm !== false) {
+      state.searchTerm = '';
+    }
+    SmartSearchBar.syncAll();
+    syncGeographicAreaHighlight();
+    syncGeographicAreaToUrl();
+    syncShareAreaUi();
+    refreshSearchResults();
+
+    if (options.openSearch && state.activeView === 'map') {
+      state.vizSearchSessionOpen = true;
+      VizSearchVariant.updateOpenState(true, 'map');
+    }
+  }
+
+  function handleApplyArea(areaOrTerm, displayHint) {
+    const payload =
+      typeof areaOrTerm === 'object'
+        ? areaOrTerm
+        : { label: String(areaOrTerm || '').trim(), displayName: displayHint || null };
+    applyGeographicAreaFilter(payload);
+  }
+
+  function getPlaceSearchViewbox() {
+    return PlaceSearch.GERMANY_VIEWBOX;
+  }
+
+  function pickBestAreaMatch(areas, term) {
+    if (!areas?.length) {
+      return null;
+    }
+
+    const normalized = String(term || '').trim().toLowerCase();
+    const top = areas[0];
+    const exactLabel = areas.find((area) => area.label?.toLowerCase() === normalized);
+
+    if (exactLabel?.polygon?.length >= 3) {
+      return exactLabel;
+    }
+    if (top?.polygon?.length >= 3) {
+      return top;
+    }
+    return exactLabel || top;
+  }
+
+  function resolveAreaFromTerm(term) {
+    const normalized = String(term || '').trim();
+    if (!normalized) {
+      return null;
+    }
+
+    const local = MapLocations.findGeographicArea(normalized, lookup);
+    if (local) {
+      return local;
+    }
+
+    const localMatches = MapLocations.searchGeographicAreas(normalized, lookup, 20);
+    const merged = PlaceSearch.mergeAreas(
+      localMatches,
+      [...(state.placeSearchResults || []), ...PlaceSearch.getCached(normalized)],
+      normalized,
+      20
+    );
+    return pickBestAreaMatch(merged, normalized);
+  }
+
+  function schedulePlaceSearchFromInput(inputValue) {
+    if (!isMapGeographicSearchEnabled()) {
+      state.placeSearchResults = [];
+      return;
+    }
+    const raw = inputValue ?? state.searchTerm;
+    if (PlaceSearch.extractAreaSuggestionQuery(raw) !== null) {
+      return;
+    }
+
+    const query = PlaceSearch.extractSearchQuery(raw);
+    window.clearTimeout(state.placeSearchTimer);
+
+    if (query.length < 2) {
+      state.placeSearchResults = [];
+      return;
+    }
+
+    state.placeSearchTimer = window.setTimeout(async () => {
+      const requestId = ++state.placeSearchRequestId;
+      const results = await PlaceSearch.searchPlaces(query, {
+        viewbox: getPlaceSearchViewbox(),
+        limit: 20,
+      });
+      if (requestId !== state.placeSearchRequestId) {
+        return;
+      }
+      state.placeSearchResults = results;
+      refreshSearchResults();
+      SmartSearchBar.syncAll();
+    }, 350);
+  }
+
+  function scheduleAreaSuggestionSearch(inputValue) {
+    if (!isMapGeographicSearchEnabled()) {
+      state.areaSuggestionResults = [];
+      return;
+    }
+    const partial = PlaceSearch.extractAreaSuggestionQuery(inputValue ?? state.searchTerm);
+    if (partial === null) {
+      return;
+    }
+
+    window.clearTimeout(state.areaSuggestionTimer);
+
+    if (!partial) {
+      state.areaSuggestionResults = PlaceSearch.getDefaultAreaSuggestions();
+      SmartSearchBar.refreshMenus();
+      return;
+    }
+
+    state.areaSuggestionTimer = window.setTimeout(async () => {
+      const requestId = ++state.areaSuggestionRequestId;
+      const results = await PlaceSearch.searchAreaSuggestions(partial, {
+        viewbox: getPlaceSearchViewbox(),
+        limit: 15,
+      });
+      if (requestId !== state.areaSuggestionRequestId) {
+        return;
+      }
+      state.areaSuggestionResults = results;
+      SmartSearchBar.refreshMenus();
+    }, partial.length < 2 ? 450 : 250);
+  }
+
+  function getMatchingGeographicAreas() {
+    if (!isMapGeographicSearchEnabled()) {
+      return [];
+    }
+    const term = state.searchTerm.trim();
+    if (!term || term.length < 2 || SmartSearchBar.isFilterCommandInput(term)) {
+      return [];
+    }
+    const local = MapLocations.searchGeographicAreas(term, lookup, 20);
+    const cached = PlaceSearch.getCached(term);
+    return PlaceSearch.mergeAreas(local, [...(state.placeSearchResults || []), ...cached], term, 20);
+  }
+
+  function clearMapDrawPreview() {
+    if (mapDrawState.preview) {
+      selectionLayer?.removeLayer(mapDrawState.preview);
+      mapDrawState.preview = null;
+    }
+  }
+
+  function updateMapDrawUi() {
+    const active = Boolean(mapDrawState.mode);
+
+    els.mapFrame?.classList.toggle('map-frame--draw-area', active);
+    els.mapAreaTools?.classList.toggle('hidden', active);
+    els.btnDrawArea?.classList.toggle('active', active);
+    els.mapAreaToolsMenu
+      ?.querySelectorAll('[data-draw-mode]')
+      .forEach((button) => button.classList.toggle('active', button.dataset.drawMode === mapDrawState.mode));
+
+    if (els.mapAreaToolsLabel) {
+      els.mapAreaToolsLabel.textContent = 'Draw area';
+    }
+
+    els.btnFinishAreaShape?.classList.toggle(
+      'hidden',
+      mapDrawState.mode !== 'polygon' && mapDrawState.mode !== 'line'
+    );
+    els.btnCancelAreaDraw?.classList.toggle('hidden', !active);
+
+    if (active) {
+      closeMapAreaToolsMenu();
+    }
+
+    if (els.mapSelectionHint) {
+      if (mapDrawState.mode === 'rectangle') {
+        els.mapSelectionHint.textContent = 'Drag on the map to draw a rectangular area';
+      } else if (mapDrawState.mode === 'circle') {
+        els.mapSelectionHint.textContent = 'Drag from the center to set the circle radius';
+      } else if (mapDrawState.mode === 'polygon') {
+        els.mapSelectionHint.textContent = 'Click points on the map, then press Finish shape';
+      } else if (mapDrawState.mode === 'lasso') {
+        els.mapSelectionHint.textContent = 'Draw a freehand shape on the map to define the area';
+      } else if (mapDrawState.mode === 'line') {
+        els.mapSelectionHint.textContent = 'Click to add line segments, then press Finish shape';
+      } else {
+        els.mapSelectionHint.textContent = 'Shift+drag to select multiple objects';
+      }
+    }
+  }
+
+  function closeMapAreaToolsMenu() {
+    els.mapAreaToolsMenu?.classList.add('hidden');
+    els.btnDrawArea?.setAttribute('aria-expanded', 'false');
+  }
+
+  function toggleMapAreaToolsMenu() {
+    const isOpen = !els.mapAreaToolsMenu?.classList.contains('hidden');
+    if (isOpen) {
+      closeMapAreaToolsMenu();
+      return;
+    }
+    els.mapAreaToolsMenu?.classList.remove('hidden');
+    els.btnDrawArea?.setAttribute('aria-expanded', 'true');
+  }
+
+  function setMapDrawMode(mode) {
+    mapDrawState.mode = mode;
+    mapDrawState.polygonPoints = [];
+    mapDrawState.linePoints = [];
+    mapDrawState.lassoPoints = [];
+    mapDrawState.lassoActive = false;
+    clearMapDrawPreview();
+    clearMapBoxSelectionOverlay();
+    ensureMap();
+    if (map) {
+      if (mode) {
+        map.dragging.disable();
+      } else if (!mapBoxSelect.active) {
+        map.dragging.enable();
+      }
+    }
+    updateMapDrawUi();
+  }
+
+  function finishCustomCircleDraw(center, edge) {
+    ensureMap();
+    const radiusMeters = map.distance(center, edge);
+    if (!(radiusMeters >= 10)) {
+      clearMapBoxSelectionOverlay();
+      setMapDrawMode(null);
+      return;
+    }
+
+    const area = MapLocations.circleFromLatLngPoints(center, edge, 'Custom area');
+    clearMapBoxSelectionOverlay();
+    setMapDrawMode(null);
+    applyGeographicAreaFilter(area, { openSearch: true });
+  }
+
+  function finishCustomAreaDraw(bounds) {
+    if (!bounds?.isValid()) {
+      clearMapBoxSelectionOverlay();
+      setMapDrawMode(null);
+      return;
+    }
+
+    const area = MapLocations.boundsFromLatLngBounds(bounds, 'Custom area');
+    clearMapBoxSelectionOverlay();
+    setMapDrawMode(null);
+    applyGeographicAreaFilter(area, { openSearch: true });
+  }
+
+  function finishCustomLinePathDraw() {
+    if (mapDrawState.linePoints.length < 2) {
+      return;
+    }
+
+    const area = MapLocations.lineFromLatLngs(mapDrawState.linePoints, 'Custom area');
+    clearMapDrawPreview();
+    setMapDrawMode(null);
+    applyGeographicAreaFilter(area, { openSearch: true });
+  }
+
+  function finishCustomLassoDraw() {
+    mapDrawState.lassoActive = false;
+    const simplified = MapLocations.simplifyDrawPath(mapDrawState.lassoPoints);
+    clearMapDrawPreview();
+    mapDrawState.lassoPoints = [];
+
+    if (simplified.length < 3) {
+      setMapDrawMode(null);
+      return;
+    }
+
+    const latLngs = simplified.map((point) => L.latLng(point.lat, point.lon));
+    const area = MapLocations.polygonFromLatLngs(latLngs, 'Custom area');
+    setMapDrawMode(null);
+    applyGeographicAreaFilter(area, { openSearch: true });
+  }
+
+  function finishCustomPolygonDraw() {
+    if (mapDrawState.polygonPoints.length < 3) {
+      return;
+    }
+
+    const area = MapLocations.polygonFromLatLngs(mapDrawState.polygonPoints, 'Custom area');
+    clearMapDrawPreview();
+    setMapDrawMode(null);
+    applyGeographicAreaFilter(area, { openSearch: true });
+  }
+
+  function addLineDrawPoint(latlng) {
+    ensureMap();
+    mapDrawState.linePoints.push(latlng);
+    clearMapDrawPreview();
+
+    if (mapDrawState.linePoints.length >= 2) {
+      mapDrawState.preview = L.polyline(mapDrawState.linePoints, {
+        color: '#1b44b1',
+        weight: 3,
+        dashArray: '4 4',
+      }).addTo(selectionLayer);
+    }
+  }
+
+  function addPolygonDrawPoint(latlng) {
+    ensureMap();
+    mapDrawState.polygonPoints.push(latlng);
+    clearMapDrawPreview();
+
+    if (mapDrawState.polygonPoints.length >= 3) {
+      mapDrawState.preview = L.polygon(mapDrawState.polygonPoints, {
+        color: '#1b44b1',
+        weight: 2,
+        fillColor: '#1b44b1',
+        fillOpacity: 0.12,
+        dashArray: '4 4',
+      }).addTo(selectionLayer);
+      return;
+    }
+
+    if (mapDrawState.polygonPoints.length >= 2) {
+      mapDrawState.preview = L.polyline(mapDrawState.polygonPoints, {
+        color: '#1b44b1',
+        weight: 2,
+        dashArray: '4 4',
+      }).addTo(selectionLayer);
+    }
   }
 
   function clearMapBoxSelectionOverlay() {
@@ -860,6 +1610,7 @@
     mapBoxSelect.startLatLng = null;
     mapBoxSelect.startPoint = null;
     mapBoxSelect.rectangle = null;
+    clearMapDrawPreview();
   }
 
   function finishMapBoxSelection(bounds) {
@@ -891,11 +1642,45 @@
     map._boxSelectMounted = true;
 
     map.on('mousedown', (event) => {
-      if (event.originalEvent.button !== 0 || !event.originalEvent.shiftKey) {
+      if (mapDrawState.mode === 'polygon' && event.originalEvent.button === 0) {
+        hideMapContextMenu();
+        addPolygonDrawPoint(event.latlng);
+        L.DomEvent.stopPropagation(event);
+        L.DomEvent.preventDefault(event);
+        return;
+      }
+      if (mapDrawState.mode === 'line' && event.originalEvent.button === 0) {
+        hideMapContextMenu();
+        addLineDrawPoint(event.latlng);
+        L.DomEvent.stopPropagation(event);
+        L.DomEvent.preventDefault(event);
+        return;
+      }
+      if (mapDrawState.mode === 'lasso' && event.originalEvent.button === 0) {
+        hideMapContextMenu();
+        mapDrawState.lassoActive = true;
+        mapDrawState.lassoPoints = [event.latlng];
+        map.dragging.disable();
+        L.DomEvent.stopPropagation(event);
+        L.DomEvent.preventDefault(event);
+        return;
+      }
+      if (
+        (mapDrawState.mode === 'rectangle' || mapDrawState.mode === 'circle') &&
+        event.originalEvent.button === 0
+      ) {
+        hideMapContextMenu();
+        mapBoxSelect.active = true;
+        mapBoxSelect.startLatLng = event.latlng;
+        mapBoxSelect.startPoint = event.containerPoint;
+        map.dragging.disable();
+        L.DomEvent.stopPropagation(event);
+        return;
+      }
+      if (event.originalEvent.button !== 0 || !event.originalEvent.shiftKey || mapDrawState.mode) {
         return;
       }
       hideMapContextMenu();
-      hideRelatedOptionsPopover();
       mapBoxSelect.active = true;
       mapBoxSelect.startLatLng = event.latlng;
       mapBoxSelect.startPoint = event.containerPoint;
@@ -904,7 +1689,36 @@
     });
 
     map.on('mousemove', (event) => {
+      if (mapDrawState.mode === 'lasso' && mapDrawState.lassoActive) {
+        mapDrawState.lassoPoints.push(event.latlng);
+        if (!mapDrawState.preview) {
+          mapDrawState.preview = L.polyline(mapDrawState.lassoPoints, {
+            color: '#1b44b1',
+            weight: 2,
+            dashArray: '4 4',
+          }).addTo(selectionLayer);
+        } else {
+          mapDrawState.preview.setLatLngs(mapDrawState.lassoPoints);
+        }
+        return;
+      }
       if (!mapBoxSelect.active || !mapBoxSelect.startLatLng) {
+        return;
+      }
+      if (mapDrawState.mode === 'circle') {
+        const radiusMeters = Math.max(map.distance(mapBoxSelect.startLatLng, event.latlng), 1);
+        if (!mapBoxSelect.rectangle) {
+          mapBoxSelect.rectangle = L.circle(mapBoxSelect.startLatLng, {
+            radius: radiusMeters,
+            color: '#1b44b1',
+            weight: 1.5,
+            fillColor: '#1b44b1',
+            fillOpacity: 0.12,
+            dashArray: '4 4',
+          }).addTo(selectionLayer);
+        } else {
+          mapBoxSelect.rectangle.setRadius(radiusMeters);
+        }
         return;
       }
       if (!mapBoxSelect.rectangle) {
@@ -921,10 +1735,22 @@
     });
 
     const finishDrag = (event) => {
+      if (mapDrawState.mode === 'lasso' && mapDrawState.lassoActive) {
+        finishCustomLassoDraw();
+        return;
+      }
       if (!mapBoxSelect.active) {
         return;
       }
       if (mapBoxSelect.rectangle) {
+        if (mapDrawState.mode === 'rectangle') {
+          finishCustomAreaDraw(mapBoxSelect.rectangle.getBounds());
+          return;
+        }
+        if (mapDrawState.mode === 'circle') {
+          finishCustomCircleDraw(mapBoxSelect.startLatLng, event.latlng);
+          return;
+        }
         finishMapBoxSelection(mapBoxSelect.rectangle.getBounds());
         return;
       }
@@ -936,45 +1762,21 @@
 
     map.on('mouseup', finishDrag);
     map.on('mouseout', (event) => {
+      if (mapDrawState.mode === 'lasso' && mapDrawState.lassoActive && event.originalEvent?.buttons === 0) {
+        finishCustomLassoDraw();
+        return;
+      }
       if (mapBoxSelect.active && event.originalEvent?.buttons === 0) {
         finishDrag(event);
       }
     });
   }
 
-  function selectEntitiesInGeographicArea(area) {
-    const ids = MapLocations.collectEntityIdsInBounds(area.bounds, lookup, relations);
-    if (ids.length === 0) {
-      setMultiSelection([]);
-      refreshSelectionViews();
+  function clearMapGeographicHighlightOnInput() {
+    if (state.searchFilters.geographicArea) {
       return;
     }
-
-    setMultiSelection(ids);
-    for (const entityId of ids) {
-      if (!state.pinnedIds.has(entityId)) {
-        state.pinnedIds.add(entityId);
-        if (!state.pinSettings.has(entityId)) {
-          state.pinSettings.set(entityId, defaultPinSettings());
-        }
-      }
-    }
-    renderMapPins({ preserveView: true });
-    refreshSelectionViews();
-  }
-
-  function syncMapGeographicSearchOnInput() {
-    if (state.activeView !== 'map') {
-      clearMapAreaHighlight();
-      return;
-    }
-
-    const term = state.searchTerm.trim();
-    if (
-      !state.activeGeographicArea ||
-      !term ||
-      term.toLowerCase() !== state.activeGeographicArea.term.toLowerCase()
-    ) {
+    if (state.activeView === 'map') {
       clearMapAreaHighlight();
     }
   }
@@ -985,69 +1787,54 @@
     }
 
     const term = state.searchTerm.trim();
-    if (!term || SmartSearchBar.isFilterCommandInput(term) || hasStructuredSearchFilters()) {
-      clearMapAreaHighlight();
+    if (!term || SmartSearchBar.isFilterCommandInput(term)) {
       return;
     }
 
-    const area = MapLocations.findGeographicArea(term, lookup);
-    if (!area) {
-      clearMapAreaHighlight();
+    const area = MapLocations.findGeographicArea(term, lookup) || resolveAreaFromTerm(term);
+    if (area) {
+      applyGeographicAreaFilter(area);
       return;
     }
 
-    renderAreaHighlight(area);
-    selectEntitiesInGeographicArea(area);
-    state.activeGeographicArea = { id: area.id, term, label: area.label };
+    PlaceSearch.searchPlaces(term, { viewbox: PlaceSearch.GERMANY_VIEWBOX, limit: 20 }).then((results) => {
+      if (results[0]) {
+        applyGeographicAreaFilter(pickBestAreaMatch(results, term) || results[0]);
+      }
+    });
   }
 
   function hasStructuredSearchFilters() {
     return (
       SearchFilters.isRestrictedTypes(state.searchFilters, objectTypes.length) ||
       state.searchFilters.attributeRules.length > 0 ||
-      Boolean(state.searchFilters.searchFields?.size)
+      Boolean(state.searchFilters.searchFields?.size) ||
+      Boolean(state.searchFilters.geographicArea)
     );
   }
 
-  function hideRelatedOptionsPopover() {
-    relatedPopoverEntityId = null;
-    els.mapRelatedPopover?.classList.add('hidden');
-  }
-
-  function openRelatedOptionsPopover(entityId, clientX, clientY) {
-    if (!entityId || !lookup.has(entityId)) {
+  function applyContextMenuRelatedOptions() {
+    const ids = mapContextSelectionIds.filter((entityId) => lookup.has(entityId));
+    if (ids.length === 0) {
       return;
     }
 
-    hideMapContextMenu();
-    relatedPopoverEntityId = entityId;
-    writeRelatedSettingsToUI(getPinSettings(entityId), 'popover');
-    els.mapRelatedPopover.classList.remove('hidden');
-    els.mapRelatedPopover.style.position = 'fixed';
-    els.mapRelatedPopover.style.left = `${clientX}px`;
-    els.mapRelatedPopover.style.top = `${clientY}px`;
-    els.mapRelatedPopover.style.zIndex = '10001';
+    const settings = readRelatedSettingsFromUI('menu');
+    for (const entityId of ids) {
+      applyRelatedSettingsForEntity(entityId, settings, {
+        skipRender: true,
+        skipPanelSync: ids.length > 1,
+      });
+    }
 
-    const rect = els.mapRelatedPopover.getBoundingClientRect();
-    const padding = 8;
-    let left = clientX;
-    let top = clientY;
-    if (left + rect.width > window.innerWidth - padding) {
-      left = window.innerWidth - rect.width - padding;
+    if (ids.length === 1) {
+      state.selectedId = ids[0];
+      writeRelatedSettingsToUI(settings, 'panel');
     }
-    if (top + rect.height > window.innerHeight - padding) {
-      top = window.innerHeight - rect.height - padding;
-    }
-    els.mapRelatedPopover.style.left = `${Math.max(padding, left)}px`;
-    els.mapRelatedPopover.style.top = `${Math.max(padding, top)}px`;
-  }
 
-  function applyRelatedOptionsPopover() {
-    if (!relatedPopoverEntityId) {
-      return;
+    if (state.activeView === 'map') {
+      renderMapPins({ preserveView: true });
     }
-    applyRelatedSettingsForEntity(relatedPopoverEntityId, readRelatedSettingsFromUI('popover'));
-    hideRelatedOptionsPopover();
   }
 
   function clearMultiSelection() {
@@ -1215,12 +2002,12 @@
     }
 
     ensureMap();
-    renderMapPins({ preserveView: true, ...options });
-    refreshSearchResults();
-
     if (options.switchView !== false) {
-      switchView('map');
+      switchView('map', { mapRenderOptions: { fitAll: true, ...options } });
+    } else {
+      renderMapPins({ fitAll: options.fitAll ?? true, ...options });
     }
+    refreshSearchResults();
   }
 
   function addEntitiesToGraph(entityIds, options = {}) {
@@ -1275,7 +2062,14 @@
   }
 
   function runSearch(term = state.searchTerm) {
-    return SearchFilters.filterEntities(entities, term, state.searchFilters, objectTypes, lookup);
+    return SearchFilters.filterEntities(
+      entities,
+      term,
+      state.searchFilters,
+      objectTypes,
+      lookup,
+      relations
+    );
   }
 
   function hasSearchCriteria() {
@@ -1477,9 +2271,14 @@
       VizSearchVariant.syncDropdownHostPosition(ctx || state.vizSearchContext);
     }
     refreshSearchResults();
-    if (state.activeView === 'map') {
-      syncMapGeographicSearchOnInput();
+    schedulePlaceSearchFromInput();
+    if (state.searchFilters.geographicArea) {
+      syncGeographicAreaHighlight();
+    } else if (state.activeView === 'map') {
+      clearMapAreaHighlight();
     }
+    syncGeographicAreaToUrl();
+    syncShareAreaUi();
   }
 
   function setTypeFilter(typeId) {
@@ -1611,6 +2410,77 @@
     refreshSearchResults();
   }
 
+  function handleAreaResultSelect(area, context) {
+    applyGeographicAreaFilter(area);
+    if (context === 'search' || context === 'map') {
+      if (state.activeView !== 'map') {
+        switchView('map');
+      }
+      state.vizSearchSessionOpen = true;
+      VizSearchVariant.updateOpenState(true, 'map');
+    } else if (context === 'graph') {
+      state.vizSearchSessionOpen = true;
+      VizSearchVariant.updateOpenState(true, 'graph');
+    }
+  }
+
+  function buildAreaResultRow(area, context) {
+    const row = document.createElement('div');
+    const active = state.searchFilters.geographicArea?.id === area.id;
+    row.className = `result-row result-row--area${active ? ' result-row--area-active' : ''}`;
+    row.innerHTML = `
+      <span class="result-row__icon result-row__icon--area" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1b44b1" stroke-width="1.6">
+          <path d="M4 8.5 9 4.5l6 1.5 5 3v8.5l-5-2.5-6-1.5-5 2.5V8.5Z"/>
+        </svg>
+      </span>
+      <div class="result-row__content">
+        <div class="result-row__title">${area.label}</div>
+        <div class="result-row__match">${area.displayName || area.placeType || 'Geographic area'}</div>
+      </div>
+      ${active ? '<span class="result-row__status">Active</span>' : ''}
+    `;
+    row.addEventListener('click', () => handleAreaResultSelect(area, context));
+    return row;
+  }
+
+  function renderAreaResultsSection(areas, container, context) {
+    if (areas.length === 0) {
+      return;
+    }
+
+    const section = document.createElement('section');
+    section.className = 'search-result-group search-result-group--areas';
+    const collapsed = state.collapsedResultGroups.has(GEOGRAPHIC_AREAS_GROUP_ID);
+
+    const header = document.createElement('button');
+    header.type = 'button';
+    header.className = 'search-result-group__header';
+    header.setAttribute('aria-expanded', String(!collapsed));
+    header.innerHTML = `
+      <span class="search-result-group__chevron${collapsed ? ' search-result-group__chevron--collapsed' : ''}" aria-hidden="true">▾</span>
+      <span class="search-result-group__type-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#1b44b1" stroke-width="1.6">
+          <path d="M4 8.5 9 4.5l6 1.5 5 3v8.5l-5-2.5-6-1.5-5 2.5V8.5Z"/>
+        </svg>
+      </span>
+      <span class="search-result-group__label">Geographic areas</span>
+      <span class="search-result-group__count">(${areas.length})</span>
+    `;
+    header.addEventListener('click', () => toggleResultGroup(GEOGRAPHIC_AREAS_GROUP_ID));
+
+    const body = document.createElement('div');
+    body.className = 'search-result-group__body';
+    body.hidden = collapsed;
+    for (const area of areas) {
+      body.appendChild(buildAreaResultRow(area, context));
+    }
+
+    section.appendChild(header);
+    section.appendChild(body);
+    container.appendChild(section);
+  }
+
   function buildResultCard(entity, context, options = {}) {
     const groupedList = options.groupedList === true;
     const highlighted = isSelectionHighlighted(entity.id);
@@ -1727,11 +2597,22 @@
       return;
     }
 
-    if (items.length === 0) {
+    const matchingAreas = context === 'map' ? getMatchingGeographicAreas() : [];
+    const hasEntityResults = items.length > 0;
+
+    if (!hasEntityResults && matchingAreas.length === 0) {
       const variant = hasSearchCriteria() ? 'search-no-results' : 'search-idle';
       const emptyOptions =
         container.id === 'viz-search-results' ? getVizEmptyStateOptions(context) : { context };
       container.innerHTML = EmptyStates.render(variant, emptyOptions);
+      return;
+    }
+
+    if (matchingAreas.length > 0) {
+      renderAreaResultsSection(matchingAreas, container, context);
+    }
+
+    if (!hasEntityResults) {
       return;
     }
 
@@ -1919,35 +2800,55 @@
     return MapLocations.dedupePins(pins);
   }
 
-  function renderAreaHighlight(areaOrTerm) {
-    ensureMap();
-    areaLayer.clearLayers();
-
-    const area =
-      typeof areaOrTerm === 'string'
-        ? MapLocations.findGeographicArea(areaOrTerm, lookup)
-        : areaOrTerm;
-    if (!area) {
+  function isMapViewVisible() {
+    const view = document.getElementById('view-map');
+    if (!view?.classList.contains('active')) {
       return false;
     }
-
-    const rectangle = L.rectangle(area.bounds, {
-      color: '#1b44b1',
-      weight: 2,
-      fillColor: '#1b44b1',
-      fillOpacity: 0.12,
-    }).addTo(areaLayer);
-
-    rectangle.bindPopup(
-      `<strong>${area.label}</strong><br><span style="font-size:11px;color:#6b7785">Geographic area</span>`
-    );
-    map.fitBounds(area.bounds, { padding: [24, 24] });
-    refreshMapSize();
-    return area;
+    const mapEl = document.getElementById('map');
+    if (!mapEl) {
+      return false;
+    }
+    const rect = mapEl.getBoundingClientRect();
+    return rect.width > 8 && rect.height > 8;
   }
 
-  function shouldPreserveMapView(previousBounds, pinBounds, options) {
+  function fitMapToPins(pinBounds, options = {}) {
+    if (!pinBounds?.isValid()) {
+      return;
+    }
+
+    map.fitBounds(pinBounds, {
+      padding: [48, 48],
+      maxZoom: 16,
+      animate: options.animate !== false,
+    });
+    updateMapZoomLabel();
+  }
+
+  function applyMapPinView(previousBounds, pinBounds, savedCenter, savedZoom, options = {}) {
+    const shouldFit =
+      options.fitAll === true ||
+      options.preserveView === false ||
+      !isMapViewVisible() ||
+      savedZoom < MAP_BASE_ZOOM - 4;
+
+    if (!shouldFit && shouldPreserveMapView(previousBounds, pinBounds, options, savedZoom)) {
+      map.setView(savedCenter, savedZoom, { animate: false });
+      updateMapZoomLabel();
+      return;
+    }
+
+    fitMapToPins(pinBounds, options);
+  }
+  function shouldPreserveMapView(previousBounds, pinBounds, options, savedZoom = MAP_BASE_ZOOM) {
     if (options.preserveView === false || options.fitAll === true) {
+      return false;
+    }
+    if (options.preserveView !== true && !isMapViewVisible()) {
+      return false;
+    }
+    if (savedZoom < MAP_BASE_ZOOM - 4) {
       return false;
     }
     if (!previousBounds || !pinBounds.isValid()) {
@@ -1971,12 +2872,11 @@
         icon: L.divIcon({
           className: 'map-marker-wrap',
           html: ObjectIcons.markerHtml(pin.sourceEntity.type, color, {
-            indirect: pin.connectionType === 'indirect',
             title: DisplayNames.formatMapPinTooltip(pin),
             selected: isSelectionHighlighted(pin.sourceEntity.id),
           }),
-          iconSize: pin.connectionType === 'indirect' ? [28, 28] : [32, 32],
-          iconAnchor: pin.connectionType === 'indirect' ? [14, 14] : [16, 16],
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
         }),
       })
         .bindTooltip(tooltipHtml, {
@@ -1994,6 +2894,7 @@
           )
         )
         .on('click', (event) => {
+          hideMapContextMenu();
           if (event.originalEvent.button !== 0) {
             return;
           }
@@ -2024,13 +2925,22 @@
     const layers = markerLayer.getLayers();
     if (layers.length > 0) {
       const pinBounds = L.featureGroup(layers).getBounds().pad(0.2);
-      if (shouldPreserveMapView(previousBounds, pinBounds, options)) {
-        map.setView(savedCenter, savedZoom, { animate: false });
+      const applyView = () => applyMapPinView(previousBounds, pinBounds, savedCenter, savedZoom, options);
+
+      if (!isMapViewVisible()) {
+        refreshMapSize();
+        requestAnimationFrame(() => {
+          refreshMapSize();
+          requestAnimationFrame(applyView);
+        });
       } else {
-        map.fitBounds(pinBounds);
+        applyView();
+        refreshMapSize();
       }
-      refreshMapSize();
+      return;
     }
+
+    refreshMapSize();
   }
 
   function renderLegend(pins = collectMapPins()) {
@@ -2050,11 +2960,6 @@
       const color = typeColors[type] || '#1b44b1';
       chips.push(
         `<span class="legend-chip">${ObjectIcons.iconMarkup(type, { size: 12, color, className: 'legend-icon' })}${type}</span>`
-      );
-    }
-    if (pins.some((pin) => pin.connectionType === 'indirect')) {
-      chips.push(
-        '<span class="legend-chip"><span class="legend-dot legend-dot--indirect"></span>Indirect</span>'
       );
     }
     els.mapLegend.innerHTML = chips.join('');
@@ -2088,6 +2993,73 @@
       x: (svgPoint.x - graphViewport.x) / graphViewport.scale,
       y: (svgPoint.y - graphViewport.y) / graphViewport.scale,
     };
+  }
+
+  function getGraphFrameElement() {
+    return els.graphSvg?.closest('.graph-frame__body') || els.graphSvg?.closest('.graph-frame');
+  }
+
+  function clearGraphBoxSelectOverlay() {
+    if (!els.graphBoxSelect) {
+      return;
+    }
+    els.graphBoxSelect.classList.add('hidden');
+    els.graphBoxSelect.style.width = '0';
+    els.graphBoxSelect.style.height = '0';
+  }
+
+  function updateGraphBoxSelectOverlay(startClient, currentClient) {
+    const frame = getGraphFrameElement();
+    if (!frame || !els.graphBoxSelect) {
+      return;
+    }
+
+    const rect = frame.getBoundingClientRect();
+    const left = Math.min(startClient.x, currentClient.x) - rect.left;
+    const top = Math.min(startClient.y, currentClient.y) - rect.top;
+    const width = Math.abs(currentClient.x - startClient.x);
+    const height = Math.abs(currentClient.y - startClient.y);
+
+    els.graphBoxSelect.style.left = `${left}px`;
+    els.graphBoxSelect.style.top = `${top}px`;
+    els.graphBoxSelect.style.width = `${width}px`;
+    els.graphBoxSelect.style.height = `${height}px`;
+    els.graphBoxSelect.classList.remove('hidden');
+  }
+
+  function finishGraphBoxSelection(startClient, endClient) {
+    clearGraphBoxSelectOverlay();
+
+    const width = Math.abs(endClient.x - startClient.x);
+    const height = Math.abs(endClient.y - startClient.y);
+    if (width < 4 && height < 4) {
+      return;
+    }
+
+    const startGraph = clientToGraphPoint(startClient.x, startClient.y);
+    const endGraph = clientToGraphPoint(endClient.x, endClient.y);
+    const minX = Math.min(startGraph.x, endGraph.x);
+    const maxX = Math.max(startGraph.x, endGraph.x);
+    const minY = Math.min(startGraph.y, endGraph.y);
+    const maxY = Math.max(startGraph.y, endGraph.y);
+    const ids = [];
+
+    for (const nodeId of graphState.nodeIds) {
+      const position = graphState.positions.get(nodeId);
+      if (!position) {
+        continue;
+      }
+      if (position.x >= minX && position.x <= maxX && position.y >= minY && position.y <= maxY) {
+        ids.push(nodeId);
+      }
+    }
+
+    if (ids.length === 0) {
+      return;
+    }
+
+    setMultiSelection(ids);
+    refreshSelectionViews();
   }
 
   function syncGraphDomPositions() {
@@ -2146,7 +3118,9 @@
     graphInteraction.panStart = null;
     graphInteraction.viewportStart = null;
     graphInteraction.nodeOffset = null;
-    els.graphSvg.classList.remove('graph-svg--panning', 'graph-svg--dragging-node');
+    graphInteraction.boxSelectStart = null;
+    clearGraphBoxSelectOverlay();
+    els.graphSvg.classList.remove('graph-svg--panning', 'graph-svg--dragging-node', 'graph-svg--box-select');
   }
 
   function hideGraphNodeTooltip() {
@@ -2190,6 +3164,9 @@
     els.graphContextMenu.classList.add('hidden');
     graphContextEntityId = null;
     graphContextSelectionIds = [];
+    if (openContextMenuState?.menu === els.graphContextMenu) {
+      openContextMenuState = null;
+    }
     hideGraphNodeTooltip();
   }
 
@@ -2197,6 +3174,10 @@
     els.mapContextMenu.classList.add('hidden');
     mapContextEntityId = null;
     mapContextSelectionIds = [];
+    closeMenuRelatedFlyouts();
+    if (openContextMenuState?.menu === els.mapContextMenu) {
+      openContextMenuState = null;
+    }
   }
 
   function takeGraphContextEntityId() {
@@ -2234,30 +3215,76 @@
     }
   }
 
+  function isContextMenuOpen(menu) {
+    return Boolean(menu && !menu.classList.contains('hidden'));
+  }
+
+  function isContextMenuTarget(target) {
+    if (!target?.closest) {
+      return false;
+    }
+    return Boolean(
+      target.closest('#map-context-menu') ||
+        target.closest('#graph-context-menu') ||
+        target.closest('#menu-related-filters-flyout')
+    );
+  }
+
+  function dismissOpenContextMenus(event) {
+    if (isContextMenuTarget(event.target)) {
+      return;
+    }
+
+    if (isContextMenuOpen(els.mapContextMenu)) {
+      hideMapContextMenu();
+    }
+    if (isContextMenuOpen(els.graphContextMenu)) {
+      hideGraphContextMenu();
+    }
+  }
+
   function mountContextMenus() {
-    for (const menu of [els.mapContextMenu, els.graphContextMenu]) {
+    for (const menu of [
+      els.mapContextMenu,
+      els.graphContextMenu,
+      els.menuRelatedFiltersFlyout,
+    ]) {
       if (menu && menu.parentElement !== document.body) {
         document.body.appendChild(menu);
       }
     }
-    if (els.mapRelatedPopover && els.mapRelatedPopover.parentElement !== document.body) {
-      document.body.appendChild(els.mapRelatedPopover);
-    }
+
+    document.addEventListener('pointerdown', (event) => {
+      dismissOpenContextMenus(event);
+    }, true);
 
     document.addEventListener('click', (event) => {
-      if (els.mapRelatedPopover?.contains(event.target)) {
-        return;
+      if (els.relatedTypeFilters && !els.relatedTypeFilters.contains(event.target)) {
+        closeRelatedTypeMultiselect(els.relatedTypeFilters);
       }
-      hideRelatedOptionsPopover();
+      if (els.menuRelatedTypeFilters && !els.menuRelatedTypeFilters.contains(event.target)) {
+        closeRelatedTypeMultiselect(els.menuRelatedTypeFilters);
+      }
+
+      const inMenu = els.mapContextMenu?.contains(event.target);
+      const inFlyout = els.menuRelatedFiltersFlyout?.contains(event.target);
+
+      if (openMenuRelatedFlyout && !inMenu && !inFlyout) {
+        closeMenuRelatedFlyouts();
+      }
+
+      dismissOpenContextMenus(event);
     });
   }
 
-  function openContextMenu(menu, clientX, clientY) {
+  let lastMapContextPoint = { x: 0, y: 0 };
+  let openContextMenuState = null;
+
+  function positionContextMenu(menu, clientX, clientY) {
     if (!menu) {
       return;
     }
 
-    menu.classList.remove('hidden');
     menu.style.position = 'fixed';
     menu.style.left = `${clientX}px`;
     menu.style.top = `${clientY}px`;
@@ -2265,20 +3292,57 @@
     menu.style.bottom = 'auto';
     menu.style.zIndex = '10000';
 
-    const rect = menu.getBoundingClientRect();
     const padding = 8;
+    const maxHeight = window.innerHeight - padding * 2;
+    const rect = menu.getBoundingClientRect();
+    const menuHeight = Math.min(rect.height, maxHeight);
     let left = clientX;
     let top = clientY;
 
     if (left + rect.width > window.innerWidth - padding) {
       left = window.innerWidth - rect.width - padding;
     }
-    if (top + rect.height > window.innerHeight - padding) {
-      top = window.innerHeight - rect.height - padding;
+    left = Math.max(padding, left);
+
+    if (top + menuHeight > window.innerHeight - padding) {
+      const flippedTop = clientY - menuHeight;
+      top =
+        flippedTop >= padding
+          ? flippedTop
+          : Math.max(padding, window.innerHeight - menuHeight - padding);
+    }
+    top = Math.max(padding, top);
+
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+  }
+
+  function refreshOpenContextMenuPosition() {
+    if (!openContextMenuState?.menu || openContextMenuState.menu.classList.contains('hidden')) {
+      return;
+    }
+    positionContextMenu(
+      openContextMenuState.menu,
+      openContextMenuState.x,
+      openContextMenuState.y
+    );
+
+    if (openMenuRelatedFlyout) {
+      positionMenuRelatedFlyout();
+    }
+  }
+
+  function openContextMenu(menu, clientX, clientY) {
+    if (!menu) {
+      return;
     }
 
-    menu.style.left = `${Math.max(padding, left)}px`;
-    menu.style.top = `${Math.max(padding, top)}px`;
+    openContextMenuState = { menu, x: clientX, y: clientY };
+    menu.classList.remove('hidden');
+    positionContextMenu(menu, clientX, clientY);
+    requestAnimationFrame(() => {
+      refreshOpenContextMenuPosition();
+    });
   }
 
   function setContextMenuItemsVisibility(menu, itemIds, dividerHidden) {
@@ -2299,21 +3363,36 @@
         ? resolveBulkEntityIds(selectionSnapshot)
         : getContextSelectionIds();
     const count = graphContextSelectionIds.length;
+    const isMulti = count > 1;
+    const divider = els.graphContextMenu?.querySelector('.context-menu__divider');
 
-    setContextMenuLabel(els.graphContextMap, 'Add to map', count);
+    setContextMenuLabel(els.graphContextMap, 'Show on map', count);
     setContextMenuLabel(els.graphContextDetails, 'Open object details', count);
     setContextMenuLabel(els.graphContextRemove, 'Remove object', count);
-    els.graphContextExpand.classList.toggle('hidden', detailsOnly || count > 1);
-    setContextMenuItemsVisibility(
-      els.graphContextMenu,
-      ['graph-context-map', 'graph-context-remove'],
-      detailsOnly
-    );
+    setContextMenuLabel(els.graphContextExpand, 'Expand relationships', count);
+
+    if (detailsOnly) {
+      els.graphContextDetails.classList.remove('hidden');
+      els.graphContextExpand.classList.add('hidden');
+      els.graphContextMap.classList.add('hidden');
+      els.graphContextRemove.classList.add('hidden');
+      divider?.classList.add('hidden');
+    } else if (isMulti) {
+      els.graphContextDetails.classList.add('hidden');
+      els.graphContextExpand.classList.remove('hidden');
+      els.graphContextMap.classList.remove('hidden');
+      els.graphContextRemove.classList.remove('hidden');
+      divider?.classList.remove('hidden');
+    } else {
+      els.graphContextDetails.classList.remove('hidden');
+      els.graphContextExpand.classList.remove('hidden');
+      els.graphContextMap.classList.remove('hidden');
+      els.graphContextRemove.classList.remove('hidden');
+      divider?.classList.remove('hidden');
+    }
 
     openContextMenu(els.graphContextMenu, clientX, clientY);
   }
-
-  let lastMapContextPoint = { x: 0, y: 0 };
 
   function showMapContextMenu(entityId, clientX, clientY, selectionSnapshot = null, options = {}) {
     const detailsOnly = options.detailsOnly === true;
@@ -2326,18 +3405,23 @@
         ? resolveBulkEntityIds(selectionSnapshot)
         : getContextSelectionIds();
     const count = mapContextSelectionIds.length;
-    const settings = getPinSettings(entityId);
+    const isMulti = count > 1;
+    const settings =
+      count === 1 ? getPinSettings(entityId) : getBulkRelatedSettings(mapContextSelectionIds);
     lastMapContextPoint = { x: clientX, y: clientY };
 
     setContextMenuLabel(els.mapContextGraph, 'Add to graph', count);
     setContextMenuLabel(els.mapContextDetails, 'Open object details', count);
     setContextMenuLabel(els.mapContextRemove, 'Remove object', count);
-    setContextMenuLabel(
-      els.mapContextRelated,
-      settings.showRelated ? 'Edit related objects…' : 'Show related objects…',
-      1
-    );
-    els.mapContextRelated.classList.toggle('hidden', detailsOnly || count > 1);
+    els.mapContextDetails.classList.toggle('hidden', detailsOnly || isMulti);
+    els.mapContextRelatedSection.classList.toggle('hidden', detailsOnly);
+    els.mapContextRelatedDivider.classList.toggle('hidden', detailsOnly);
+    if (!detailsOnly) {
+      els.mapContextRelatedLabel.textContent = isMulti
+        ? `Show related objects (${count} selected)`
+        : 'Show related objects';
+      writeRelatedSettingsToUI(settings, 'menu');
+    }
     setContextMenuItemsVisibility(
       els.mapContextMenu,
       ['map-context-graph', 'map-context-remove'],
@@ -2345,14 +3429,6 @@
     );
 
     openContextMenu(els.mapContextMenu, clientX, clientY);
-  }
-
-  function toggleRelatedObjectsForEntity(entityId) {
-    openRelatedOptionsPopover(
-      entityId,
-      lastMapContextPoint.x,
-      lastMapContextPoint.y
-    );
   }
 
   function renderGraphView() {
@@ -2394,25 +3470,39 @@
   }
 
   function expandGraphFromNode(entityId, options = {}) {
-    if (!lookup.has(entityId)) {
+    return expandGraphFromNodes([entityId], options);
+  }
+
+  function expandGraphFromNodes(entityIds, options = {}) {
+    let lastId = null;
+
+    for (const entityId of entityIds) {
+      if (!lookup.has(entityId)) {
+        continue;
+      }
+
+      if (!graphState.nodeIds.has(entityId)) {
+        GraphView.addNode(graphState, entityId, lookup);
+        state.graphRoots.add(entityId);
+      }
+
+      GraphView.expandRelationships(graphState, entityId, lookup, relations);
+      lastId = entityId;
+    }
+
+    if (!lastId) {
       return { addedNodes: 0, addedLinks: 0 };
     }
 
-    if (!graphState.nodeIds.has(entityId)) {
-      GraphView.addNode(graphState, entityId, lookup);
-      state.graphRoots.add(entityId);
-    }
-
-    const result = GraphView.expandRelationships(graphState, entityId, lookup, relations);
-    state.selectedId = entityId;
+    state.selectedId = lastId;
     renderGraphView();
     refreshSearchResults();
 
     if (options.openDetails) {
-      renderInspector(lookup.get(entityId));
+      renderInspector(lookup.get(lastId));
     }
 
-    return result;
+    return { addedNodes: 0, addedLinks: 0 };
   }
 
   function clearGraphView() {
@@ -2441,6 +3531,10 @@
     const shell = document.getElementById('viz-add-shell');
     const shellContext = shell?.dataset?.context;
     return shellContext === 'map' || shellContext === 'graph' ? shellContext : null;
+  }
+
+  function isMapGeographicSearchEnabled() {
+    return getVizSearchContext() === 'map';
   }
 
   function shouldShowVizResultsPanel() {
@@ -2505,7 +3599,135 @@
     renderRelatedTypeFilters(null);
   }
 
-  function switchView(viewName) {
+  function syncWorkbenchTabs() {
+    for (const tab of [els.workbenchTabExplorer, els.workbenchTabNewObject]) {
+      if (!tab) {
+        continue;
+      }
+      const assetName = tab.dataset.asset;
+      const isOpen = state.openWorkbenchAssets.has(assetName);
+      tab.classList.toggle('hidden', !isOpen);
+      tab.classList.toggle('workbench-tab--active', isOpen && state.activeAsset === assetName);
+      tab.setAttribute('aria-selected', isOpen && state.activeAsset === assetName ? 'true' : 'false');
+    }
+  }
+
+  function closeWorkbenchAsset(assetName) {
+    if (!state.openWorkbenchAssets.has(assetName) || state.openWorkbenchAssets.size <= 1) {
+      return;
+    }
+
+    if (assetName === 'new-object') {
+      closeInstancePanel();
+      finishVizSearchSession({ clearSearch: false });
+      hideMapContextMenu();
+      hideGraphContextMenu();
+      hideGraphNodeTooltip();
+    }
+
+    if (assetName === 'object-explorer' && mapDrawState.mode) {
+      setMapDrawMode(null);
+    }
+
+    state.openWorkbenchAssets.delete(assetName);
+
+    if (state.activeAsset === assetName) {
+      const fallback = [...state.openWorkbenchAssets][0];
+      switchAsset(fallback);
+      return;
+    }
+
+    syncWorkbenchTabs();
+  }
+
+  function initAssetNavigation() {
+    const resolveAssetControl = (target) => {
+      const element = target instanceof Element ? target : target?.parentElement;
+      if (!element) {
+        return null;
+      }
+      if (element.closest('.workbench-tab__close')) {
+        return { kind: 'close', control: element.closest('.workbench-tab[data-asset]') };
+      }
+      const workbenchTab = element.closest('.workbench-tab[data-asset]');
+      if (workbenchTab) {
+        return { kind: 'switch', control: workbenchTab };
+      }
+      const packageItem = element.closest('.package-nav-item[data-asset]');
+      if (packageItem) {
+        return { kind: 'switch', control: packageItem };
+      }
+      return null;
+    };
+
+    document.querySelector('.workbench-tabs')?.addEventListener('click', (event) => {
+      const resolved = resolveAssetControl(event.target);
+      if (!resolved?.control?.dataset.asset) {
+        return;
+      }
+
+      event.preventDefault();
+      if (resolved.kind === 'close') {
+        event.stopPropagation();
+        closeWorkbenchAsset(resolved.control.dataset.asset);
+        return;
+      }
+
+      switchAsset(resolved.control.dataset.asset);
+    });
+
+    document.querySelectorAll('.package-nav-item[data-asset]').forEach((item) => {
+      item.addEventListener('click', () => switchAsset(item.dataset.asset));
+    });
+  }
+
+  function switchAsset(assetName) {
+    if (assetName !== 'object-explorer' && assetName !== 'new-object') {
+      return;
+    }
+
+    if (!state.openWorkbenchAssets.has(assetName)) {
+      state.openWorkbenchAssets.add(assetName);
+    }
+
+    state.activeAsset = assetName;
+
+    document.querySelectorAll('.package-nav-item[data-asset]').forEach((item) => {
+      item.classList.toggle('package-nav-item--active', item.dataset.asset === assetName);
+    });
+
+    syncWorkbenchTabs();
+
+    els.workbenchAssetExplorer?.classList.toggle('workbench-asset--active', assetName === 'object-explorer');
+    els.workbenchAssetNewObject?.classList.toggle('workbench-asset--active', assetName === 'new-object');
+    els.objectTypeNav?.classList.toggle('hidden', assetName !== 'object-explorer');
+
+    if (assetName === 'new-object') {
+      closeInstancePanel();
+      finishVizSearchSession({ clearSearch: false });
+      hideMapContextMenu();
+      hideGraphContextMenu();
+      hideGraphNodeTooltip();
+      syncShareAreaUi();
+      return;
+    }
+
+    if (state.activeView === 'map') {
+      ensureMap();
+      refreshMapSize();
+      if (state.pinnedIds.size > 0) {
+        renderMapPins({ preserveView: true });
+      }
+    }
+    if (state.activeView === 'graph') {
+      renderGraphView();
+    }
+  }
+
+  function switchView(viewName, options = {}) {
+    if (state.activeAsset !== 'object-explorer') {
+      return;
+    }
     state.activeView = viewName;
     if (viewName !== 'map' && viewName !== 'graph') {
       finishVizSearchSession({ clearSearch: false });
@@ -2529,10 +3751,12 @@
       refreshMapSize();
       syncHeatmapFromMapPins();
       renderHeatmapLayer();
-      if (state.pinnedIds.size > 0) {
-        renderMapPins();
+      if (state.pinnedIds.size > 0 && !options.skipMapRender) {
+        renderMapPins(options.mapRenderOptions || {});
       }
       activateVizSearchForView('map');
+      syncGeographicAreaHighlight();
+      syncShareAreaUi();
     }
     if (viewName === 'graph') {
       renderGraphView();
@@ -2567,6 +3791,11 @@
       }
     }
     if (event.key === 'Escape') {
+      if (mapDrawState.mode) {
+        event.preventDefault();
+        setMapDrawMode(null);
+        return;
+      }
       if (VizSearchVariant.collapseActivePanel()) {
         event.preventDefault();
         refreshSearchResults();
@@ -2610,16 +3839,53 @@
     closeInstancePanel();
   });
 
+  els.btnShareArea?.addEventListener('click', () => {
+    void shareGeographicAreaLink();
+  });
+
   els.btnClearMap.addEventListener('click', () => {
     state.pinnedIds.clear();
     state.pinSettings.clear();
     hideMapContextMenu();
-    hideRelatedOptionsPopover();
+    setMapDrawMode(null);
     ensureMap();
     clearMapAreaHighlight();
     areaLayer?.clearLayers();
     renderMapPins();
     refreshSearchResults();
+  });
+
+  els.btnDrawArea?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (mapDrawState.mode) {
+      return;
+    }
+    toggleMapAreaToolsMenu();
+  });
+
+  els.mapAreaToolsMenu?.querySelectorAll('[data-draw-mode]').forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const mode = button.dataset.drawMode;
+      setMapDrawMode(mapDrawState.mode === mode ? null : mode);
+      closeMapAreaToolsMenu();
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!els.mapAreaTools?.contains(event.target)) {
+      closeMapAreaToolsMenu();
+    }
+  });
+  els.btnFinishAreaShape?.addEventListener('click', () => {
+    if (mapDrawState.mode === 'line') {
+      finishCustomLinePathDraw();
+      return;
+    }
+    finishCustomPolygonDraw();
+  });
+  els.btnCancelAreaDraw?.addEventListener('click', () => {
+    setMapDrawMode(null);
   });
 
   els.btnGraphClear.addEventListener('click', clearGraphView);
@@ -2634,9 +3900,9 @@
 
   els.graphContextExpand.addEventListener('click', (event) => {
     event.stopPropagation();
-    const entityId = takeGraphContextEntityId();
-    if (entityId) {
-      expandGraphFromNode(entityId, { openDetails: false });
+    const ids = takeGraphContextSelectionIds();
+    if (ids.length > 0) {
+      expandGraphFromNodes(ids, { openDetails: false });
     }
   });
 
@@ -2664,27 +3930,23 @@
     }
   });
 
-  els.mapContextRelated.addEventListener('click', (event) => {
+  els.menuShowRelated.addEventListener('click', (event) => {
     event.stopPropagation();
-    const entityId = takeMapContextEntityId();
-    if (entityId) {
-      openRelatedOptionsPopover(entityId, lastMapContextPoint.x, lastMapContextPoint.y);
-    }
   });
-
-  els.popoverShowRelated.addEventListener('change', updatePopoverRelatedFilterVisibility);
-  els.popoverRelatedCancel.addEventListener('click', (event) => {
-    event.stopPropagation();
-    hideRelatedOptionsPopover();
+  els.menuShowRelated.addEventListener('change', () => {
+    updateMenuRelatedFilterVisibility();
+    applyContextMenuRelatedOptions();
   });
-  els.popoverRelatedApply.addEventListener('click', (event) => {
-    event.stopPropagation();
-    applyRelatedOptionsPopover();
+  els.menuRelatedTimePeriod.addEventListener('change', applyContextMenuRelatedOptions);
+  els.menuRelatedDistance.addEventListener('change', applyContextMenuRelatedOptions);
+  els.menuRelatedRow?.addEventListener('mousedown', (event) => event.stopPropagation());
+  els.menuRelatedFiltersFlyout?.addEventListener('mousedown', (event) => event.stopPropagation());
+  els.menuRelatedFiltersFlyout?.addEventListener('click', (event) => event.stopPropagation());
+  els.menuRelatedFiltersFlyout?.addEventListener('wheel', (event) => event.stopPropagation(), {
+    passive: true,
   });
-  els.popoverRelatedTimePeriod.addEventListener('change', () => {});
-  els.popoverRelatedDistance.addEventListener('change', () => {});
-
-  els.mapRelatedPopover?.addEventListener('mousedown', (event) => event.stopPropagation());
+  els.mapContextRelatedSection?.addEventListener('mousedown', (event) => event.stopPropagation());
+  els.mapContextRelatedSection?.addEventListener('click', (event) => event.stopPropagation());
 
   els.mapContextGraph.addEventListener('click', (event) => {
     event.stopPropagation();
@@ -2769,6 +4031,14 @@
       return;
     }
 
+    if (event.shiftKey) {
+      graphInteraction.mode = 'boxSelect';
+      graphInteraction.boxSelectStart = { x: event.clientX, y: event.clientY };
+      els.graphSvg.classList.add('graph-svg--box-select');
+      event.preventDefault();
+      return;
+    }
+
     graphInteraction.mode = 'pan';
     graphInteraction.panStart = { x: event.clientX, y: event.clientY };
     graphInteraction.viewportStart = { x: graphViewport.x, y: graphViewport.y };
@@ -2780,6 +4050,14 @@
       graphViewport.x = graphInteraction.viewportStart.x + (event.clientX - graphInteraction.panStart.x);
       graphViewport.y = graphInteraction.viewportStart.y + (event.clientY - graphInteraction.panStart.y);
       applyGraphViewportTransform();
+      return;
+    }
+
+    if (graphInteraction.mode === 'boxSelect' && graphInteraction.boxSelectStart) {
+      updateGraphBoxSelectOverlay(graphInteraction.boxSelectStart, {
+        x: event.clientX,
+        y: event.clientY,
+      });
       return;
     }
 
@@ -2796,7 +4074,16 @@
     }
   });
 
-  window.addEventListener('mouseup', () => {
+  window.addEventListener('mouseup', (event) => {
+    if (graphInteraction.mode === 'boxSelect' && graphInteraction.boxSelectStart) {
+      finishGraphBoxSelection(graphInteraction.boxSelectStart, {
+        x: event.clientX,
+        y: event.clientY,
+      });
+      endGraphInteraction();
+      return;
+    }
+
     if (graphInteraction.mode === 'node' && graphInteraction.nodeId && !graphInteraction.dragMoved) {
       if (graphInteraction.shiftKey) {
         applySelection(graphInteraction.nodeId, { shiftKey: true });
@@ -2860,7 +4147,29 @@
     },
   });
 
-  const smartSearchOptions = {
+  function buildAreaSuggestions(partial) {
+    const normalized = String(partial || '').trim();
+    const local = MapLocations.searchGeographicAreas(normalized, lookup, 15);
+    const defaults = PlaceSearch.getDefaultAreaSuggestions(normalized);
+    const cached = normalized ? PlaceSearch.getCached(normalized) : [];
+    const remote = state.areaSuggestionResults || [];
+
+    return PlaceSearch.mergeAreas(
+      [...defaults, ...local],
+      [...remote, ...cached],
+      normalized,
+      15
+    ).map((area) => ({
+      kind: 'item',
+      id: `area-${area.id}`,
+      label: area.label,
+      description: area.displayName || area.placeType || 'Geographic area',
+      insert: `area:${area.label}`,
+      apply: { kind: 'area', term: area.label, displayName: area.displayName, area },
+    }));
+  }
+
+  const sharedSmartSearchOptions = {
     getState: () => ({ searchTerm: state.searchTerm, searchFilters: state.searchFilters }),
     setSearchTerm: (term) => {
       state.searchTerm = term;
@@ -2872,8 +4181,14 @@
     objectTypes,
     attributeCatalog,
     onChange: handleSmartSearchChange,
+    onGeographicInputClear: clearMapGeographicHighlightOnInput,
+    onSearchQueryChange: schedulePlaceSearchFromInput,
+    onAreaSuggestionSearch: scheduleAreaSuggestionSearch,
+    onApplyArea: handleApplyArea,
+    getLookup: () => lookup,
+    resolveAreaTerm: resolveAreaFromTerm,
     onSubmit: () => {
-      if (state.activeView === 'map') {
+      if (isMapGeographicSearchEnabled()) {
         submitMapGeographicSearch();
       }
     },
@@ -2884,7 +4199,8 @@
     input: els.search,
     pillsEl: document.getElementById('global-search-pills'),
     menuEl: document.getElementById('global-search-menu'),
-    ...smartSearchOptions,
+    ...sharedSmartSearchOptions,
+    isGeographicSearchEnabled: () => false,
   });
 
   SmartSearchBar.init({
@@ -2892,12 +4208,15 @@
     input: els.vizSearchInput,
     pillsEl: document.getElementById('viz-search-pills'),
     menuEl: document.getElementById('viz-search-menu'),
-    ...smartSearchOptions,
+    ...sharedSmartSearchOptions,
+    isGeographicSearchEnabled: isMapGeographicSearchEnabled,
+    getAreaSuggestions: buildAreaSuggestions,
   });
 
   renderObjectTypeNav();
   initRelatedTypeFilters();
-  mountContextMenus();
+    mountContextMenus();
+    window.addEventListener('resize', refreshOpenContextMenuPosition);
   syncHeatmapFromMapPins();
   renderLegend([]);
   refreshSearchResults();
@@ -2910,9 +4229,19 @@
     attributeCatalog,
     onCreated(entity) {
       refreshSearchResults();
+      switchAsset('object-explorer');
       selectEntity(entity.id);
       switchView('search');
     },
   });
-  switchView('search');
+  initAssetNavigation();
+  syncWorkbenchTabs();
+  void (async () => {
+    if (new URLSearchParams(window.location.search).has('area')) {
+      await loadGeographicAreaFromUrl();
+      return;
+    }
+    switchAsset('object-explorer');
+    switchView('search');
+  })();
 })();

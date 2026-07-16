@@ -95,9 +95,9 @@
         resolvedMessage = '';
         resolvedTips = [
           'Type a name, place, or keyword to start',
-          'Add filters with <code>type:Person</code> or <code>BRANCHE = value</code>',
+          'Add filters with <code>type:Person</code>, <code>area:Munich</code>, or attribute rules',
           'Scope a field with <code>in:</code> then pick an attribute',
-          'Select a result to pin it on the map',
+          'Click a geographic area result to filter and highlight on the map',
         ];
       } else if (vizContext === 'graph') {
         resolvedTitle = 'Add to graph';
@@ -113,15 +113,16 @@
       resolvedMessage = 'Look up people, organisations, locations, and case objects to pin on the map.';
       resolvedTips = [
         'Type a name, place, or keyword to start',
-        'Add filters with <code>type:Person</code> or <code>BRANCHE = value</code>',
+        'Add filters with <code>type:Person</code>, <code>area:Munich</code>, or <code>BRANCHE = value</code>',
         'Scope a field with <code>in:</code> then pick an attribute',
+        'Draw a custom area from the map toolbar (circle, polygon, rectangle, lasso, or line)',
         'Select a result to drop it on the map',
       ];
     } else if (variant === 'search-viz' && vizContext === 'graph') {
       resolvedMessage = 'Look up people, organisations, locations, and case objects to add to the graph.';
       resolvedTips = [
         'Type a name, place, or keyword to start',
-        'Add filters with <code>type:Person</code> or <code>BRANCHE = value</code>',
+        'Add filters with <code>type:Person</code> or attribute rules',
         'Scope a field with <code>in:</code> then pick an attribute',
         'Select a result to create a node and expand relationships',
       ];

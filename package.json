@@ -1,0 +1,12 @@
+{
+  "name": "investigation-explorer-demo",
+  "version": "1.0.0",
+  "description": "A **standalone** Palantir Gotham–style investigation prototype with **PnE English object categories** and fake Munich mock data. No Celonis frontend or dev server required.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

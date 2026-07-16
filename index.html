@@ -10,7 +10,7 @@
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin=""
     />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260716ag" />
     <link rel="stylesheet" href="./variant-styles.css" />
   </head>
   <body>
@@ -41,7 +41,8 @@
         <div class="package-sidebar__section">
           <button class="package-nav-item" type="button">AI Builder</button>
           <button class="package-nav-item" type="button">Browse Context Model</button>
-          <button class="package-nav-item package-nav-item--active" type="button">Object Explorer</button>
+          <button class="package-nav-item package-nav-item--active" type="button" data-asset="object-explorer">Object Explorer</button>
+          <button class="package-nav-item" type="button" data-asset="new-object">New Object</button>
         </div>
         <div id="object-type-nav" class="package-object-list"></div>
       </aside>
@@ -56,9 +57,13 @@
               <button class="icon-btn icon-btn--ghost" type="button" title="Favorite">☆</button>
             </nav>
             <div class="workbench-tabs">
-              <button class="workbench-tab workbench-tab--active" type="button">
-                Object Explorer
-                <span class="workbench-tab__close">×</span>
+              <button id="workbench-tab-explorer" class="workbench-tab workbench-tab--active" type="button" data-asset="object-explorer" aria-selected="true">
+                <span class="workbench-tab__label">Object Explorer</span>
+                <span class="workbench-tab__close" aria-hidden="true">×</span>
+              </button>
+              <button id="workbench-tab-new-object" class="workbench-tab" type="button" data-asset="new-object" aria-selected="false">
+                <span class="workbench-tab__label">New Object</span>
+                <span class="workbench-tab__close" aria-hidden="true">×</span>
               </button>
             </div>
           </div>
@@ -71,13 +76,13 @@
         </header>
 
         <main class="workbench">
+          <div id="workbench-asset-explorer" class="workbench-asset workbench-asset--active">
           <div class="explorer-header">
             <h1>Object Explorer</h1>
             <div class="explorer-tabs" role="tablist">
               <button class="explorer-tab active" data-view="search" type="button">Search</button>
               <button class="explorer-tab" data-view="map" type="button">Map</button>
               <button class="explorer-tab" data-view="graph" type="button">Graph</button>
-              <button class="explorer-tab" data-view="augmentation" type="button">New Object</button>
             </div>
           </div>
 
@@ -125,6 +130,61 @@
                         <kbd>⌘</kbd><kbd>/</kbd>
                       </span>
                     </button>
+                    <div class="map-area-tools" id="map-area-tools">
+                      <button id="btn-draw-area" class="viz-chrome__action map-area-tools__trigger" type="button" aria-haspopup="menu" aria-expanded="false" title="Draw a geographic search area on the map">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
+                          <rect x="4" y="6" width="16" height="12" rx="1"/>
+                        </svg>
+                        <span id="map-area-tools-label">Draw area</span>
+                        <span class="map-area-tools__chevron" aria-hidden="true">▾</span>
+                      </button>
+                      <div id="map-area-tools-menu" class="map-area-tools__menu hidden" role="menu" aria-label="Choose a selection mode">
+                        <div class="map-area-tools__menu-header">Choose a selection mode</div>
+                        <button class="map-area-tools__option" type="button" role="menuitem" data-draw-mode="circle">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
+                            <circle cx="12" cy="12" r="7"/>
+                          </svg>
+                          <span>Circle</span>
+                        </button>
+                        <button class="map-area-tools__option" type="button" role="menuitem" data-draw-mode="polygon">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
+                            <path d="M12 4 20 18H4Z"/>
+                          </svg>
+                          <span>Polygon</span>
+                        </button>
+                        <button class="map-area-tools__option" type="button" role="menuitem" data-draw-mode="rectangle">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
+                            <rect x="5" y="5" width="14" height="14" rx="1.5"/>
+                          </svg>
+                          <span>Rectangle</span>
+                        </button>
+                        <button class="map-area-tools__option" type="button" role="menuitem" data-draw-mode="lasso">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
+                            <path d="M4 16c4-8 8-10 12-8"/>
+                          </svg>
+                          <span>Lasso</span>
+                        </button>
+                        <button class="map-area-tools__option" type="button" role="menuitem" data-draw-mode="line">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                            <circle cx="6" cy="18" r="2"/>
+                            <circle cx="12" cy="6" r="2"/>
+                            <circle cx="18" cy="14" r="2"/>
+                            <path d="M8 16.5 11 8l6 4"/>
+                          </svg>
+                          <span>Line</span>
+                        </button>
+                      </div>
+                    </div>
+                    <button id="btn-finish-area-shape" class="viz-chrome__action map-area-tools__btn map-area-tools__btn--primary hidden" type="button">Finish shape</button>
+                    <button id="btn-cancel-area-draw" class="viz-chrome__action map-area-tools__btn hidden" type="button">Cancel</button>
+                    <button id="btn-share-area" class="viz-chrome__action map-area-tools__btn hidden" type="button" title="Copy a link to this geographic area">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/>
+                        <path d="M16 6l-4-4-4 4"/>
+                        <path d="M12 2v13"/>
+                      </svg>
+                      <span>Share area</span>
+                    </button>
                     <button id="btn-clear-map" class="viz-chrome__action view-clear-btn" type="button" aria-label="Clear map pins">
                       <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
                         <path d="M18 6 6 18M6 6l12 12"/>
@@ -162,17 +222,56 @@
                       </span>
                       <span class="context-menu__label">Open object details</span>
                     </button>
-                    <button id="map-context-related" class="context-menu__item" type="button" role="menuitem">
-                      <span class="context-menu__icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-                          <circle cx="6" cy="12" r="2.5"/>
-                          <circle cx="18" cy="6" r="2.5"/>
-                          <circle cx="18" cy="18" r="2.5"/>
-                          <path d="M8.2 16.4 15.8 7.6M8.2 16.4l9.5 1.1M15.8 7.6 7.3 15.5"/>
-                        </svg>
-                      </span>
-                      <span class="context-menu__label">Show related objects</span>
-                    </button>
+                    <div id="map-context-related-section" class="context-menu__section hidden">
+                      <div class="context-menu__divider context-menu__divider--section" aria-hidden="true"></div>
+                      <div id="menu-related-row" class="context-menu__item context-menu__item--related">
+                        <span class="context-menu__icon" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                            <circle cx="7" cy="7" r="3"/>
+                            <circle cx="17" cy="17" r="3"/>
+                            <path d="M9.5 9.5 14.5 14.5"/>
+                          </svg>
+                        </span>
+                        <label id="map-context-related-label" class="context-menu__label" for="menu-show-related">Show related objects</label>
+                        <label class="context-menu__check">
+                          <input id="menu-show-related" type="checkbox" />
+                          <span class="context-menu__check-mark"></span>
+                        </label>
+                      </div>
+                    </div>
+                    <div id="menu-related-filters-flyout" class="context-menu context-menu--flyout hidden" role="dialog" aria-label="Related filters">
+                      <div class="context-menu__flyout-form">
+                        <div class="context-menu__field">
+                          <span class="context-menu__field-label">Object types</span>
+                          <div id="menu-related-type-filters" class="type-multiselect"></div>
+                        </div>
+                        <label class="context-menu__field" for="menu-related-time-period">
+                          <span class="context-menu__field-label">Time period</span>
+                          <select id="menu-related-time-period" class="context-menu__select">
+                            <option value="all">All time</option>
+                            <option value="1m">Last 30 days</option>
+                            <option value="3m">Last 3 months</option>
+                            <option value="6m">Last 6 months</option>
+                            <option value="12m">Last 12 months</option>
+                            <option value="24m">Last 24 months</option>
+                            <option value="36m">Last 3 years</option>
+                            <option value="5y">Last 5 years</option>
+                          </select>
+                        </label>
+                        <label class="context-menu__field" for="menu-related-distance">
+                          <span class="context-menu__field-label">Distance</span>
+                          <select id="menu-related-distance" class="context-menu__select">
+                            <option value="">Any distance</option>
+                            <option value="1">Within 1 mile</option>
+                            <option value="5">Within 5 miles</option>
+                            <option value="10">Within 10 miles</option>
+                            <option value="25">Within 25 miles</option>
+                            <option value="50">Within 50 miles</option>
+                          </select>
+                        </label>
+                      </div>
+                    </div>
+                    <div id="map-context-related-divider" class="context-menu__divider hidden" role="separator" aria-hidden="true"></div>
                     <button id="map-context-graph" class="context-menu__item" type="button" role="menuitem">
                       <span class="context-menu__icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
@@ -193,47 +292,6 @@
                       </span>
                       <span class="context-menu__label">Remove object</span>
                     </button>
-                  </div>
-                  <div id="map-related-popover" class="related-options-popover hidden" role="dialog" aria-label="Related object options">
-                    <div class="related-options-popover__header">Related objects</div>
-                    <label class="instance-related-option">
-                      <input id="popover-show-related" type="checkbox" />
-                      <span>Show related objects</span>
-                    </label>
-                    <div id="popover-related-filters" class="instance-related-filters hidden">
-                      <div class="instance-related-filter-field">
-                        <span class="instance-related-filter-field__label">Object types</span>
-                        <div id="popover-related-type-filters" class="search-filter-chips instance-related-type-filters"></div>
-                      </div>
-                      <label class="field-inline" for="popover-related-time-period">
-                        Time period
-                        <select id="popover-related-time-period">
-                          <option value="all">All time</option>
-                          <option value="1m">Last 30 days</option>
-                          <option value="3m">Last 3 months</option>
-                          <option value="6m">Last 6 months</option>
-                          <option value="12m">Last 12 months</option>
-                          <option value="24m">Last 24 months</option>
-                          <option value="36m">Last 3 years</option>
-                          <option value="5y">Last 5 years</option>
-                        </select>
-                      </label>
-                      <label class="field-inline" for="popover-related-distance">
-                        Distance
-                        <select id="popover-related-distance">
-                          <option value="">Any distance</option>
-                          <option value="1">Within 1 mile</option>
-                          <option value="5">Within 5 miles</option>
-                          <option value="10">Within 10 miles</option>
-                          <option value="25">Within 25 miles</option>
-                          <option value="50">Within 50 miles</option>
-                        </select>
-                      </label>
-                    </div>
-                    <div class="related-options-popover__actions">
-                      <button id="popover-related-cancel" class="btn btn-outline btn-sm" type="button">Cancel</button>
-                      <button id="popover-related-apply" class="btn btn-primary btn-sm" type="button">Apply</button>
-                    </div>
                   </div>
                   </div>
                 </div>
@@ -260,6 +318,7 @@
                     </button>
                   </div>
                   <svg id="graph-svg" viewBox="0 0 960 520" role="img" aria-label="Network graph"></svg>
+                  <div id="graph-box-select" class="graph-box-select hidden" aria-hidden="true"></div>
                   <div id="graph-caption" class="graph-caption" aria-live="polite"></div>
                   <div id="graph-context-menu" class="context-menu hidden" role="menu" aria-label="Graph object actions">
                     <button id="graph-context-details" class="context-menu__item" type="button" role="menuitem">
@@ -287,7 +346,7 @@
                           <circle cx="12" cy="11" r="2.2" fill="currentColor" stroke="none"/>
                         </svg>
                       </span>
-                      <span class="context-menu__label">Add to map</span>
+                      <span class="context-menu__label">Show on map</span>
                     </button>
                     <div class="context-menu__divider" role="separator" aria-hidden="true"></div>
                     <button id="graph-context-remove" class="context-menu__item context-menu__item--danger" type="button" role="menuitem">
@@ -305,70 +364,8 @@
                     <div class="graph-controls__zoom" id="graph-zoom">100%</div>
                     <button id="btn-graph-zoom-in" class="graph-controls__btn" type="button" aria-label="Zoom in">+</button>
                   </div>
-                  <p class="graph-hint">Drag to pan · Scroll to zoom</p>
+                  <p class="graph-hint">Shift+click or drag to select · Drag to pan · Scroll to zoom</p>
                   </div>
-                </div>
-              </div>
-
-              <div id="view-augmentation" class="view">
-                <div class="new-object-view">
-                  <div class="new-object-view__header">
-                    <h2>New Object</h2>
-                    <p class="new-object-view__intro">Add a new instance to the dataset. Choose a type, fill in attributes, and optionally link it to existing objects.</p>
-                  </div>
-                  <form id="new-object-form" class="new-object-form">
-                    <section class="new-object-section">
-                      <label class="new-object-section__label" for="new-object-type">Object type</label>
-                      <select id="new-object-type" class="new-object-type-select"></select>
-                    </section>
-
-                    <section class="new-object-section">
-                      <h3 class="new-object-section__title">Attributes</h3>
-                      <p id="new-object-attributes-empty" class="new-object-hint">Select an object type to show attribute fields.</p>
-                      <div id="new-object-attributes" class="new-object-fields"></div>
-                    </section>
-
-                    <section class="new-object-section">
-                      <div class="new-object-section__head">
-                        <h3 class="new-object-section__title">Documents &amp; images</h3>
-                      </div>
-                      <p class="new-object-hint">Upload files and tag what each image or document represents.</p>
-                      <div class="new-object-upload">
-                        <label class="new-object-upload__field">
-                          <span class="new-object-upload__label">File</span>
-                          <input id="new-object-file" class="new-object-upload__input" type="file" accept="image/*,.pdf,.doc,.docx,.txt,application/pdf" />
-                        </label>
-                        <label class="new-object-upload__field">
-                          <span class="new-object-upload__label">Tag</span>
-                          <input id="new-object-file-tag" class="new-object-upload__input" type="text" list="new-object-attachment-tags" placeholder="e.g. Mugshot, Report" autocomplete="off" />
-                        </label>
-                        <label id="new-object-person-photo-wrap" class="new-object-upload__person-photo hidden">
-                          <input id="new-object-person-photo" type="checkbox" />
-                          <span>Photo of this person</span>
-                        </label>
-                        <button id="btn-add-attachment" class="btn btn-outline btn-sm" type="button">Add file</button>
-                      </div>
-                      <datalist id="new-object-attachment-tags"></datalist>
-                      <p id="new-object-attachments-empty" class="new-object-hint">No files added yet.</p>
-                      <div id="new-object-attachments" class="new-object-attachments"></div>
-                    </section>
-
-                    <section class="new-object-section">
-                      <div class="new-object-section__head">
-                        <h3 class="new-object-section__title">Relationships</h3>
-                        <button id="btn-add-relationship" class="btn btn-outline btn-sm" type="button">Add relationship</button>
-                      </div>
-                      <p id="new-object-relationships-empty" class="new-object-hint">No relationships yet. Add one to connect this object to existing instances.</p>
-                      <div id="new-object-relationships" class="new-object-relationships"></div>
-                      <datalist id="new-object-relationship-labels"></datalist>
-                    </section>
-
-                    <div class="new-object-form__actions">
-                      <button id="btn-reset-new-object" class="btn btn-outline" type="button">Reset</button>
-                      <button id="btn-create-new-object" class="btn btn-primary" type="submit">Create object</button>
-                    </div>
-                    <p id="new-object-status" class="new-object-status hidden" role="status"></p>
-                  </form>
                 </div>
               </div>
             </section>
@@ -457,7 +454,7 @@
                   <div id="related-object-filters" class="instance-related-filters hidden">
                     <div class="instance-related-filter-field">
                       <span class="instance-related-filter-field__label">Object types</span>
-                      <div id="related-type-filters" class="search-filter-chips instance-related-type-filters"></div>
+                      <div id="related-type-filters" class="type-multiselect"></div>
                     </div>
                     <label class="field-inline" for="related-time-period">
                       Time period
@@ -533,6 +530,71 @@
               </div>
             </aside>
           </div>
+          </div>
+
+          <div id="workbench-asset-new-object" class="workbench-asset">
+            <div class="explorer-header">
+              <h1>New Object</h1>
+            </div>
+            <div class="new-object-layout">
+              <div class="new-object-view">
+                <p class="new-object-view__intro">Add a new instance to the dataset. Choose a type, fill in attributes, and optionally link it to existing objects.</p>
+                <form id="new-object-form" class="new-object-form">
+                  <section class="new-object-section">
+                    <label class="new-object-section__label" for="new-object-type">Object type</label>
+                    <select id="new-object-type" class="new-object-type-select"></select>
+                  </section>
+
+                  <section class="new-object-section">
+                    <h3 class="new-object-section__title">Attributes</h3>
+                    <p id="new-object-attributes-empty" class="new-object-hint">Select an object type to show attribute fields.</p>
+                    <div id="new-object-attributes" class="new-object-fields"></div>
+                  </section>
+
+                  <section class="new-object-section">
+                    <div class="new-object-section__head">
+                      <h3 class="new-object-section__title">Documents &amp; images</h3>
+                    </div>
+                    <p class="new-object-hint">Upload files and tag what each image or document represents.</p>
+                    <div class="new-object-upload">
+                      <label class="new-object-upload__field">
+                        <span class="new-object-upload__label">File</span>
+                        <input id="new-object-file" class="new-object-upload__input" type="file" accept="image/*,.pdf,.doc,.docx,.txt,application/pdf" />
+                      </label>
+                      <label class="new-object-upload__field">
+                        <span class="new-object-upload__label">Tag</span>
+                        <input id="new-object-file-tag" class="new-object-upload__input" type="text" list="new-object-attachment-tags" placeholder="e.g. Mugshot, Report" autocomplete="off" />
+                      </label>
+                      <label id="new-object-person-photo-wrap" class="new-object-upload__person-photo hidden">
+                        <input id="new-object-person-photo" type="checkbox" />
+                        <span>Photo of this person</span>
+                      </label>
+                      <button id="btn-add-attachment" class="btn btn-outline btn-sm" type="button">Add file</button>
+                    </div>
+                    <datalist id="new-object-attachment-tags"></datalist>
+                    <p id="new-object-attachments-empty" class="new-object-hint">No files added yet.</p>
+                    <div id="new-object-attachments" class="new-object-attachments"></div>
+                  </section>
+
+                  <section class="new-object-section">
+                    <div class="new-object-section__head">
+                      <h3 class="new-object-section__title">Relationships</h3>
+                      <button id="btn-add-relationship" class="btn btn-outline btn-sm" type="button">Add relationship</button>
+                    </div>
+                    <p id="new-object-relationships-empty" class="new-object-hint">No relationships yet. Add one to connect this object to existing instances.</p>
+                    <div id="new-object-relationships" class="new-object-relationships"></div>
+                    <datalist id="new-object-relationship-labels"></datalist>
+                  </section>
+
+                  <div class="new-object-form__actions">
+                    <button id="btn-reset-new-object" class="btn btn-outline" type="button">Reset</button>
+                    <button id="btn-create-new-object" class="btn btn-primary" type="submit">Create object</button>
+                  </div>
+                  <p id="new-object-status" class="new-object-status hidden" role="status"></p>
+                </form>
+              </div>
+            </div>
+          </div>
         </main>
       </div>
     </div>
@@ -540,19 +602,21 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     <script src="./data/mock-data.js"></script>
+    <script src="./data/geo-boundaries.js?v=20260716f"></script>
     <script src="./data/mock-data-bulk.js"></script>
     <script src="./js/display-names.js"></script>
-    <script src="./js/object-icons.js"></script>
+    <script src="./js/object-icons.js?v=20260716y"></script>
     <script src="./js/entity-attachments.js"></script>
     <script src="./data/mock-attachments.js"></script>
-    <script src="./js/map-locations.js"></script>
+    <script src="./js/place-search.js?v=20260716i"></script>
+    <script src="./js/map-locations.js?v=20260716ai"></script>
     <script src="./js/map-heatmap.js"></script>
-    <script src="./js/search-filters.js"></script>
-    <script src="./js/smart-search.js"></script>
-    <script src="./js/viz-search-variant.js"></script>
-    <script src="./js/empty-states.js"></script>
+    <script src="./js/search-filters.js?v=20260716af"></script>
+    <script src="./js/smart-search.js?v=20260716v"></script>
+    <script src="./js/viz-search-variant.js?v=20260716"></script>
+    <script src="./js/empty-states.js?v=20260716w"></script>
     <script src="./js/graph-view.js"></script>
     <script src="./js/new-object.js"></script>
-    <script src="./js/app.js"></script>
+    <script src="./js/app.js?v=20260716ai"></script>
   </body>
 </html>

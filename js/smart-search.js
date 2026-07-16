@@ -63,6 +63,10 @@
       return true;
     }
 
+    if (/^area(?::|$)/i.test(trimmed)) {
+      return true;
+    }
+
     return (
       /^[A-Z][A-Z0-9_]*\s+(contains|equals|=|is:set|exists)(\s|$)/i.test(trimmed) ||
       /^[A-Z][A-Z0-9_]*\s*:\s*\S/.test(trimmed)
@@ -156,6 +160,16 @@
       });
     }
 
+    if (filters.geographicArea) {
+      pills.push({
+        id: `area:${filters.geographicArea.id}`,
+        kind: 'area',
+        areaId: filters.geographicArea.id,
+        label: filters.geographicArea.label,
+        prefix: 'area',
+      });
+    }
+
     return pills;
   }
 
@@ -184,6 +198,32 @@
     if (available.length > 0 && next.searchFields.size >= available.length) {
       next.searchFields = null;
     }
+    return next;
+  }
+
+  function applyAreaCommand(areaOrTerm, filters, lookup, resolveAreaTerm) {
+    const next = SearchFilters.clone(filters);
+    let area = null;
+
+    if (areaOrTerm && typeof areaOrTerm === 'object' && areaOrTerm.bounds) {
+      area = window.MapLocations?.cloneArea(areaOrTerm) || areaOrTerm;
+    } else if (areaOrTerm && lookup) {
+      area = window.MapLocations?.findGeographicArea(String(areaOrTerm), lookup) || null;
+      if (!area && resolveAreaTerm) {
+        area = resolveAreaTerm(String(areaOrTerm));
+      }
+      if (!area && window.PlaceSearch) {
+        const cached = window.PlaceSearch.getCached(String(areaOrTerm).trim().toLowerCase());
+        area =
+          cached.find(
+            (entry) => entry.label.toLowerCase() === String(areaOrTerm).trim().toLowerCase()
+          ) ||
+          cached[0] ||
+          null;
+      }
+    }
+
+    next.geographicArea = area;
     return next;
   }
 
@@ -222,6 +262,11 @@
       return null;
     }
 
+    const areaMatch = trimmed.match(/^area:(.+)$/i);
+    if (areaMatch) {
+      return { kind: 'area', term: areaMatch[1].trim() };
+    }
+
     const attrColon = trimmed.match(/^([A-Z][A-Z0-9_]*)\s*:\s*(.+)$/);
     if (attrColon) {
       const fieldId = resolveFieldId(catalog, filters.types, attrColon[1]);
@@ -256,12 +301,39 @@
     return null;
   }
 
-  function getSuggestions(input, objectTypes, catalog, filters) {
+  function getSuggestions(
+    input,
+    objectTypes,
+    catalog,
+    filters,
+    lookup = null,
+    getAreaSuggestions = null,
+    geographicEnabled = false
+  ) {
     const value = input;
     const trimmed = value.trim();
 
     if (!trimmed || !isFilterCommandInput(trimmed)) {
       return [];
+    }
+
+    if (/^area(?::|$)/i.test(trimmed)) {
+      if (!geographicEnabled) {
+        return [];
+      }
+      const partial = trimmed.replace(/^area:?/i, '').trim();
+      if (getAreaSuggestions) {
+        return getAreaSuggestions(partial);
+      }
+      const areas = window.MapLocations?.searchGeographicAreas(partial, lookup, 12) || [];
+      return areas.map((area) => ({
+        kind: 'item',
+        id: `area-${area.id}`,
+        label: area.label,
+        description: area.placeType || area.displayName || 'Geographic area',
+        insert: `area:${area.label}`,
+        apply: { kind: 'area', area },
+      }));
     }
 
     if (/^type(?::|$)/i.test(trimmed)) {
@@ -374,12 +446,14 @@
       }
     } else if (kind === 'attr') {
       next.attributeRules = next.attributeRules.filter((rule) => rule.id !== payload.ruleId);
+    } else if (kind === 'area') {
+      next.geographicArea = null;
     }
 
     return next;
   }
 
-  function applyParsedCommand(command, filters, objectTypes, catalog) {
+  function applyParsedCommand(command, filters, objectTypes, catalog, lookup = null, resolveAreaTerm = null) {
     if (!command) {
       return filters;
     }
@@ -391,6 +465,9 @@
     }
     if (command.kind === 'attr') {
       return applyAttrCommand(command.fieldId, command.operator, command.value, filters);
+    }
+    if (command.kind === 'area') {
+      return applyAreaCommand(command.area || command.term, filters, lookup, resolveAreaTerm);
     }
     return filters;
   }
@@ -408,7 +485,19 @@
       attributeCatalog,
       onChange,
       onSubmit,
+      onGeographicInputClear,
+      onSearchQueryChange,
+      onAreaSuggestionSearch,
+      onApplyArea,
+      getLookup,
+      resolveAreaTerm,
+      getAreaSuggestions,
+      isGeographicSearchEnabled = () => false,
     } = options;
+
+    function geographicEnabled() {
+      return isGeographicSearchEnabled();
+    }
 
     let activeIndex = 0;
     let menuEntries = [];
@@ -447,7 +536,12 @@
         button.addEventListener('click', () => {
           const next = removePill(
             pill.kind,
-            { typeId: pill.typeId, fieldId: pill.fieldId, ruleId: pill.ruleId },
+            {
+              typeId: pill.typeId,
+              fieldId: pill.fieldId,
+              ruleId: pill.ruleId,
+              areaId: pill.areaId,
+            },
             getFilters(),
             objectTypes
           );
@@ -494,7 +588,16 @@
       }
 
       const filters = getFilters();
-      menuEntries = getSuggestions(input.value, objectTypes, attributeCatalog, filters);
+      const lookup = getLookup?.() || null;
+      menuEntries = getSuggestions(
+        input.value,
+        objectTypes,
+        attributeCatalog,
+        filters,
+        lookup,
+        geographicEnabled() ? getAreaSuggestions : null,
+        geographicEnabled()
+      );
       selectableItems = flattenSelectableItems(menuEntries);
       if (selectableItems.length === 0) {
         hideMenu();
@@ -549,8 +652,24 @@
       if (!item) {
         return;
       }
+      if (item.apply?.kind === 'area' && onApplyArea && geographicEnabled()) {
+        onApplyArea(item.apply.area || item.apply.term, item.apply.displayName);
+        input.value = '';
+        setSearchTerm('');
+        hideMenu();
+        onChange();
+        return;
+      }
       if (item.apply) {
-        const next = applyParsedCommand(item.apply, getFilters(), objectTypes, attributeCatalog);
+        const lookup = getLookup?.() || null;
+        const next = applyParsedCommand(
+          item.apply,
+          getFilters(),
+          objectTypes,
+          attributeCatalog,
+          lookup,
+          resolveAreaTerm
+        );
         setSearchFilters(next);
         input.value = '';
         setSearchTerm('');
@@ -568,7 +687,26 @@
       if (!command) {
         return false;
       }
-      const next = applyParsedCommand(command, getFilters(), objectTypes, attributeCatalog);
+      if (command.kind === 'area') {
+        if (!geographicEnabled() || !onApplyArea) {
+          return false;
+        }
+        onApplyArea(command.area || command.term, command.displayName);
+        input.value = '';
+        setSearchTerm('');
+        hideMenu();
+        onChange();
+        return true;
+      }
+      const lookup = getLookup?.() || null;
+      const next = applyParsedCommand(
+        command,
+        getFilters(),
+        objectTypes,
+        attributeCatalog,
+        lookup,
+        resolveAreaTerm
+      );
       setSearchFilters(next);
       input.value = '';
       setSearchTerm('');
@@ -578,7 +716,12 @@
     }
 
     input.addEventListener('input', () => {
+      onGeographicInputClear?.();
       const value = input.value;
+      onSearchQueryChange?.(value);
+      if (geographicEnabled() && /^area(?::|$)/i.test(value.trim())) {
+        onAreaSuggestionSearch?.(value);
+      }
       if (isFilterCommandInput(value)) {
         activeIndex = 0;
         renderMenu();
@@ -588,6 +731,15 @@
       }
       syncDropdownFilterMode();
       onChange();
+    });
+
+    input.addEventListener('focus', () => {
+      if (isFilterCommandInput(input.value)) {
+        if (geographicEnabled() && /^area(?::|$)/i.test(input.value.trim())) {
+          onAreaSuggestionSearch?.(input.value);
+        }
+        renderMenu();
+      }
     });
 
     input.addEventListener('keydown', (event) => {
@@ -617,8 +769,8 @@
           return;
         }
         hideMenu();
-        onChange();
         onSubmit?.();
+        onChange();
         return;
       }
 
@@ -642,12 +794,6 @@
       }
     });
 
-    input.addEventListener('focus', () => {
-      if (isFilterCommandInput(input.value)) {
-        renderMenu();
-      }
-    });
-
     input.addEventListener('blur', () => {
       window.setTimeout(hideMenu, 120);
     });
@@ -655,6 +801,7 @@
     const instance = {
       renderPills,
       syncInput,
+      renderMenu,
       focus: () => input.focus(),
     };
 
@@ -670,6 +817,12 @@
     }
   }
 
+  function refreshMenus() {
+    for (const instance of instances) {
+      instance.renderMenu?.();
+    }
+  }
+
   function init(options) {
     const instance = createInstance(options);
     instances.push(instance);
@@ -679,6 +832,7 @@
   window.SmartSearchBar = {
     init,
     syncAll,
+    refreshMenus,
     buildPillDescriptors,
     parseCommand,
     applyParsedCommand,

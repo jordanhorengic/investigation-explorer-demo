@@ -69,20 +69,12 @@
   }
 
   function markerHtml(type, color, options = {}) {
-    const indirect = Boolean(options.indirect);
     const selected = Boolean(options.selected);
-    const iconSize = indirect ? 14 : 16;
     const title = options.title ? ` title="${String(options.title).replace(/"/g, '&quot;')}"` : '';
-    const classes = [
-      'map-marker',
-      indirect ? 'map-marker--indirect' : '',
-      selected ? 'map-marker--selected' : '',
-    ]
-      .filter(Boolean)
-      .join(' ');
+    const classes = ['map-marker', selected ? 'map-marker--selected' : ''].filter(Boolean).join(' ');
     return `
       <div class="${classes}" style="--marker-color:${color}"${title}>
-        ${iconMarkup(type, { size: iconSize, color: '#ffffff' })}
+        ${iconMarkup(type, { size: 16, color: '#ffffff' })}
       </div>
     `;
   }

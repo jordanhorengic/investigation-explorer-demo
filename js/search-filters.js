@@ -1,11 +1,30 @@
 (function () {
   const METADATA_FIELDS = new Set(['QUELLSYSTEM', 'QUELLMODUL', 'QUELLINSTANZ', 'MANDANT', 'EXTRAKTIONSDATUM']);
 
+  function cloneGeographicArea(area) {
+    if (!area) {
+      return null;
+    }
+    return {
+      id: area.id,
+      label: area.label,
+      bounds: area.bounds ? [[...area.bounds[0]], [...area.bounds[1]]] : null,
+      source: area.source || 'catalog',
+      shape: area.shape || 'rectangle',
+      polygon: area.polygon ? area.polygon.map((point) => ({ ...point })) : null,
+      line: area.line ? area.line.map((point) => ({ ...point })) : null,
+      center: area.center ? { ...area.center } : null,
+      radiusMeters: area.radiusMeters ?? null,
+      bufferMeters: area.bufferMeters ?? null,
+    };
+  }
+
   function createDefault(objectTypes) {
     return {
       types: new Set(objectTypes.map((type) => type.id)),
       searchFields: null,
       attributeRules: [],
+      geographicArea: null,
     };
   }
 
@@ -14,6 +33,7 @@
       types: new Set(filters.types),
       searchFields: filters.searchFields ? new Set(filters.searchFields) : null,
       attributeRules: filters.attributeRules.map((rule) => ({ ...rule })),
+      geographicArea: cloneGeographicArea(filters.geographicArea),
     };
   }
 
@@ -55,7 +75,8 @@
     return (
       Boolean(term.trim()) ||
       filters.attributeRules.length > 0 ||
-      isRestrictedTypes(filters, totalTypeCount)
+      isRestrictedTypes(filters, totalTypeCount) ||
+      Boolean(filters.geographicArea)
     );
   }
 
@@ -113,6 +134,10 @@
       );
     }
 
+    if (filters.geographicArea?.label) {
+      parts.push(filters.geographicArea.label);
+    }
+
     return parts.join(' · ');
   }
 
@@ -133,6 +158,9 @@
       count += 1;
     }
     count += filters.attributeRules.length;
+    if (filters.geographicArea) {
+      count += 1;
+    }
     return count;
   }
 
@@ -150,7 +178,7 @@
     };
   }
 
-  function filterEntities(entities, term, filters, objectTypes, lookup = null, limit = 100) {
+  function filterEntities(entities, term, filters, objectTypes, lookup = null, relations = [], limit = 100) {
     if (!hasActiveCriteria(term, filters, objectTypes.length)) {
       return [];
     }
@@ -168,6 +196,12 @@
             continue;
           }
           if (!entityMatchesAttributeRule(entity, rule)) {
+            return false;
+          }
+        }
+
+        if (filters.geographicArea && lookup && window.MapLocations) {
+          if (!window.MapLocations.entityHasGeoInArea(entity, filters.geographicArea, lookup, relations)) {
             return false;
           }
         }
@@ -198,6 +232,14 @@
           value: value || '—',
         };
       }
+    }
+
+    if (filters.geographicArea?.label) {
+      return {
+        fieldId: 'AREA',
+        fieldLabel: 'Area',
+        value: filters.geographicArea.label,
+      };
     }
 
     return {

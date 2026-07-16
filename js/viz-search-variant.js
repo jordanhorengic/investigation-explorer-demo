@@ -31,7 +31,7 @@
     },
   };
 
-  let current = 'modal';
+  let current = 'dropdown';
   let shell = null;
   let hosts = { map: null, graph: null };
   let frames = { map: null, graph: null };
@@ -51,7 +51,7 @@
   }
 
   function getMeta() {
-    return VARIANTS[current] || VARIANTS.modal;
+    return VARIANTS[current] || VARIANTS.dropdown;
   }
 
   function isModal() {
@@ -89,8 +89,8 @@
 
   function readVariantFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    const value = (params.get('variant') || 'modal').toLowerCase();
-    return VARIANTS[value] ? value : 'modal';
+    const value = (params.get('variant') || 'dropdown').toLowerCase();
+    return VARIANTS[value] ? value : 'dropdown';
   }
 
   function contextTitle(context) {
@@ -120,7 +120,7 @@
     if (!banner) {
       return;
     }
-    banner.classList.toggle('hidden', isModal());
+    banner.classList.toggle('hidden', current === 'dropdown');
     const label = banner.querySelector('[data-variant-label]');
     if (label) {
       label.textContent = getMeta().label;
