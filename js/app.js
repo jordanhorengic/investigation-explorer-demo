@@ -24,6 +24,7 @@
       enabled: false,
       typeFilters: null,
     },
+    activeGeographicArea: null,
   };
 
   const graphState = GraphView.createGraphState();
@@ -45,8 +46,15 @@
   let map = null;
   let markerLayer = null;
   let areaLayer = null;
+  let selectionLayer = null;
   let heatLayer = null;
   const MAP_BASE_ZOOM = 13;
+  const mapBoxSelect = {
+    active: false,
+    startLatLng: null,
+    startPoint: null,
+    rectangle: null,
+  };
 
   function ensureMap() {
     if (map) {
@@ -62,6 +70,8 @@
     }).addTo(map);
     markerLayer = L.layerGroup().addTo(map);
     areaLayer = L.layerGroup().addTo(map);
+    selectionLayer = L.layerGroup().addTo(map);
+    mountMapBoxSelection();
     map.on('click', (event) => {
       hideMapContextMenu();
       if (event.originalEvent?.button !== 0) {
@@ -171,14 +181,38 @@
     mapContextRelated: document.getElementById('map-context-related'),
     mapContextGraph: document.getElementById('map-context-graph'),
     mapContextRemove: document.getElementById('map-context-remove'),
+    mapRelatedPopover: document.getElementById('map-related-popover'),
+    popoverShowRelated: document.getElementById('popover-show-related'),
+    popoverRelatedFilters: document.getElementById('popover-related-filters'),
+    popoverRelatedTypeFilters: document.getElementById('popover-related-type-filters'),
+    popoverRelatedTimePeriod: document.getElementById('popover-related-time-period'),
+    popoverRelatedDistance: document.getElementById('popover-related-distance'),
+    popoverRelatedCancel: document.getElementById('popover-related-cancel'),
+    popoverRelatedApply: document.getElementById('popover-related-apply'),
+    relatedDistance: document.getElementById('related-distance'),
   };
+
+  let relatedPopoverEntityId = null;
 
   function defaultPinSettings() {
     return {
       showRelated: false,
       typeFilters: null,
       timePeriod: 'all',
+      distanceMiles: null,
     };
+  }
+
+  function parseDistanceMiles(value) {
+    if (value === null || value === undefined || value === '') {
+      return null;
+    }
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  }
+
+  function formatDistanceMiles(value) {
+    return value ? String(value) : '';
   }
 
   function getHeatmapTypeOptions() {
@@ -328,10 +362,10 @@
     return null;
   }
 
-  function readRelatedTypeFiltersFromUI() {
+  function readRelatedTypeFiltersFromContainer(container) {
     const options = getMapRelatedTypeOptions();
     const selected = new Set();
-    for (const input of els.relatedTypeFilters.querySelectorAll('input[type="checkbox"]')) {
+    for (const input of container.querySelectorAll('input[type="checkbox"]')) {
       if (input.checked) {
         selected.add(input.value);
       }
@@ -342,12 +376,30 @@
     return selected;
   }
 
-  function renderRelatedTypeFilters(activeFilters) {
+  function readRelatedTypeFiltersFromUI() {
+    return readRelatedTypeFiltersFromContainer(els.relatedTypeFilters);
+  }
+
+  function readRelatedSettingsFromUI(source = 'panel') {
+    const isPopover = source === 'popover';
+    return {
+      showRelated: isPopover ? els.popoverShowRelated.checked : els.showRelatedObjects.checked,
+      typeFilters: readRelatedTypeFiltersFromContainer(
+        isPopover ? els.popoverRelatedTypeFilters : els.relatedTypeFilters
+      ),
+      timePeriod: isPopover ? els.popoverRelatedTimePeriod.value : els.relatedTimePeriod.value,
+      distanceMiles: parseDistanceMiles(
+        isPopover ? els.popoverRelatedDistance.value : els.relatedDistance.value
+      ),
+    };
+  }
+
+  function renderRelatedTypeFiltersInto(container, activeFilters, onChange) {
     const options = getMapRelatedTypeOptions();
     const active = activeFilters instanceof Set ? activeFilters : null;
     const allActive = !active;
 
-    els.relatedTypeFilters.innerHTML = '';
+    container.innerHTML = '';
     for (const type of options) {
       const checked = allActive || active.has(type.id);
       const label = document.createElement('label');
@@ -358,10 +410,41 @@
       `;
       label.querySelector('input').addEventListener('change', (event) => {
         label.classList.toggle('search-filter-chip--active', event.target.checked);
-        applyRelatedOptionsForSelection();
+        onChange?.();
       });
-      els.relatedTypeFilters.appendChild(label);
+      container.appendChild(label);
     }
+  }
+
+  function renderRelatedTypeFilters(activeFilters) {
+    renderRelatedTypeFiltersInto(els.relatedTypeFilters, activeFilters, applyRelatedOptionsForSelection);
+  }
+
+  function renderPopoverRelatedTypeFilters(activeFilters) {
+    renderRelatedTypeFiltersInto(els.popoverRelatedTypeFilters, activeFilters, updatePopoverRelatedFilterVisibility);
+  }
+
+  function writeRelatedSettingsToUI(settings, target = 'panel') {
+    const isPopover = target === 'popover';
+    const showRelatedEl = isPopover ? els.popoverShowRelated : els.showRelatedObjects;
+    const timePeriodEl = isPopover ? els.popoverRelatedTimePeriod : els.relatedTimePeriod;
+    const distanceEl = isPopover ? els.popoverRelatedDistance : els.relatedDistance;
+
+    showRelatedEl.checked = settings.showRelated;
+    timePeriodEl.value = settings.timePeriod || 'all';
+    distanceEl.value = formatDistanceMiles(settings.distanceMiles);
+
+    if (isPopover) {
+      renderPopoverRelatedTypeFilters(normalizePinTypeFilters(settings));
+      updatePopoverRelatedFilterVisibility();
+    } else {
+      renderRelatedTypeFilters(normalizePinTypeFilters(settings));
+      updateRelatedFilterVisibility();
+    }
+  }
+
+  function updatePopoverRelatedFilterVisibility() {
+    els.popoverRelatedFilters.classList.toggle('hidden', !els.popoverShowRelated.checked);
   }
 
   function getPinSettings(entityId) {
@@ -374,18 +457,55 @@
 
   function syncRelatedOptionsFromSelection() {
     if (!state.selectedId) {
-      els.showRelatedObjects.checked = false;
-      els.relatedTimePeriod.value = 'all';
-      renderRelatedTypeFilters(null);
-      updateRelatedFilterVisibility();
+      writeRelatedSettingsToUI(defaultPinSettings(), 'panel');
       return;
     }
 
-    const settings = getPinSettings(state.selectedId);
-    els.showRelatedObjects.checked = settings.showRelated;
-    els.relatedTimePeriod.value = settings.timePeriod;
-    renderRelatedTypeFilters(normalizePinTypeFilters(settings));
-    updateRelatedFilterVisibility();
+    writeRelatedSettingsToUI(getPinSettings(state.selectedId), 'panel');
+  }
+
+  function applyRelatedSettingsForEntity(entityId, settings) {
+    if (!entityId || !lookup.has(entityId)) {
+      return;
+    }
+
+    state.selectedId = entityId;
+    state.pinSettings.set(entityId, {
+      showRelated: settings.showRelated,
+      typeFilters: settings.typeFilters,
+      timePeriod: settings.timePeriod,
+      distanceMiles: settings.distanceMiles,
+    });
+
+    writeRelatedSettingsToUI(settings, 'panel');
+
+    if (state.activeView === 'map') {
+      if (!state.pinnedIds.has(entityId)) {
+        if (settings.showRelated) {
+          pinEntityOnMap(entityId, { stayOnMap: true, showRelated: true, ...settings });
+        }
+        return;
+      }
+
+      renderMapPins();
+      return;
+    }
+
+    if (state.activeView === 'graph') {
+      if (!graphState.nodeIds.has(entityId)) {
+        if (settings.showRelated) {
+          appendEntityToGraph(entityId, { stayOnGraph: true });
+        } else {
+          return;
+        }
+      }
+
+      if (!state.graphRoots.has(entityId)) {
+        state.graphRoots.add(entityId);
+      }
+
+      syncGraphRelatedObjects();
+    }
   }
 
   function findGraphAnchorForEntity(entityId) {
@@ -427,6 +547,7 @@
       const related = MapLocations.collectRelatedEntities(rootEntity, lookup, relations, 2, {
         typeFilters: normalizePinTypeFilters(settings),
         timePeriod: settings.timePeriod,
+        distanceMiles: settings.distanceMiles,
       });
 
       for (const entry of related) {
@@ -477,41 +598,7 @@
       return;
     }
 
-    state.pinSettings.set(state.selectedId, {
-      showRelated: els.showRelatedObjects.checked,
-      typeFilters: readRelatedTypeFiltersFromUI(),
-      timePeriod: els.relatedTimePeriod.value,
-    });
-
-    updateRelatedFilterVisibility();
-
-    if (state.activeView === 'map') {
-      if (!state.pinnedIds.has(state.selectedId)) {
-        if (els.showRelatedObjects.checked) {
-          pinEntityOnMap(state.selectedId, { stayOnMap: true, showRelated: true });
-        }
-        return;
-      }
-
-      renderMapPins();
-      return;
-    }
-
-    if (state.activeView === 'graph') {
-      if (!graphState.nodeIds.has(state.selectedId)) {
-        if (els.showRelatedObjects.checked) {
-          appendEntityToGraph(state.selectedId, { stayOnGraph: true });
-        } else {
-          return;
-        }
-      }
-
-      if (!state.graphRoots.has(state.selectedId)) {
-        state.graphRoots.add(state.selectedId);
-      }
-
-      syncGraphRelatedObjects();
-    }
+    applyRelatedSettingsForEntity(state.selectedId, readRelatedSettingsFromUI('panel'));
   }
 
   function getLinkedPlacementIds(entityId) {
@@ -610,6 +697,10 @@
         showRelated: true,
         typeFilters: options.typeFilters ?? readRelatedTypeFiltersFromUI(),
         timePeriod: options.timePeriod || els.relatedTimePeriod.value,
+        distanceMiles:
+          options.distanceMiles !== undefined
+            ? options.distanceMiles
+            : parseDistanceMiles(els.relatedDistance.value),
       });
     }
     state.selectedId = entityId;
@@ -742,6 +833,210 @@
     }
 
     return true;
+  }
+
+  function setMultiSelection(entityIds) {
+    const ids = resolveBulkEntityIds(entityIds);
+    clearMultiSelection();
+    for (const entityId of ids) {
+      state.multiSelectedIds.add(entityId);
+    }
+    if (ids.length > 0) {
+      state.selectedId = ids[ids.length - 1];
+      state.multiSelectAnchorId = ids[0];
+    }
+  }
+
+  function clearMapAreaHighlight() {
+    ensureMap();
+    areaLayer?.clearLayers();
+    state.activeGeographicArea = null;
+  }
+
+  function clearMapBoxSelectionOverlay() {
+    ensureMap();
+    selectionLayer?.clearLayers();
+    mapBoxSelect.active = false;
+    mapBoxSelect.startLatLng = null;
+    mapBoxSelect.startPoint = null;
+    mapBoxSelect.rectangle = null;
+  }
+
+  function finishMapBoxSelection(bounds) {
+    const pins = MapLocations.spreadOverlappingPins(collectMapPins());
+    const ids = new Set();
+    for (const pin of pins) {
+      if (bounds.contains(L.latLng(pin.geo.lat, pin.geo.lon))) {
+        ids.add(pin.sourceEntity.id);
+      }
+    }
+
+    clearMapBoxSelectionOverlay();
+    if (map?.dragging && !map.dragging.enabled()) {
+      map.dragging.enable();
+    }
+
+    if (ids.size === 0) {
+      return;
+    }
+
+    setMultiSelection([...ids]);
+    refreshSelectionViews();
+  }
+
+  function mountMapBoxSelection() {
+    if (!map || map._boxSelectMounted) {
+      return;
+    }
+    map._boxSelectMounted = true;
+
+    map.on('mousedown', (event) => {
+      if (event.originalEvent.button !== 0 || !event.originalEvent.shiftKey) {
+        return;
+      }
+      hideMapContextMenu();
+      hideRelatedOptionsPopover();
+      mapBoxSelect.active = true;
+      mapBoxSelect.startLatLng = event.latlng;
+      mapBoxSelect.startPoint = event.containerPoint;
+      map.dragging.disable();
+      L.DomEvent.stopPropagation(event);
+    });
+
+    map.on('mousemove', (event) => {
+      if (!mapBoxSelect.active || !mapBoxSelect.startLatLng) {
+        return;
+      }
+      if (!mapBoxSelect.rectangle) {
+        mapBoxSelect.rectangle = L.rectangle([mapBoxSelect.startLatLng, event.latlng], {
+          color: '#1b44b1',
+          weight: 1.5,
+          fillColor: '#1b44b1',
+          fillOpacity: 0.12,
+          dashArray: '4 4',
+        }).addTo(selectionLayer);
+      } else {
+        mapBoxSelect.rectangle.setBounds(L.latLngBounds(mapBoxSelect.startLatLng, event.latlng));
+      }
+    });
+
+    const finishDrag = (event) => {
+      if (!mapBoxSelect.active) {
+        return;
+      }
+      if (mapBoxSelect.rectangle) {
+        finishMapBoxSelection(mapBoxSelect.rectangle.getBounds());
+        return;
+      }
+      clearMapBoxSelectionOverlay();
+      if (map.dragging && !map.dragging.enabled()) {
+        map.dragging.enable();
+      }
+    };
+
+    map.on('mouseup', finishDrag);
+    map.on('mouseout', (event) => {
+      if (mapBoxSelect.active && event.originalEvent?.buttons === 0) {
+        finishDrag(event);
+      }
+    });
+  }
+
+  function selectEntitiesInGeographicArea(area) {
+    const ids = MapLocations.collectEntityIdsInBounds(area.bounds, lookup, relations);
+    if (ids.length === 0) {
+      setMultiSelection([]);
+      refreshSelectionViews();
+      return;
+    }
+
+    setMultiSelection(ids);
+    for (const entityId of ids) {
+      if (!state.pinnedIds.has(entityId)) {
+        state.pinnedIds.add(entityId);
+        if (!state.pinSettings.has(entityId)) {
+          state.pinSettings.set(entityId, defaultPinSettings());
+        }
+      }
+    }
+    renderMapPins({ preserveView: true });
+    refreshSelectionViews();
+  }
+
+  function syncMapGeographicSearch() {
+    if (state.activeView !== 'map') {
+      clearMapAreaHighlight();
+      return;
+    }
+
+    const term = state.searchTerm.trim();
+    if (!term || SmartSearchBar.isFilterCommandInput(term) || hasStructuredSearchFilters()) {
+      clearMapAreaHighlight();
+      return;
+    }
+
+    const area = MapLocations.findGeographicArea(term, lookup);
+    if (!area) {
+      clearMapAreaHighlight();
+      return;
+    }
+
+    if (state.activeGeographicArea?.id === area.id && state.activeGeographicArea?.term === term) {
+      return;
+    }
+
+    renderAreaHighlight(area);
+    selectEntitiesInGeographicArea(area);
+    state.activeGeographicArea = { id: area.id, term, label: area.label };
+  }
+
+  function hasStructuredSearchFilters() {
+    return (
+      SearchFilters.isRestrictedTypes(state.searchFilters, objectTypes.length) ||
+      state.searchFilters.attributeRules.length > 0 ||
+      Boolean(state.searchFilters.searchFields?.size)
+    );
+  }
+
+  function hideRelatedOptionsPopover() {
+    relatedPopoverEntityId = null;
+    els.mapRelatedPopover?.classList.add('hidden');
+  }
+
+  function openRelatedOptionsPopover(entityId, clientX, clientY) {
+    if (!entityId || !lookup.has(entityId)) {
+      return;
+    }
+
+    hideMapContextMenu();
+    relatedPopoverEntityId = entityId;
+    writeRelatedSettingsToUI(getPinSettings(entityId), 'popover');
+    els.mapRelatedPopover.classList.remove('hidden');
+    els.mapRelatedPopover.style.position = 'fixed';
+    els.mapRelatedPopover.style.left = `${clientX}px`;
+    els.mapRelatedPopover.style.top = `${clientY}px`;
+    els.mapRelatedPopover.style.zIndex = '10001';
+
+    const rect = els.mapRelatedPopover.getBoundingClientRect();
+    const padding = 8;
+    let left = clientX;
+    let top = clientY;
+    if (left + rect.width > window.innerWidth - padding) {
+      left = window.innerWidth - rect.width - padding;
+    }
+    if (top + rect.height > window.innerHeight - padding) {
+      top = window.innerHeight - rect.height - padding;
+    }
+    els.mapRelatedPopover.style.left = `${Math.max(padding, left)}px`;
+    els.mapRelatedPopover.style.top = `${Math.max(padding, top)}px`;
+  }
+
+  function applyRelatedOptionsPopover() {
+    if (!relatedPopoverEntityId) {
+      return;
+    }
+    applyRelatedSettingsForEntity(relatedPopoverEntityId, readRelatedSettingsFromUI('popover'));
+    hideRelatedOptionsPopover();
   }
 
   function clearMultiSelection() {
@@ -895,6 +1190,10 @@
           showRelated: true,
           typeFilters: options.typeFilters ?? readRelatedTypeFiltersFromUI(),
           timePeriod: options.timePeriod || els.relatedTimePeriod.value,
+          distanceMiles:
+            options.distanceMiles !== undefined
+              ? options.distanceMiles
+              : parseDistanceMiles(els.relatedDistance.value),
         });
       }
     }
@@ -1167,6 +1466,9 @@
       VizSearchVariant.syncDropdownHostPosition(ctx || state.vizSearchContext);
     }
     refreshSearchResults();
+    if (state.activeView === 'map') {
+      syncMapGeographicSearch();
+    }
   }
 
   function setTypeFilter(typeId) {
@@ -1606,11 +1908,14 @@
     return MapLocations.dedupePins(pins);
   }
 
-  function renderAreaHighlight(term) {
+  function renderAreaHighlight(areaOrTerm) {
     ensureMap();
     areaLayer.clearLayers();
 
-    const area = MapLocations.findGeographicArea(term, lookup);
+    const area =
+      typeof areaOrTerm === 'string'
+        ? MapLocations.findGeographicArea(areaOrTerm, lookup)
+        : areaOrTerm;
     if (!area) {
       return false;
     }
@@ -1622,10 +1927,12 @@
       fillOpacity: 0.12,
     }).addTo(areaLayer);
 
-    rectangle.bindPopup(`<strong>${area.label}</strong><br><span style="font-size:11px;color:#6b7785">Geographic area</span>`);
+    rectangle.bindPopup(
+      `<strong>${area.label}</strong><br><span style="font-size:11px;color:#6b7785">Geographic area</span>`
+    );
     map.fitBounds(area.bounds, { padding: [24, 24] });
     refreshMapSize();
-    return true;
+    return area;
   }
 
   function shouldPreserveMapView(previousBounds, pinBounds, options) {
@@ -1922,6 +2229,16 @@
         document.body.appendChild(menu);
       }
     }
+    if (els.mapRelatedPopover && els.mapRelatedPopover.parentElement !== document.body) {
+      document.body.appendChild(els.mapRelatedPopover);
+    }
+
+    document.addEventListener('click', (event) => {
+      if (els.mapRelatedPopover?.contains(event.target)) {
+        return;
+      }
+      hideRelatedOptionsPopover();
+    });
   }
 
   function openContextMenu(menu, clientX, clientY) {
@@ -1985,6 +2302,8 @@
     openContextMenu(els.graphContextMenu, clientX, clientY);
   }
 
+  let lastMapContextPoint = { x: 0, y: 0 };
+
   function showMapContextMenu(entityId, clientX, clientY, selectionSnapshot = null, options = {}) {
     const detailsOnly = options.detailsOnly === true;
     hideGraphContextMenu();
@@ -1997,13 +2316,14 @@
         : getContextSelectionIds();
     const count = mapContextSelectionIds.length;
     const settings = getPinSettings(entityId);
+    lastMapContextPoint = { x: clientX, y: clientY };
 
     setContextMenuLabel(els.mapContextGraph, 'Add to graph', count);
     setContextMenuLabel(els.mapContextDetails, 'Open object details', count);
     setContextMenuLabel(els.mapContextRemove, 'Remove object', count);
     setContextMenuLabel(
       els.mapContextRelated,
-      settings.showRelated ? 'Hide related objects' : 'Show related objects',
+      settings.showRelated ? 'Edit related objects…' : 'Show related objects…',
       1
     );
     els.mapContextRelated.classList.toggle('hidden', detailsOnly || count > 1);
@@ -2017,14 +2337,11 @@
   }
 
   function toggleRelatedObjectsForEntity(entityId) {
-    if (!entityId || !lookup.has(entityId)) {
-      return;
-    }
-
-    state.selectedId = entityId;
-    syncRelatedOptionsFromSelection();
-    els.showRelatedObjects.checked = !els.showRelatedObjects.checked;
-    applyRelatedOptionsForSelection();
+    openRelatedOptionsPopover(
+      entityId,
+      lastMapContextPoint.x,
+      lastMapContextPoint.y
+    );
   }
 
   function renderGraphView() {
@@ -2205,6 +2522,7 @@
         renderMapPins();
       }
       activateVizSearchForView('map');
+      syncMapGeographicSearch();
     }
     if (viewName === 'graph') {
       renderGraphView();
@@ -2260,17 +2578,17 @@
     if (!state.selectedId) {
       return;
     }
-    state.pinSettings.set(state.selectedId, {
-      showRelated: els.showRelatedObjects.checked,
-      typeFilters: readRelatedTypeFiltersFromUI(),
-      timePeriod: els.relatedTimePeriod.value,
-    });
+    state.pinSettings.set(state.selectedId, readRelatedSettingsFromUI('panel'));
     closeInstancePanel();
-    pinEntityOnMap(state.selectedId, { showRelated: els.showRelatedObjects.checked });
+    pinEntityOnMap(state.selectedId, {
+      showRelated: els.showRelatedObjects.checked,
+      ...readRelatedSettingsFromUI('panel'),
+    });
   });
 
   els.showRelatedObjects.addEventListener('change', applyRelatedOptionsForSelection);
   els.relatedTimePeriod.addEventListener('change', applyRelatedOptionsForSelection);
+  els.relatedDistance.addEventListener('change', applyRelatedOptionsForSelection);
 
   els.mapShowHeatmap.addEventListener('change', applyHeatmapSettings);
 
@@ -2286,7 +2604,9 @@
     state.pinnedIds.clear();
     state.pinSettings.clear();
     hideMapContextMenu();
+    hideRelatedOptionsPopover();
     ensureMap();
+    clearMapAreaHighlight();
     areaLayer?.clearLayers();
     renderMapPins();
     refreshSearchResults();
@@ -2338,9 +2658,23 @@
     event.stopPropagation();
     const entityId = takeMapContextEntityId();
     if (entityId) {
-      toggleRelatedObjectsForEntity(entityId);
+      openRelatedOptionsPopover(entityId, lastMapContextPoint.x, lastMapContextPoint.y);
     }
   });
+
+  els.popoverShowRelated.addEventListener('change', updatePopoverRelatedFilterVisibility);
+  els.popoverRelatedCancel.addEventListener('click', (event) => {
+    event.stopPropagation();
+    hideRelatedOptionsPopover();
+  });
+  els.popoverRelatedApply.addEventListener('click', (event) => {
+    event.stopPropagation();
+    applyRelatedOptionsPopover();
+  });
+  els.popoverRelatedTimePeriod.addEventListener('change', () => {});
+  els.popoverRelatedDistance.addEventListener('change', () => {});
+
+  els.mapRelatedPopover?.addEventListener('mousedown', (event) => event.stopPropagation());
 
   els.mapContextGraph.addEventListener('click', (event) => {
     event.stopPropagation();

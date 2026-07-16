@@ -98,7 +98,7 @@
     return parsed >= cutoff.getTime();
   }
 
-  function passesFilters(entity, filters = {}) {
+  function passesFilters(entity, filters = {}, rootEntity = null, lookup = null, relations = null) {
     if (filters.typeFilters instanceof Set && filters.typeFilters.size > 0) {
       if (!filters.typeFilters.has(entity.type)) {
         return false;
@@ -106,7 +106,97 @@
     } else if (filters.typeFilter && filters.typeFilter !== 'all' && entity.type !== filters.typeFilter) {
       return false;
     }
-    return passesTimeFilter(entity, filters.timePeriod);
+    if (!passesTimeFilter(entity, filters.timePeriod)) {
+      return false;
+    }
+    if (rootEntity && lookup && relations) {
+      return entityWithinDistance(rootEntity, entity, filters, lookup, relations);
+    }
+    return true;
+  }
+
+  function haversineMeters(a, b) {
+    const earthRadius = 6371000;
+    const toRadians = (degrees) => (degrees * Math.PI) / 180;
+    const dLat = toRadians(b.lat - a.lat);
+    const dLon = toRadians(b.lon - a.lon);
+    const lat1 = toRadians(a.lat);
+    const lat2 = toRadians(b.lat);
+    const h =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+    return 2 * earthRadius * Math.asin(Math.sqrt(h));
+  }
+
+  function getEntityAnchorGeo(entity, lookup, relations) {
+    const directGeo = getGeo(entity);
+    if (directGeo) {
+      return directGeo;
+    }
+    const pins = resolveDefaultPins(entity, lookup, relations);
+    return pins[0]?.geo || null;
+  }
+
+  function entityWithinDistance(rootEntity, entity, filters, lookup, relations) {
+    const miles = filters.distanceMiles;
+    if (!miles || miles <= 0) {
+      return true;
+    }
+    const rootGeo = getEntityAnchorGeo(rootEntity, lookup, relations);
+    if (!rootGeo) {
+      return true;
+    }
+    const maxMeters = miles * 1609.344;
+    const pins = resolveDefaultPins(entity, lookup, relations);
+    if (pins.length > 0) {
+      return pins.some((pin) => haversineMeters(rootGeo, pin.geo) <= maxMeters);
+    }
+    const geo = getGeo(entity);
+    if (!geo) {
+      return false;
+    }
+    return haversineMeters(rootGeo, geo) <= maxMeters;
+  }
+
+  function normalizeBounds(bounds) {
+    const lats = [bounds[0][0], bounds[1][0]];
+    const lons = [bounds[0][1], bounds[1][1]];
+    return {
+      south: Math.min(...lats),
+      north: Math.max(...lats),
+      west: Math.min(...lons),
+      east: Math.max(...lons),
+    };
+  }
+
+  function isGeoInBounds(geo, bounds) {
+    if (!geo) {
+      return false;
+    }
+    const box = normalizeBounds(bounds);
+    return (
+      geo.lat >= box.south &&
+      geo.lat <= box.north &&
+      geo.lon >= box.west &&
+      geo.lon <= box.east
+    );
+  }
+
+  function entityHasGeoInBounds(entity, bounds, lookup, relations) {
+    if (isGeoInBounds(getGeo(entity), bounds)) {
+      return true;
+    }
+    return resolveDefaultPins(entity, lookup, relations).some((pin) => isGeoInBounds(pin.geo, bounds));
+  }
+
+  function collectEntityIdsInBounds(bounds, lookup, relations) {
+    const ids = new Set();
+    for (const entity of lookup.values()) {
+      if (entityHasGeoInBounds(entity, bounds, lookup, relations)) {
+        ids.add(entity.id);
+      }
+    }
+    return [...ids];
   }
 
   function neighbors(entityId, relations) {
@@ -588,7 +678,7 @@
       if (!related || isLocationEntity(related)) {
         continue;
       }
-      if (passesFilters(related, filters)) {
+      if (passesFilters(related, filters, rootEntity, lookup, relations)) {
         direct.push({ entity: related, relation: rel, hop: 1 });
       }
     }
@@ -613,7 +703,7 @@
           if (!related || isLocationEntity(related)) {
             continue;
           }
-          if (passesFilters(related, filters)) {
+          if (passesFilters(related, filters, rootEntity, lookup, relations)) {
             entries.push({ entity: related, relation: rel, hop });
           }
           if (hop < maxHops) {
@@ -648,6 +738,7 @@
       typeFilters: settings.typeFilters instanceof Set ? settings.typeFilters : null,
       typeFilter: settings.typeFilter || 'all',
       timePeriod: settings.timePeriod || 'all',
+      distanceMiles: settings.distanceMiles || null,
     });
 
     return dedupePins([...defaultPins, ...relatedPins]);
@@ -703,6 +794,10 @@
     resolvePinsForEntity,
     collectRelatedEntities,
     findGeographicArea,
+    collectEntityIdsInBounds,
+    entityHasGeoInBounds,
+    isGeoInBounds,
+    getEntityAnchorGeo,
     passesFilters,
     dedupePins,
     spreadOverlappingPins,

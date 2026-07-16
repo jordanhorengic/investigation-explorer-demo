@@ -1428,6 +1428,12 @@ code {
   flex-wrap: wrap;
 }
 
+.map-status-bar__hint {
+  color: var(--text-subtle);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .map-status-bar__legend:empty::before {
   content: none;
 }
@@ -1976,6 +1982,39 @@ code {
   height: 1px;
   margin: 5px 8px;
   background: rgb(16 24 40 / 8%);
+}
+
+.related-options-popover {
+  width: min(320px, calc(100vw - 24px));
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-md);
+}
+
+.related-options-popover.hidden {
+  display: none !important;
+}
+
+.related-options-popover__header {
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.related-options-popover__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.related-options-popover .instance-related-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .instance-backdrop {

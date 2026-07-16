@@ -148,6 +148,7 @@
                         <div id="map-heatmap-type-filters" class="search-filter-chips map-heatmap-type-filters"></div>
                       </div>
                     </div>
+                    <div class="map-status-bar__hint" id="map-selection-hint">Shift+drag to select multiple objects</div>
                     <div class="map-status-bar__divider" aria-hidden="true"></div>
                     <div class="map-status-bar__legend" id="map-legend"></div>
                   </div>
@@ -192,6 +193,47 @@
                       </span>
                       <span class="context-menu__label">Remove object</span>
                     </button>
+                  </div>
+                  <div id="map-related-popover" class="related-options-popover hidden" role="dialog" aria-label="Related object options">
+                    <div class="related-options-popover__header">Related objects</div>
+                    <label class="instance-related-option">
+                      <input id="popover-show-related" type="checkbox" />
+                      <span>Show related objects</span>
+                    </label>
+                    <div id="popover-related-filters" class="instance-related-filters hidden">
+                      <div class="instance-related-filter-field">
+                        <span class="instance-related-filter-field__label">Object types</span>
+                        <div id="popover-related-type-filters" class="search-filter-chips instance-related-type-filters"></div>
+                      </div>
+                      <label class="field-inline" for="popover-related-time-period">
+                        Time period
+                        <select id="popover-related-time-period">
+                          <option value="all">All time</option>
+                          <option value="1m">Last 30 days</option>
+                          <option value="3m">Last 3 months</option>
+                          <option value="6m">Last 6 months</option>
+                          <option value="12m">Last 12 months</option>
+                          <option value="24m">Last 24 months</option>
+                          <option value="36m">Last 3 years</option>
+                          <option value="5y">Last 5 years</option>
+                        </select>
+                      </label>
+                      <label class="field-inline" for="popover-related-distance">
+                        Distance
+                        <select id="popover-related-distance">
+                          <option value="">Any distance</option>
+                          <option value="1">Within 1 mile</option>
+                          <option value="5">Within 5 miles</option>
+                          <option value="10">Within 10 miles</option>
+                          <option value="25">Within 25 miles</option>
+                          <option value="50">Within 50 miles</option>
+                        </select>
+                      </label>
+                    </div>
+                    <div class="related-options-popover__actions">
+                      <button id="popover-related-cancel" class="btn btn-outline btn-sm" type="button">Cancel</button>
+                      <button id="popover-related-apply" class="btn btn-primary btn-sm" type="button">Apply</button>
+                    </div>
                   </div>
                   </div>
                 </div>
@@ -428,6 +470,17 @@
                         <option value="24m">Last 24 months</option>
                         <option value="36m">Last 3 years</option>
                         <option value="5y">Last 5 years</option>
+                      </select>
+                    </label>
+                    <label class="field-inline" for="related-distance">
+                      Distance
+                      <select id="related-distance">
+                        <option value="">Any distance</option>
+                        <option value="1">Within 1 mile</option>
+                        <option value="5">Within 5 miles</option>
+                        <option value="10">Within 10 miles</option>
+                        <option value="25">Within 25 miles</option>
+                        <option value="50">Within 50 miles</option>
                       </select>
                     </label>
                   </div>
