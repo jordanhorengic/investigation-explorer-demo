@@ -50,6 +50,8 @@
     viewportStart: null,
     nodeOffset: null,
     dragMoved: false,
+    dragNodeIds: null,
+    dragStartPositions: null,
     boxSelectStart: null,
   };
 
@@ -3111,6 +3113,42 @@
     };
   }
 
+  function getGraphDragNodeIds(anchorId) {
+    if (state.multiSelectedIds.size > 1 && state.multiSelectedIds.has(anchorId)) {
+      return [...state.multiSelectedIds].filter((id) => graphState.positions.has(id));
+    }
+    return graphState.positions.has(anchorId) ? [anchorId] : [];
+  }
+
+  function captureGraphDragStartPositions(nodeIds) {
+    const positions = new Map();
+    for (const id of nodeIds) {
+      const position = graphState.positions.get(id);
+      if (position) {
+        positions.set(id, { x: position.x, y: position.y });
+      }
+    }
+    return positions;
+  }
+
+  function moveGraphDragNodes(anchorId, point) {
+    const anchorStart = graphInteraction.dragStartPositions?.get(anchorId);
+    if (!anchorStart || !graphInteraction.nodeOffset) {
+      return;
+    }
+
+    const deltaX = point.x - graphInteraction.nodeOffset.x - anchorStart.x;
+    const deltaY = point.y - graphInteraction.nodeOffset.y - anchorStart.y;
+
+    for (const id of graphInteraction.dragNodeIds || [anchorId]) {
+      const start = graphInteraction.dragStartPositions?.get(id);
+      if (!start) {
+        continue;
+      }
+      GraphView.setNodePosition(graphState, id, start.x + deltaX, start.y + deltaY);
+    }
+  }
+
   function getGraphFrameElement() {
     return els.graphSvg?.closest('.graph-frame__body') || els.graphSvg?.closest('.graph-frame');
   }
@@ -3234,6 +3272,8 @@
     graphInteraction.panStart = null;
     graphInteraction.viewportStart = null;
     graphInteraction.nodeOffset = null;
+    graphInteraction.dragNodeIds = null;
+    graphInteraction.dragStartPositions = null;
     graphInteraction.boxSelectStart = null;
     clearGraphBoxSelectOverlay();
     els.graphSvg.classList.remove('graph-svg--panning', 'graph-svg--dragging-node', 'graph-svg--box-select');
@@ -4148,6 +4188,8 @@
         x: point.x - position.x,
         y: point.y - position.y,
       };
+      graphInteraction.dragNodeIds = getGraphDragNodeIds(graphInteraction.nodeId);
+      graphInteraction.dragStartPositions = captureGraphDragStartPositions(graphInteraction.dragNodeIds);
       els.graphSvg.classList.add('graph-svg--dragging-node');
       event.preventDefault();
       return;
@@ -4185,12 +4227,7 @@
 
     if (graphInteraction.mode === 'node' && graphInteraction.nodeId && graphInteraction.nodeOffset) {
       const point = clientToGraphPoint(event.clientX, event.clientY);
-      GraphView.setNodePosition(
-        graphState,
-        graphInteraction.nodeId,
-        point.x - graphInteraction.nodeOffset.x,
-        point.y - graphInteraction.nodeOffset.y
-      );
+      moveGraphDragNodes(graphInteraction.nodeId, point);
       graphInteraction.dragMoved = true;
       syncGraphDomPositions();
     }
