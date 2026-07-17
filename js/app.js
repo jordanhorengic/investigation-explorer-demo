@@ -48,6 +48,8 @@
     shiftKey: false,
     panStart: null,
     viewportStart: null,
+    nodeOffset: null,
+    dragMoved: false,
     boxSelectStart: null,
   };
 
@@ -3231,9 +3233,10 @@
     graphInteraction.shiftKey = false;
     graphInteraction.panStart = null;
     graphInteraction.viewportStart = null;
+    graphInteraction.nodeOffset = null;
     graphInteraction.boxSelectStart = null;
     clearGraphBoxSelectOverlay();
-    els.graphSvg.classList.remove('graph-svg--panning', 'graph-svg--box-select');
+    els.graphSvg.classList.remove('graph-svg--panning', 'graph-svg--dragging-node', 'graph-svg--box-select');
   }
 
   function hideGraphNodeTooltip() {
@@ -4135,6 +4138,17 @@
       graphInteraction.mode = 'node';
       graphInteraction.nodeId = node.dataset.entityId;
       graphInteraction.shiftKey = event.shiftKey;
+      graphInteraction.dragMoved = false;
+      const point = clientToGraphPoint(event.clientX, event.clientY);
+      const position = graphState.positions.get(graphInteraction.nodeId);
+      if (!position) {
+        return;
+      }
+      graphInteraction.nodeOffset = {
+        x: point.x - position.x,
+        y: point.y - position.y,
+      };
+      els.graphSvg.classList.add('graph-svg--dragging-node');
       event.preventDefault();
       return;
     }
@@ -4166,6 +4180,19 @@
         x: event.clientX,
         y: event.clientY,
       });
+      return;
+    }
+
+    if (graphInteraction.mode === 'node' && graphInteraction.nodeId && graphInteraction.nodeOffset) {
+      const point = clientToGraphPoint(event.clientX, event.clientY);
+      GraphView.setNodePosition(
+        graphState,
+        graphInteraction.nodeId,
+        point.x - graphInteraction.nodeOffset.x,
+        point.y - graphInteraction.nodeOffset.y
+      );
+      graphInteraction.dragMoved = true;
+      syncGraphDomPositions();
     }
   });
 
@@ -4179,7 +4206,7 @@
       return;
     }
 
-    if (graphInteraction.mode === 'node' && graphInteraction.nodeId) {
+    if (graphInteraction.mode === 'node' && graphInteraction.nodeId && !graphInteraction.dragMoved) {
       if (graphInteraction.shiftKey) {
         applySelection(graphInteraction.nodeId, { shiftKey: true });
         refreshSelectionViews();
