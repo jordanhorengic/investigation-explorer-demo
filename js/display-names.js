@@ -47,8 +47,57 @@
     return new Date(parsed).toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' });
   }
 
+  const ENTITY_ID_PATTERN = /^[0-9a-f]{4,12}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
+
+  function isExactEntityIdTerm(term) {
+    return ENTITY_ID_PATTERN.test(String(term || '').trim());
+  }
+
+  let identityByPersonId = null;
+  let identityIndexLookup = null;
+
+  function ensureIdentityByPersonIndex(lookup) {
+    if (identityByPersonId && identityIndexLookup === lookup) {
+      return identityByPersonId;
+    }
+
+    identityByPersonId = new Map();
+    identityIndexLookup = lookup;
+    for (const entity of lookup.values()) {
+      if (entity.type !== 'Identity Record') {
+        continue;
+      }
+      const personId = readAttr(entity, 'PERSON_ID');
+      if (personId) {
+        identityByPersonId.set(personId, entity);
+      }
+    }
+    return identityByPersonId;
+  }
+
+  function identityRecordForPerson(person, lookup) {
+    if (!person || person.type !== 'Person' || !lookup) {
+      return null;
+    }
+
+    const recordId = readAttr(person, 'IDENTITY_RECORD_ID');
+    if (recordId && lookup.has(recordId)) {
+      return lookup.get(recordId);
+    }
+
+    return ensureIdentityByPersonIndex(lookup).get(person.id) ?? null;
+  }
+
   function identityName(entity, lookup) {
-    const recordId = readAttr(entity, 'IDENTITY_RECORD_ID') || readAttr(entity, 'PERSON_ID');
+    if (entity.type === 'Person') {
+      const identity = identityRecordForPerson(entity, lookup);
+      if (identity) {
+        return displayName(identity, lookup);
+      }
+      return readAttr(entity, 'ANONYMISIERUNGSSCHLUESSEL');
+    }
+
+    const recordId = readAttr(entity, 'IDENTITY_RECORD_ID');
     if (recordId && lookup.has(recordId)) {
       return displayName(lookup.get(recordId), lookup);
     }
@@ -192,8 +241,7 @@
       case 'Physical Description': {
         const personId = readAttr(entity, 'PERSON_ID');
         const person = personId ? lookup.get(personId) : null;
-        const identityId = person ? readAttr(person, 'IDENTITY_RECORD_ID') : null;
-        const identity = identityId ? lookup.get(identityId) : null;
+        const identity = person ? identityRecordForPerson(person, lookup) : null;
         const name = identity ? displayName(identity, lookup) : person ? displayName(person, lookup) : null;
         const trait = readAttr(entity, 'DISTINKTIVE_MERKMALE') || readAttr(entity, 'KLEIDUNG_TYP');
         if (name && trait) {
@@ -222,9 +270,22 @@
    * Match attribute values on the entity. Person objects also match linked identity names.
    */
   function resolveMatch(entity, term, options = {}) {
-    const normalized = term.trim().toLowerCase();
+    const trimmed = term.trim();
+    const normalized = trimmed.toLowerCase();
     if (!normalized) {
       return null;
+    }
+
+    if (isExactEntityIdTerm(trimmed)) {
+      if (entity.id.toLowerCase() !== normalized) {
+        return null;
+      }
+      return {
+        fieldId: 'ID',
+        fieldLabel: 'ID',
+        value: entity.id,
+        priority: -2,
+      };
     }
 
     const allowedFields = options.allowedFields || null;
@@ -263,9 +324,9 @@
     }
 
     if (entity.type === 'Person' && lookup) {
-      const recordId = readAttr(entity, 'IDENTITY_RECORD_ID');
-      if (recordId && lookup.has(recordId)) {
-        const identityMatch = resolveMatch(lookup.get(recordId), term, options);
+      const identity = identityRecordForPerson(entity, lookup);
+      if (identity) {
+        const identityMatch = resolveMatch(identity, term, options);
         if (identityMatch) {
           candidates.push({
             ...identityMatch,
@@ -294,6 +355,10 @@
   }
 
   function entityMatchesSearch(entity, term, options = {}) {
+    const trimmed = term.trim();
+    if (isExactEntityIdTerm(trimmed)) {
+      return entity.id.toLowerCase() === trimmed.toLowerCase();
+    }
     return resolveMatch(entity, term, options) !== null;
   }
 

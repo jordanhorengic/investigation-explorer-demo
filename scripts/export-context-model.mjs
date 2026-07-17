@@ -41,6 +41,29 @@ const OBJECT_TYPES = [
 ];
 
 const TYPE_BY_TECH = new Map(OBJECT_TYPES.map((type) => [type.technicalName, type.id]));
+const TECH_BY_TYPE = new Map(OBJECT_TYPES.map((type) => [type.id, type.technicalName]));
+
+const M2M_LINK_FIELD_GUESSES = {
+  Person_Wohnsitz_Oertlichkeit: ['ID', 'PERSON_ID', 'OERTLICHKEIT_ID'],
+  Person_Arbeitsstaette_Oertlichkeit: ['ID', 'PERSON_ID', 'OERTLICHKEIT_ID'],
+  Person_Aufenthaltsort_Oertlichkeit: ['ID', 'PERSON_ID', 'OERTLICHKEIT_ID'],
+  Person_Vorgang_Alle: ['ID', 'PERSON_ID', 'VORGANG_ID'],
+  Person_Taeter_Vorgang: ['ID', 'PERSON_ID', 'VORGANG_ID'],
+  Person_Geschaedigter_Vorgang: ['ID', 'PERSON_ID', 'VORGANG_ID'],
+  Person_Zeuge_Vorgang: ['ID', 'PERSON_ID', 'VORGANG_ID'],
+  Person_Bearbeiter_Vorgang: ['ID', 'PERSON_ID', 'VORGANG_ID'],
+  Person_Netzwerk_Person: ['ID', 'PERSON_ID', 'RELATED_PERSON_ID'],
+  Person_Kraftfahrzeug_Alle: ['ID', 'PERSON_ID', 'KRAFTFAHRZEUG_ID'],
+  Person_Organisation_Alle: ['ID', 'PERSON_ID', 'ORGANISATION_ID'],
+  Dokumente_Person: ['ID', 'DOKUMENTE_ID', 'PERSON_ID'],
+  Dokumente_Vorgang: ['ID', 'DOKUMENTE_ID', 'VORGANG_ID'],
+  Dokumente_Oertlichkeit: ['ID', 'DOKUMENTE_ID', 'OERTLICHKEIT_ID'],
+  Dokumente_Straftat: ['ID', 'DOKUMENTE_ID', 'STRAFTAT_ID'],
+  Dokumente_Kraftfahrzeug: ['ID', 'DOKUMENTE_ID', 'KRAFTFAHRZEUG_ID'],
+  Hinweis_Person: ['ID', 'HINWEIS_ID', 'PERSON_ID'],
+  HoheitlicheMassnahme_Person: ['ID', 'HOHEITLICHEMASSNAHME_ID', 'PERSON_ID'],
+  Verkehrsunfall_Person_Beteiligter: ['ID', 'VERKEHRSUNFALL_ID', 'PERSON_ID'],
+};
 const LOCATION_FIELD_BY_TYPE = {
   Organisation: 'SITZ_OERTLICHKEIT_ID',
   Straftat: 'TATORT_ID',
@@ -133,6 +156,157 @@ async function apiPost(baseUrl, token, apiPath, payload) {
   return response.json();
 }
 
+async function apiPut(baseUrl, token, apiPath) {
+  const response = await fetch(`${baseUrl}${apiPath}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+    },
+  });
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`PUT ${apiPath} failed (${response.status}): ${body.slice(0, 400)}`);
+  }
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
+}
+
+function perspectiveApiBase(perspectiveKey) {
+  return (
+    `/pig-semantic-layer/api/v1/package/${encodeURIComponent(PACKAGE_KEY)}` +
+    `/targets/${encodeURIComponent(TARGET)}/pig/pql/${encodeURIComponent(perspectiveKey)}`
+  );
+}
+
+async function ensurePerspectiveLoaded(baseUrl, token, perspectiveKey) {
+  const base = perspectiveApiBase(perspectiveKey);
+  console.log('Loading perspective cache...');
+  await apiPut(baseUrl, token, `${base}/load`);
+
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const status = await apiGet(baseUrl, token, `${base}/load/terminal-status`);
+    if (status.phase === 'SUCCESS' || status.status === 'COMPLETED') {
+      console.log('Perspective cache ready');
+      return;
+    }
+    if (status.phase === 'FAILED') {
+      throw new Error(`Perspective load failed: ${status.message ?? JSON.stringify(status)}`);
+    }
+  }
+
+  throw new Error('Perspective load timed out');
+}
+
+async function fetchPerspectiveSchema(baseUrl, token, perspectiveKey) {
+  return apiGet(
+    baseUrl,
+    token,
+    `/pig-semantic-layer/api/v1/package/${encodeURIComponent(PACKAGE_KEY)}` +
+      `/targets/${encodeURIComponent(TARGET)}/pig/perspectives/${encodeURIComponent(perspectiveKey)}/schema`,
+  );
+}
+
+const PERSPECTIVE_JUNCTION_TO_RELATIONSHIP = {
+  Person__Vorgang: 'Person_Vorgang_Alle',
+  Person__Organisation: 'Person_Organisation_Alle',
+  Person__Kraftfahrzeug: 'Person_Kraftfahrzeug_Alle',
+};
+
+function junctionRelationMeta(pig, sourceTable, targetTable, junctionTableName) {
+  const preferredName = PERSPECTIVE_JUNCTION_TO_RELATIONSHIP[junctionTableName];
+  const candidates = (pig.relationships ?? []).filter((relationship) => {
+    if (relationship.cardinality !== 'MANY_TO_MANY') {
+      return false;
+    }
+    const sourceName = relationship.source?.name ?? relationship.source;
+    const targetName = relationship.target?.name ?? relationship.target;
+    return sourceName === sourceTable && targetName === targetTable;
+  });
+
+  const match =
+    (preferredName ? candidates.find((rel) => rel.entityIdentifier?.name === preferredName) : null) ??
+    candidates.find((rel) => String(rel.entityIdentifier?.name ?? '').includes('_Alle')) ??
+    candidates[0];
+
+  if (match) {
+    return {
+      label: match.displayName ?? junctionTableName,
+      relationshipType: match.entityIdentifier?.name ?? junctionTableName,
+    };
+  }
+
+  return {
+    label: `${sourceTable} ↔ ${targetTable}`,
+    relationshipType: junctionTableName,
+  };
+}
+
+async function exportPerspectiveJunctionTables(pig, baseUrl, token, perspectiveKey, schema) {
+  const relations = [];
+  const junctionTables = new Map();
+
+  for (const foreignKey of schema.foreignKeys ?? []) {
+    const junctionTableName = foreignKey.factTableName;
+    if (!junctionTableName || !String(junctionTableName).includes('__')) {
+      continue;
+    }
+
+    if (!junctionTables.has(junctionTableName)) {
+      junctionTables.set(junctionTableName, { sides: [] });
+    }
+
+    junctionTables.get(junctionTableName).sides.push({
+      dimensionTable: foreignKey.dimensionTableName,
+      junctionColumn: foreignKey.factTableColumns?.[0],
+    });
+  }
+
+  for (const [junctionTableName, meta] of junctionTables) {
+    const sides = meta.sides.filter((side) => side.junctionColumn);
+    const sourceSide = sides.find((side) => side.junctionColumn === 'ID') ?? sides[0];
+    const targetSide = sides.find((side) => side.junctionColumn !== 'ID') ?? sides[1];
+    if (!sourceSide || !targetSide) {
+      continue;
+    }
+
+    const fieldIds = ['ID'];
+    if (targetSide.junctionColumn !== 'ID') {
+      fieldIds.push(targetSide.junctionColumn);
+    }
+
+    try {
+      const rows = await fetchAllRows(baseUrl, token, perspectiveKey, junctionTableName, fieldIds);
+      const relationMeta = junctionRelationMeta(
+        pig,
+        sourceSide.dimensionTable,
+        targetSide.dimensionTable,
+        junctionTableName,
+      );
+      console.log(`Perspective junction ${junctionTableName}: ${rows.length} rows`);
+
+      for (const row of rows) {
+        const fromId = readField(row, sourceSide.junctionColumn);
+        const toId = readField(row, targetSide.junctionColumn);
+        if (!fromId || !toId) {
+          continue;
+        }
+        relations.push({
+          from: String(fromId),
+          to: String(toId),
+          label: relationMeta.label,
+          relationshipType: relationMeta.relationshipType,
+        });
+      }
+    } catch (error) {
+      console.warn(`Perspective junction ${junctionTableName} unavailable: ${error.message.split('\n')[0]}`);
+    }
+  }
+
+  return relations;
+}
+
 async function queryTable(baseUrl, token, perspectiveKey, tableName, fields, offset = 0) {
   const apiPath =
     `/pig-semantic-layer/api/v1/package/${encodeURIComponent(PACKAGE_KEY)}` +
@@ -222,9 +396,33 @@ function entityFromRow(technicalName, englishType, row, fieldIds) {
   return entity;
 }
 
-function inferRelationsFromForeignKeys(entities, entityById) {
+function buildFkRelationIndex(pig) {
+  const index = new Map();
+  for (const relationship of pig.relationships ?? []) {
+    const sourceName = relationship.source?.name ?? relationship.source;
+    if (!sourceName || relationship.source?.entityType !== 'OBJECT') {
+      continue;
+    }
+    for (const mapping of relationship.foreignKeyMappings ?? []) {
+      const sourceFieldId = mapping.sourceField?.id;
+      if (!sourceFieldId) {
+        continue;
+      }
+      index.set(`${sourceName}|${sourceFieldId}`, {
+        label: relationship.displayName ?? relationship.entityIdentifier?.name ?? `${sourceName} ${sourceFieldId}`,
+        relationshipType: relationship.entityIdentifier?.name ?? `${sourceName} ${sourceFieldId}`,
+        targetName: relationship.target?.name ?? relationship.target,
+        cardinality: relationship.cardinality,
+      });
+    }
+  }
+  return index;
+}
+
+function inferRelationsFromForeignKeys(entities, entityById, fkRelationIndex = new Map()) {
   const relations = [];
   for (const entity of entities) {
+    const technicalName = TECH_BY_TYPE.get(entity.type);
     for (const [key, value] of Object.entries(entity.attributes ?? {})) {
       if (!key.endsWith('_ID') || !value) {
         continue;
@@ -236,11 +434,82 @@ function inferRelationsFromForeignKeys(entities, entityById) {
       if (!entityById.has(targetId) || targetId === entity.id) {
         continue;
       }
+      const meta = technicalName ? fkRelationIndex.get(`${technicalName}|${key}`) : null;
       relations.push({
         from: entity.id,
         to: targetId,
-        label: `${entity.type} ${key}`,
+        label: meta?.label ?? `${entity.type} ${key}`,
+        relationshipType: meta?.relationshipType ?? `${entity.type} ${key}`,
       });
+    }
+  }
+  return relations;
+}
+
+function relationFromManyToManyRow(tableName, row, sourceName, targetName, relationshipMeta) {
+  const fieldIds = Object.keys(row).map((key) => key.replaceAll('"', ''));
+  const sourceField =
+    fieldIds.find((field) => field === `${sourceName}_ID`) ??
+    fieldIds.find((field) => field.endsWith('_ID') && field.includes(String(sourceName).slice(0, 4)));
+  const targetField =
+    fieldIds.find((field) => field === `${targetName}_ID`) ??
+    fieldIds.find((field) => field.endsWith('_ID') && field !== sourceField && field !== 'ID');
+
+  const fromId = sourceField ? readField(row, sourceField) : null;
+  const toId = targetField ? readField(row, targetField) : null;
+  if (!fromId || !toId) {
+    return relationFromLinkRow(tableName, row);
+  }
+
+  const relation = {
+    from: String(fromId),
+    to: String(toId),
+    label: relationshipMeta.displayName ?? tableName,
+    relationshipType: tableName,
+  };
+
+  if (LOCATION_ROLE_BY_REL[tableName]) {
+    relation.kind = 'location';
+    relation.role = LOCATION_ROLE_BY_REL[tableName];
+  }
+
+  return relation;
+}
+
+async function exportManyToManyLinkTables(pig, baseUrl, token, perspectiveKey) {
+  const relations = [];
+  for (const relationship of pig.relationships ?? []) {
+    if (relationship.cardinality !== 'MANY_TO_MANY') {
+      continue;
+    }
+    const tableName = relationship.entityIdentifier?.name;
+    if (!tableName) {
+      continue;
+    }
+
+    const sourceName = relationship.source?.name ?? relationship.source;
+    const targetName = relationship.target?.name ?? relationship.target;
+    const fieldIds =
+      M2M_LINK_FIELD_GUESSES[tableName] ??
+      [
+        'ID',
+        `${sourceName}_ID`,
+        `${targetName}_ID`,
+        'SOURCE_ID',
+        'TARGET_ID',
+      ];
+
+    try {
+      const rows = await fetchAllRows(baseUrl, token, perspectiveKey, tableName, fieldIds);
+      console.log(`Link table ${tableName}: ${rows.length} rows`);
+      for (const row of rows) {
+        const relation = relationFromManyToManyRow(tableName, row, sourceName, targetName, relationship);
+        if (relation) {
+          relations.push(relation);
+        }
+      }
+    } catch (error) {
+      console.warn(`Link table ${tableName} unavailable: ${error.message.split('\n')[0]}`);
     }
   }
   return relations;
@@ -325,10 +594,7 @@ function attachmentFromFileRow(tableName, row, parentEntity) {
   }
 
   if (!attachment.url) {
-    attachment.url =
-      attachment.kind === 'image'
-        ? `https://placehold.co/320x220/1b44b1/ffffff?text=${encodeURIComponent(String(tag).slice(0, 24))}`
-        : null;
+    return null;
   }
 
   return attachment;
@@ -429,6 +695,9 @@ async function main() {
   const perspectiveKey = buildPerspectiveKey(perspective);
   console.log(`Using perspective ${perspectiveKey}`);
 
+  await ensurePerspectiveLoaded(baseUrl, token, perspectiveKey);
+  const perspectiveSchema = await fetchPerspectiveSchema(baseUrl, token, perspectiveKey);
+
   const entities = [];
   const relations = [];
   const entityById = new Map();
@@ -469,13 +738,40 @@ async function main() {
     if (fieldIds.length === 0) {
       continue;
     }
-    const rows = await fetchAllRows(baseUrl, token, perspectiveKey, tableName, fieldIds);
-    console.log(`Relationship ${tableName}: ${rows.length} rows`);
-    for (const row of rows) {
-      const relation = relationFromLinkRow(tableName, row);
-      if (relation) {
-        relations.push(relation);
+    try {
+      const rows = await fetchAllRows(baseUrl, token, perspectiveKey, tableName, fieldIds);
+      console.log(`Relationship ${tableName}: ${rows.length} rows`);
+      for (const row of rows) {
+        const relation = relationFromLinkRow(tableName, row);
+        if (relation) {
+          relations.push(relation);
+        }
       }
+    } catch (error) {
+      console.warn(`Skipping ${tableName}: ${error.message.split('\n')[0]}`);
+    }
+  }
+
+  for (const relationship of pig.relationships ?? []) {
+    const tableName = relationship.entityIdentifier?.name;
+    if (!tableName || !RELATIONSHIP_OBJECT_TYPES.has(tableName)) {
+      continue;
+    }
+    const fieldIds = (relationship.fields ?? []).map((field) => field.id).filter(Boolean);
+    if (fieldIds.length === 0) {
+      continue;
+    }
+    try {
+      const rows = await fetchAllRows(baseUrl, token, perspectiveKey, tableName, fieldIds);
+      console.log(`Relationship (metadata) ${tableName}: ${rows.length} rows`);
+      for (const row of rows) {
+        const relation = relationFromLinkRow(tableName, row);
+        if (relation) {
+          relations.push(relation);
+        }
+      }
+    } catch (error) {
+      console.warn(`Skipping ${tableName}: ${error.message.split('\n')[0]}`);
     }
   }
 
@@ -500,7 +796,11 @@ async function main() {
     }
   }
 
-  relations.push(...inferRelationsFromForeignKeys(entities, entityById));
+  relations.push(...await exportPerspectiveJunctionTables(pig, baseUrl, token, perspectiveKey, perspectiveSchema));
+  relations.push(...await exportManyToManyLinkTables(pig, baseUrl, token, perspectiveKey));
+
+  const fkRelationIndex = buildFkRelationIndex(pig);
+  relations.push(...inferRelationsFromForeignKeys(entities, entityById, fkRelationIndex));
   applyPersonLocations(entities, relations);
 
   const documentsEnriched = attachDocumentsFromAttributes(entities, entityById);
