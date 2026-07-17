@@ -178,7 +178,7 @@
     };
   }
 
-  function filterEntities(entities, term, filters, objectTypes, lookup = null, relations = [], limit = 100) {
+  function filterEntities(entities, term, filters, objectTypes, lookup = null, relations = [], limit = 5000) {
     if (!hasActiveCriteria(term, filters, objectTypes.length)) {
       return [];
     }
