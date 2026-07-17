@@ -2031,8 +2031,7 @@ code {
   user-select: none;
 }
 
-#graph-svg.graph-svg--panning,
-#graph-svg.graph-svg--dragging-node {
+#graph-svg.graph-svg--panning {
   cursor: grabbing;
 }
 
@@ -2074,7 +2073,7 @@ code {
 }
 
 .graph-node {
-  cursor: grab;
+  cursor: pointer;
 }
 
 .graph-node__shadow {

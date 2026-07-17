@@ -513,6 +513,25 @@
     return false;
   }
 
+  function isVizSearchSurfaceTarget(target) {
+    if (!target?.closest) {
+      return false;
+    }
+    if (shell?.contains(target)) {
+      return true;
+    }
+    if (target.closest('#viz-strip-results-panel')) {
+      return true;
+    }
+    if (target.closest('.viz-chrome-search')) {
+      return true;
+    }
+    if (target.closest('.viz-search-trigger')) {
+      return true;
+    }
+    return false;
+  }
+
   function attachVizResultsScrollGuard() {
     const panel = document.getElementById('viz-strip-results-panel');
     const results = document.getElementById('viz-search-results');
@@ -521,6 +540,9 @@
     };
     panel?.addEventListener('wheel', stopWheel, { passive: true });
     results?.addEventListener('wheel', stopWheel, { passive: true });
+    panel?.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
   }
 
   function init(options = {}) {
@@ -607,13 +629,7 @@
     });
 
     document.addEventListener('click', (event) => {
-      if (shell?.contains(event.target)) {
-        return;
-      }
-      if (event.target.closest('.viz-search-trigger')) {
-        return;
-      }
-      if (event.target.closest('.viz-chrome-search')) {
+      if (isVizSearchSurfaceTarget(event.target)) {
         return;
       }
       if (current === 'strip' && resultsExpanded) {

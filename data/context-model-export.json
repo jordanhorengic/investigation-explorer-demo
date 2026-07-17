@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-07-17T08:49:25.279Z",
+  "exportedAt": "2026-07-17T12:41:05.168Z",
   "packageKey": "7c4666c9_d865_45aa_a9ee_dff7470a3153",
   "perspectiveKey": "perspective.local.Polizei-PnE-v2",
   "objectTypes": [
@@ -32394,2780 +32394,2780 @@
     {
       "from": "bbbb-0075-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0131-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0075-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0048-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0075-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0059-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0095-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0066-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0095-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0040-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0095-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0113-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0090-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0077-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0090-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0044-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0042-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0033-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0042-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0129-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0120-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0091-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0120-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0039-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0029-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0099-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0141-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0131-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0141-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0041-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0118-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0100-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0146-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0054-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0146-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0047-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0146-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0136-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0074-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0085-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0074-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0059-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0066-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0143-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0066-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0041-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0066-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0111-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0066-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0046-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0066-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0087-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0116-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0102-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0116-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0073-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0047-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0057-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0047-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0050-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0047-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0051-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0046-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0148-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0046-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0065-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0046-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0054-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0046-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0123-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0046-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0121-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0046-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0049-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0110-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0084-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0110-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0122-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0040-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0049-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0040-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0043-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0040-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0038-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0040-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0120-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0040-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0138-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0126-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0124-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0126-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0105-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0126-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0062-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0064-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0125-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0064-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0018-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0064-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0118-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0079-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0082-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0079-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0124-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0014-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0137-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0014-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0091-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0014-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0005-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0014-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0045-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0056-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0079-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0056-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0033-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0087-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0116-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0087-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0149-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0107-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0126-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0107-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0040-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0107-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0065-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0125-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0023-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0125-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0065-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0125-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0097-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0125-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0139-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0053-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0028-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0088-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0063-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0088-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0055-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0098-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0143-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0098-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0049-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0098-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0140-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0098-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0021-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0098-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0105-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0067-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0142-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0067-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0107-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0067-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0088-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0067-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0095-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0067-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0091-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0083-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0128-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0083-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0021-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0083-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0076-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0054-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0034-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0054-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0119-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0054-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0032-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0008-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0127-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0008-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0106-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0008-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0003-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0043-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0119-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0043-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0034-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0091-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0111-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0091-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0031-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0091-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0052-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0091-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0116-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0123-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0125-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0123-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0060-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0121-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0020-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0005-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0039-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0005-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0012-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0005-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0002-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0005-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0009-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0005-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0106-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0045-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0099-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0045-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0132-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0124-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0032-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0124-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0026-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0124-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0042-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0016-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0102-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0016-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0008-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0016-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0006-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0016-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0148-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0016-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0033-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0093-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0077-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0093-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0099-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0106-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0085-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0106-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0135-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0106-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0035-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0106-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0018-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0106-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0051-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0106-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0026-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0106-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0119-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0106-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0088-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0089-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0084-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0089-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0055-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0089-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0072-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0057-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0142-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0057-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0140-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0057-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0043-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0112-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0057-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0112-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0066-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0112-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0028-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0112-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0055-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0112-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0085-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0130-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0123-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0130-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0068-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0012-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0006-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0012-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0009-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0012-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0105-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0012-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0002-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0012-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0049-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0013-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0050-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0013-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0094-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0013-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0016-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0013-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0103-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0013-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0005-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0013-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0064-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0013-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0109-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0013-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0120-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0117-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0124-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0117-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0092-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0076-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0147-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0076-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0103-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0076-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0056-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0033-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0130-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0138-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0138-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0138-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0096-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0138-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0028-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0138-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0133-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0015-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0069-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0015-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0008-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0015-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0029-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0015-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0006-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0132-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0075-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0132-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0039-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0132-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0107-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0132-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0021-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0010-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0120-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0010-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0002-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0010-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0006-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0010-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0027-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0010-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0134-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0010-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0003-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0069-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0114-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0069-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0092-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0069-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0019-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0069-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0136-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0069-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0144-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0144-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0074-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0144-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0072-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0144-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0030-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0094-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0024-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0102-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0038-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0102-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0029-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0024-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0054-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0024-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0029-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0024-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0108-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0024-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0146-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0024-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0036-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0024-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0084-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0113-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0091-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0113-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0136-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0113-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0146-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0113-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0062-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0084-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0116-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0084-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0119-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0051-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0073-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0051-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0115-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0002-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0001-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0002-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0138-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0002-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0005-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0002-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0074-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0002-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0029-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0002-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0035-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0041-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0131-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0041-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0066-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0041-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0101-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0100-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0060-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0100-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0063-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0100-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0146-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0100-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0101-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0100-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0121-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0058-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0145-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0058-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0046-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0001-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0005-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0001-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0128-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0001-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0001-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0001-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0004-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0134-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0058-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0134-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0120-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0023-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0104-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0023-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0135-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0023-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0022-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0023-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0038-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0023-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0141-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0063-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0083-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0063-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0125-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0063-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0048-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0063-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0055-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0011-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0007-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0011-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0015-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0011-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0008-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0011-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0048-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0011-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0010-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0150-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0056-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0150-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0111-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0150-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0081-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0037-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0123-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0037-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0113-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0037-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0103-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0022-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0057-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0122-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0147-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0122-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0114-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0092-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0081-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0007-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0011-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0007-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0044-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0007-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0059-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0007-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0003-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0115-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0016-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0115-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0110-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0115-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0137-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0115-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0072-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0059-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0112-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0080-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0082-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0080-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0087-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0080-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0114-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0027-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0053-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0027-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0127-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0027-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0068-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0027-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0149-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0027-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0013-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0021-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0063-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0021-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0034-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0021-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0070-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0026-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0141-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0026-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0061-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0082-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0130-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0082-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0073-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0082-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0088-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0082-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0146-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0017-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0110-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0017-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0007-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0017-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0083-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0017-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0113-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0119-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0106-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0119-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0125-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0119-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0060-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0127-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0089-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0127-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0112-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0127-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0114-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0073-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0059-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0073-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0149-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0073-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0103-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0073-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0022-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0114-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0128-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0114-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0030-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0114-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0016-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0114-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0111-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0139-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0022-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0139-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0104-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0149-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0024-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0149-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0110-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0032-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0107-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0032-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0086-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0032-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0110-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0136-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0133-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0060-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0051-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0060-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0121-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0060-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0143-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0060-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0081-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0060-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0108-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0018-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0010-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0018-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0023-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0068-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0025-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0068-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0060-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0143-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0068-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0143-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0020-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0101-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0022-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0101-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0063-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0101-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0054-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0103-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0041-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0103-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0097-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0070-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0120-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0070-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0135-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0034-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0098-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0034-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0093-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0034-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0027-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0034-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0064-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0034-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0150-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0034-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0090-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0034-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0071-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0077-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0085-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0077-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0021-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0077-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0094-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0050-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0073-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0050-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0079-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0050-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0141-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0131-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0111-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0131-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0057-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0131-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0056-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0140-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0141-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0140-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0133-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0140-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0115-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0140-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0024-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0086-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0069-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0086-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0051-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0086-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0101-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0072-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0059-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0072-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0020-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0072-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0115-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0072-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0104-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0062-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0016-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0062-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0068-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0062-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0112-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0062-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0132-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0099-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0087-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0099-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0052-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0099-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0141-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0004-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0007-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0004-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0032-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0006-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0009-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0006-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0002-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0006-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0131-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0006-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0033-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0111-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0089-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0111-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0082-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0085-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0052-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0129-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0142-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0129-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0089-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0129-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0086-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0109-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0136-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0052-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0067-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0052-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0053-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0052-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0074-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0052-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0054-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0052-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0122-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0052-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0062-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0028-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0047-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0028-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0030-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0028-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0099-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0028-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0092-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0028-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0013-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0028-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0027-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0049-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0031-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0049-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0128-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0049-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0130-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0044-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0117-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0044-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0045-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0044-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0137-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0030-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0021-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0030-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0013-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0030-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0026-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0030-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0130-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0030-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0080-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0030-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0052-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0030-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0077-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0081-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0031-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0081-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0121-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0081-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0053-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0081-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0028-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0035-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0124-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0035-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0018-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0035-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0057-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0035-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0147-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0035-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0134-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0035-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0067-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0038-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0019-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0038-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0143-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0038-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0029-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0038-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0146-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0036-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0107-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0020-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0004-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0020-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0014-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0020-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0070-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0020-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0001-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0096-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0092-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0096-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0069-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0096-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0138-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0096-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0033-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0096-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0122-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0096-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0114-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0104-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0081-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0104-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0024-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0031-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0038-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0031-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0030-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0031-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0133-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0031-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0086-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0031-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0089-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0031-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0051-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0031-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0121-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0108-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0105-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0135-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0102-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0135-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0061-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0135-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0048-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0071-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0039-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0071-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0084-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0071-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0018-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0105-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0017-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0061-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0031-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0061-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0023-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0061-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0087-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0048-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0032-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0048-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0142-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0048-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0052-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0048-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0091-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0019-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0040-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0019-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0010-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0009-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0082-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0009-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0068-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0009-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0037-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0009-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0061-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0009-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0004-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0009-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0078-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0133-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0101-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0133-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0100-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0133-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0109-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0142-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0039-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0142-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0143-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0142-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0119-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0003-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0035-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0003-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0087-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0003-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0001-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0003-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0120-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0003-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0012-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0003-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0005-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0003-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0004-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0003-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0015-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0003-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0100-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0003-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0032-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0147-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0050-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0147-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0114-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0147-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0130-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0147-0000-0000-bbbbbbbbbbbb",
       "to": "aaaa-0067-0000-0000-aaaaaaaaaaaa",
-      "label": "Person Perpetrator Case File",
-      "relationshipType": "Person_Taeter_Vorgang"
+      "label": "Person Case File (All Roles)",
+      "relationshipType": "Person_Vorgang_Alle"
     },
     {
       "from": "bbbb-0008-0000-0000-bbbbbbbbbbbb",

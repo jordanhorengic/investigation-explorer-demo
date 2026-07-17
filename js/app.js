@@ -48,8 +48,6 @@
     shiftKey: false,
     panStart: null,
     viewportStart: null,
-    nodeOffset: null,
-    dragMoved: false,
     boxSelectStart: null,
   };
 
@@ -826,6 +824,79 @@
     return nodeIds;
   }
 
+  function buildGraphAdjacency() {
+    const adjacency = new Map();
+    for (const link of graphState.links) {
+      if (!adjacency.has(link.from)) {
+        adjacency.set(link.from, new Set());
+      }
+      if (!adjacency.has(link.to)) {
+        adjacency.set(link.to, new Set());
+      }
+      adjacency.get(link.from).add(link.to);
+      adjacency.get(link.to).add(link.from);
+    }
+    return adjacency;
+  }
+
+  function getReachableGraphNodeIds(fromRootIds) {
+    const adjacency = buildGraphAdjacency();
+    const reachable = new Set();
+    const queue = [...fromRootIds].filter((id) => graphState.nodeIds.has(id));
+    for (const id of queue) {
+      reachable.add(id);
+    }
+
+    for (let index = 0; index < queue.length; index += 1) {
+      const id = queue[index];
+      for (const neighbor of adjacency.get(id) || []) {
+        if (!reachable.has(neighbor) && graphState.nodeIds.has(neighbor)) {
+          reachable.add(neighbor);
+          queue.push(neighbor);
+        }
+      }
+    }
+
+    return reachable;
+  }
+
+  function anyGraphRootShowsRelated() {
+    for (const rootId of state.graphRoots) {
+      if (getPinSettings(rootId).showRelated) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function pruneDisconnectedGraphNodes() {
+    if (state.graphRoots.size === 0) {
+      for (const id of [...graphState.nodeIds]) {
+        GraphView.removeNode(graphState, id);
+      }
+      return;
+    }
+
+    const reachable = getReachableGraphNodeIds(state.graphRoots);
+    for (const id of [...graphState.nodeIds]) {
+      if (!reachable.has(id)) {
+        GraphView.removeNode(graphState, id);
+      }
+    }
+  }
+
+  function reconcileGraphAfterRemoval(options = {}) {
+    pruneDisconnectedGraphNodes();
+    if (anyGraphRootShowsRelated()) {
+      syncGraphRelatedObjects();
+      return;
+    }
+    if (!options.skipRender) {
+      renderGraphView();
+      refreshSearchResults();
+    }
+  }
+
   function syncGraphRelatedObjects() {
     if (state.graphRoots.size === 0) {
       return;
@@ -1034,7 +1105,7 @@
     let removed = 0;
 
     for (const entityId of ids) {
-      if (removeEntityFromGraph(entityId, { skipRender: true })) {
+      if (removeEntityFromGraph(entityId, { skipRender: true, skipPrune: true })) {
         removed += 1;
       }
     }
@@ -1052,7 +1123,7 @@
       closeInstancePanel();
     }
 
-    renderGraphView();
+    reconcileGraphAfterRemoval();
     afterVizRemove('graph');
   }
 
@@ -2401,13 +2472,42 @@
       .filter((group) => group.items.length > 0);
   }
 
+  function applyResultGroupCollapsedState(section, collapsed) {
+    const header = section.querySelector('.search-result-group__header');
+    const body = section.querySelector('.search-result-group__body');
+    const chevron = header?.querySelector('.search-result-group__chevron');
+    if (body) {
+      body.hidden = collapsed;
+    }
+    if (header) {
+      header.setAttribute('aria-expanded', String(!collapsed));
+    }
+    if (chevron) {
+      chevron.classList.toggle('search-result-group__chevron--collapsed', collapsed);
+    }
+  }
+
+  function syncCollapsedResultGroupsInDom() {
+    for (const container of [els.searchResults, els.vizSearchResults]) {
+      if (!container) {
+        continue;
+      }
+      for (const section of container.querySelectorAll('.search-result-group[data-result-group]')) {
+        applyResultGroupCollapsedState(
+          section,
+          state.collapsedResultGroups.has(section.dataset.resultGroup)
+        );
+      }
+    }
+  }
+
   function toggleResultGroup(typeId) {
     if (state.collapsedResultGroups.has(typeId)) {
       state.collapsedResultGroups.delete(typeId);
     } else {
       state.collapsedResultGroups.add(typeId);
     }
-    refreshSearchResults();
+    syncCollapsedResultGroupsInDom();
   }
 
   function handleAreaResultSelect(area, context) {
@@ -2451,6 +2551,7 @@
 
     const section = document.createElement('section');
     section.className = 'search-result-group search-result-group--areas';
+    section.dataset.resultGroup = GEOGRAPHIC_AREAS_GROUP_ID;
     const collapsed = state.collapsedResultGroups.has(GEOGRAPHIC_AREAS_GROUP_ID);
 
     const header = document.createElement('button');
@@ -2467,7 +2568,10 @@
       <span class="search-result-group__label">Geographic areas</span>
       <span class="search-result-group__count">(${areas.length})</span>
     `;
-    header.addEventListener('click', () => toggleResultGroup(GEOGRAPHIC_AREAS_GROUP_ID));
+    header.addEventListener('click', (event) => {
+      event.stopPropagation();
+      toggleResultGroup(GEOGRAPHIC_AREAS_GROUP_ID);
+    });
 
     const body = document.createElement('div');
     body.className = 'search-result-group__body';
@@ -2518,7 +2622,10 @@
         </div>
         ${status}
       `;
-      card.addEventListener('click', (event) => handleSearchResultSelect(entity.id, context, event));
+      card.addEventListener('click', (event) => {
+        event.stopPropagation();
+        handleSearchResultSelect(entity.id, context, event);
+      });
       if (context === 'map' || context === 'graph') {
         card.addEventListener('contextmenu', (event) => {
           event.preventDefault();
@@ -2561,7 +2668,10 @@
       </div>
     `;
 
-    card.addEventListener('click', (event) => handleSearchResultSelect(entity.id, context, event));
+    card.addEventListener('click', (event) => {
+      event.stopPropagation();
+      handleSearchResultSelect(entity.id, context, event);
+    });
 
     const addGraphButton = card.querySelector('.result-card__add-graph');
     if (addGraphButton) {
@@ -2628,6 +2738,7 @@
     for (const group of groupResultsByType(items)) {
       const section = document.createElement('section');
       section.className = 'search-result-group';
+      section.dataset.resultGroup = group.type;
       const collapsed = state.collapsedResultGroups.has(group.type);
       const color = typeColors[group.type] || '#1b44b1';
 
@@ -2641,7 +2752,10 @@
         <span class="search-result-group__label">${group.type}</span>
         <span class="search-result-group__count">(${group.items.length})</span>
       `;
-      header.addEventListener('click', () => toggleResultGroup(group.type));
+      header.addEventListener('click', (event) => {
+        event.stopPropagation();
+        toggleResultGroup(group.type);
+      });
 
       const body = document.createElement('div');
       body.className = 'search-result-group__body';
@@ -3117,10 +3231,9 @@
     graphInteraction.shiftKey = false;
     graphInteraction.panStart = null;
     graphInteraction.viewportStart = null;
-    graphInteraction.nodeOffset = null;
     graphInteraction.boxSelectStart = null;
     clearGraphBoxSelectOverlay();
-    els.graphSvg.classList.remove('graph-svg--panning', 'graph-svg--dragging-node', 'graph-svg--box-select');
+    els.graphSvg.classList.remove('graph-svg--panning', 'graph-svg--box-select');
   }
 
   function hideGraphNodeTooltip() {
@@ -3462,10 +3575,16 @@
 
     GraphView.removeNode(graphState, entityId);
     state.graphRoots.delete(entityId);
-    if (!options.skipRender) {
-      renderGraphView();
-      refreshSearchResults();
+
+    if (options.skipPrune) {
+      if (!options.skipRender) {
+        renderGraphView();
+        refreshSearchResults();
+      }
+      return true;
     }
+
+    reconcileGraphAfterRemoval(options);
     return true;
   }
 
@@ -4016,17 +4135,6 @@
       graphInteraction.mode = 'node';
       graphInteraction.nodeId = node.dataset.entityId;
       graphInteraction.shiftKey = event.shiftKey;
-      graphInteraction.dragMoved = false;
-      const point = clientToGraphPoint(event.clientX, event.clientY);
-      const position = graphState.positions.get(graphInteraction.nodeId);
-      if (!position) {
-        return;
-      }
-      graphInteraction.nodeOffset = {
-        x: point.x - position.x,
-        y: point.y - position.y,
-      };
-      els.graphSvg.classList.add('graph-svg--dragging-node');
       event.preventDefault();
       return;
     }
@@ -4058,19 +4166,6 @@
         x: event.clientX,
         y: event.clientY,
       });
-      return;
-    }
-
-    if (graphInteraction.mode === 'node' && graphInteraction.nodeId && graphInteraction.nodeOffset) {
-      const point = clientToGraphPoint(event.clientX, event.clientY);
-      GraphView.setNodePosition(
-        graphState,
-        graphInteraction.nodeId,
-        point.x - graphInteraction.nodeOffset.x,
-        point.y - graphInteraction.nodeOffset.y
-      );
-      graphInteraction.dragMoved = true;
-      syncGraphDomPositions();
     }
   });
 
@@ -4084,7 +4179,7 @@
       return;
     }
 
-    if (graphInteraction.mode === 'node' && graphInteraction.nodeId && !graphInteraction.dragMoved) {
+    if (graphInteraction.mode === 'node' && graphInteraction.nodeId) {
       if (graphInteraction.shiftKey) {
         applySelection(graphInteraction.nodeId, { shiftKey: true });
         refreshSelectionViews();
