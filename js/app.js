@@ -211,7 +211,6 @@
     graphMenuRelatedTypeFilters: document.getElementById('graph-menu-related-type-filters'),
     graphMenuRelatedFiltersFlyout: document.getElementById('graph-menu-related-filters-flyout'),
     graphMenuRelatedTimePeriod: document.getElementById('graph-menu-related-time-period'),
-    graphMenuRelatedDistance: document.getElementById('graph-menu-related-distance'),
     btnGraphClear: document.getElementById('btn-graph-clear'),
     btnGraphZoomIn: document.getElementById('btn-graph-zoom-in'),
     btnGraphZoomOut: document.getElementById('btn-graph-zoom-out'),
@@ -266,7 +265,6 @@
         relatedRow: els.graphMenuRelatedRow,
         typeFilters: els.graphMenuRelatedTypeFilters,
         timePeriod: els.graphMenuRelatedTimePeriod,
-        distance: els.graphMenuRelatedDistance,
       };
     }
 
@@ -475,7 +473,7 @@
     return {
       typeFilters: normalizePinTypeFilters(settings),
       timePeriod: settings.timePeriod,
-      distanceMiles: settings.distanceMiles,
+      distanceMiles: null,
       excludeTypes: GRAPH_RELATED_EXCLUDED_TYPES,
     };
   }
@@ -638,7 +636,9 @@
     renderMenuRelatedTypeFilters(normalizePinTypeFilters(settings), context);
     const ui = getRelatedUiElements(context === 'graph' ? 'graph-menu' : 'menu');
     ui.timePeriod.value = settings.timePeriod || 'all';
-    ui.distance.value = formatDistanceMiles(settings.distanceMiles);
+    if (ui.distance) {
+      ui.distance.value = formatDistanceMiles(settings.distanceMiles);
+    }
 
     if (openMenuRelatedFlyoutContext === context) {
       requestAnimationFrame(() => positionMenuRelatedFlyout(context));
@@ -742,7 +742,7 @@
       showRelated: ui.showRelated.checked,
       typeFilters: readRelatedTypeFiltersFromContainer(ui.typeFilters),
       timePeriod: ui.timePeriod.value,
-      distanceMiles: parseDistanceMiles(ui.distance.value),
+      distanceMiles: ui.distance ? parseDistanceMiles(ui.distance.value) : null,
     };
   }
 
@@ -751,7 +751,9 @@
 
     ui.showRelated.checked = settings.showRelated;
     ui.timePeriod.value = settings.timePeriod || 'all';
-    ui.distance.value = formatDistanceMiles(settings.distanceMiles);
+    if (ui.distance) {
+      ui.distance.value = formatDistanceMiles(settings.distanceMiles);
+    }
 
     if (target === 'menu' || target === 'graph-menu') {
       syncContextMenuRelatedFiltersFlyout(settings, target === 'graph-menu' ? 'graph' : 'map');
@@ -2045,6 +2047,9 @@
     }
 
     const settings = readRelatedSettingsFromUI(uiSource);
+    if (uiSource === 'graph-menu') {
+      settings.distanceMiles = getBulkRelatedSettings(ids).distanceMiles;
+    }
     for (const entityId of ids) {
       applyRelatedSettingsForEntity(entityId, settings, {
         skipRender: true,
@@ -4309,7 +4314,6 @@
     applyGraphContextMenuRelatedOptions();
   });
   els.graphMenuRelatedTimePeriod.addEventListener('change', applyGraphContextMenuRelatedOptions);
-  els.graphMenuRelatedDistance.addEventListener('change', applyGraphContextMenuRelatedOptions);
   els.graphMenuRelatedRow?.addEventListener('mousedown', (event) => event.stopPropagation());
   els.graphMenuRelatedFiltersFlyout?.addEventListener('mousedown', (event) => event.stopPropagation());
   els.graphMenuRelatedFiltersFlyout?.addEventListener('click', (event) => event.stopPropagation());
