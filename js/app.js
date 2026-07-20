@@ -5,6 +5,7 @@
   const technicalNames = Object.fromEntries(objectTypes.map((type) => [type.id, type.technicalName]));
 
   const attributeCatalog = SearchFilters.buildAttributeCatalog(entities, objectTypes);
+  const roleCatalog = SearchFilters.buildRoleCatalog(relations);
 
   const GRAPH_RELATED_MAX_HOPS = 1;
   const GRAPH_RELATED_EXCLUDED_TYPES = new Set([
@@ -2035,6 +2036,7 @@
     return (
       SearchFilters.isRestrictedTypes(state.searchFilters, objectTypes.length) ||
       state.searchFilters.attributeRules.length > 0 ||
+      (state.searchFilters.roleRules?.length ?? 0) > 0 ||
       Boolean(state.searchFilters.searchFields?.size) ||
       Boolean(state.searchFilters.geographicArea)
     );
@@ -2309,7 +2311,8 @@
       state.searchFilters,
       objectTypes,
       lookup,
-      relations
+      relations,
+      roleCatalog.index
     );
   }
 
@@ -2759,7 +2762,13 @@
     const groupedList = options.groupedList === true;
     const highlighted = isSelectionHighlighted(entity.id);
     const card = document.createElement('div');
-    const match = SearchFilters.resolveResultMatch(entity, state.searchTerm, state.searchFilters, lookup);
+    const match = SearchFilters.resolveResultMatch(
+      entity,
+      state.searchTerm,
+      state.searchFilters,
+      lookup,
+      roleCatalog.index
+    );
     const onMap = isEntityOnMap(entity.id, options.mapPresence);
     const onGraph = isEntityOnGraph(entity.id, options.graphPresence);
     const color = typeColors[entity.type] || '#1b44b1';
@@ -4567,6 +4576,7 @@
     },
     objectTypes,
     attributeCatalog,
+    getRoleCatalog: () => roleCatalog,
     onChange: handleSmartSearchChange,
     onGeographicInputClear: clearMapGeographicHighlightOnInput,
     onSearchQueryChange: schedulePlaceSearchFromInput,

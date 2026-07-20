@@ -49,6 +49,18 @@
     return null;
   }
 
+  function findRole(roleCatalog, token) {
+    const needle = String(token || '').trim().toLowerCase();
+    if (!needle) {
+      return null;
+    }
+    return (
+      roleCatalog?.roles?.find((role) => role.toLowerCase() === needle) ||
+      roleCatalog?.roles?.find((role) => role.toLowerCase().includes(needle)) ||
+      null
+    );
+  }
+
   function isFilterCommandInput(value) {
     const trimmed = normalizeText(value);
     if (!trimmed) {
@@ -64,6 +76,10 @@
     }
 
     if (/^area(?::|$)/i.test(trimmed)) {
+      return true;
+    }
+
+    if (/^role(?::|$)/i.test(trimmed)) {
       return true;
     }
 
@@ -160,6 +176,16 @@
       });
     }
 
+    for (const rule of filters.roleRules || []) {
+      pills.push({
+        id: rule.id,
+        kind: 'role',
+        ruleId: rule.id,
+        label: SearchFilters.describeRoleRule(rule),
+        prefix: 'role',
+      });
+    }
+
     if (filters.geographicArea) {
       pills.push({
         id: `area:${filters.geographicArea.id}`,
@@ -227,6 +253,22 @@
     return next;
   }
 
+  function applyRoleCommand(role, filters) {
+    const next = SearchFilters.clone(filters);
+    const normalized = String(role || '').trim();
+    if (!normalized) {
+      return next;
+    }
+    if (next.roleRules.some((rule) => rule.role.toLowerCase() === normalized.toLowerCase())) {
+      return next;
+    }
+    next.roleRules.push({
+      id: `role-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      role: normalized,
+    });
+    return next;
+  }
+
   function applyAttrCommand(fieldId, operator, value, filters) {
     const next = SearchFilters.clone(filters);
     next.attributeRules.push({
@@ -238,7 +280,7 @@
     return next;
   }
 
-  function parseCommand(text, objectTypes, catalog, filters) {
+  function parseCommand(text, objectTypes, catalog, filters, roleCatalog = null) {
     const trimmed = normalizeText(text);
     if (!trimmed) {
       return null;
@@ -251,6 +293,13 @@
         return { kind: 'type', typeId: type.id };
       }
       return null;
+    }
+
+    const roleMatch = trimmed.match(/^role:(.+)$/i);
+    if (roleMatch) {
+      const token = roleMatch[1].trim();
+      const knownRole = findRole(roleCatalog, token);
+      return { kind: 'role', role: knownRole || token };
     }
 
     const inMatch = trimmed.match(/^in:(.+)$/i);
@@ -308,7 +357,8 @@
     filters,
     lookup = null,
     getAreaSuggestions = null,
-    geographicEnabled = false
+    geographicEnabled = false,
+    roleCatalog = null
   ) {
     const value = input;
     const trimmed = value.trim();
@@ -347,6 +397,21 @@
           description: 'Object type',
           insert: `type:${type.id}`,
           apply: { kind: 'type', typeId: type.id },
+        }));
+    }
+
+    if (/^role(?::|$)/i.test(trimmed)) {
+      const partial = trimmed.replace(/^role:?/i, '').trim().toLowerCase();
+      const roles = roleCatalog?.roles || [];
+      return roles
+        .filter((role) => !partial || role.toLowerCase().includes(partial))
+        .map((role) => ({
+          kind: 'item',
+          id: `role-${role.replace(/\s+/g, '-')}`,
+          label: role,
+          description: 'Relationship role',
+          insert: `role:${role}`,
+          apply: { kind: 'role', role },
         }));
     }
 
@@ -446,6 +511,8 @@
       }
     } else if (kind === 'attr') {
       next.attributeRules = next.attributeRules.filter((rule) => rule.id !== payload.ruleId);
+    } else if (kind === 'role') {
+      next.roleRules = next.roleRules.filter((rule) => rule.id !== payload.ruleId);
     } else if (kind === 'area') {
       next.geographicArea = null;
     }
@@ -465,6 +532,9 @@
     }
     if (command.kind === 'attr') {
       return applyAttrCommand(command.fieldId, command.operator, command.value, filters);
+    }
+    if (command.kind === 'role') {
+      return applyRoleCommand(command.role, filters);
     }
     if (command.kind === 'area') {
       return applyAreaCommand(command.area || command.term, filters, lookup, resolveAreaTerm);
@@ -493,6 +563,7 @@
       resolveAreaTerm,
       getAreaSuggestions,
       isGeographicSearchEnabled = () => false,
+      getRoleCatalog = () => null,
     } = options;
 
     function geographicEnabled() {
@@ -596,7 +667,8 @@
         filters,
         lookup,
         geographicEnabled() ? getAreaSuggestions : null,
-        geographicEnabled()
+        geographicEnabled(),
+        getRoleCatalog?.()
       );
       selectableItems = flattenSelectableItems(menuEntries);
       if (selectableItems.length === 0) {
@@ -683,7 +755,13 @@
     }
 
     function tryApplyCommand() {
-      const command = parseCommand(input.value, objectTypes, attributeCatalog, getFilters());
+      const command = parseCommand(
+        input.value,
+        objectTypes,
+        attributeCatalog,
+        getFilters(),
+        getRoleCatalog?.()
+      );
       if (!command) {
         return false;
       }
@@ -784,7 +862,7 @@
         if (last) {
           const next = removePill(
             last.kind,
-            { typeId: last.typeId, fieldId: last.fieldId, ruleId: last.ruleId },
+            { typeId: last.typeId, fieldId: last.fieldId, ruleId: last.ruleId, areaId: last.areaId },
             getFilters(),
             objectTypes
           );

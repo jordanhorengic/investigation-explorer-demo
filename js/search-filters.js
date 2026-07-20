@@ -24,6 +24,7 @@
       types: new Set(objectTypes.map((type) => type.id)),
       searchFields: null,
       attributeRules: [],
+      roleRules: [],
       geographicArea: null,
     };
   }
@@ -33,8 +34,68 @@
       types: new Set(filters.types),
       searchFields: filters.searchFields ? new Set(filters.searchFields) : null,
       attributeRules: filters.attributeRules.map((rule) => ({ ...rule })),
+      roleRules: (filters.roleRules || []).map((rule) => ({ ...rule })),
       geographicArea: cloneGeographicArea(filters.geographicArea),
     };
+  }
+
+  function readRelationRoles(relation) {
+    if (Array.isArray(relation.roles) && relation.roles.length > 0) {
+      return relation.roles.map((role) => String(role || '').trim()).filter(Boolean);
+    }
+    const single = String(relation.role || '').trim();
+    return single ? [single] : [];
+  }
+
+  function buildRoleCatalog(relations) {
+    const roles = new Set();
+    const index = new Map();
+
+    for (const relation of relations || []) {
+      for (const role of readRelationRoles(relation)) {
+        roles.add(role);
+        for (const entityId of [relation.from, relation.to]) {
+          if (!index.has(entityId)) {
+            index.set(entityId, new Set());
+          }
+          index.get(entityId).add(role);
+        }
+      }
+    }
+
+    return {
+      roles: [...roles].sort((a, b) => a.localeCompare(b)),
+      index,
+    };
+  }
+
+  function entityHasRole(entityId, role, roleIndex) {
+    if (!roleIndex || !entityId) {
+      return false;
+    }
+    const entityRoles = roleIndex.get(entityId);
+    if (!entityRoles) {
+      return false;
+    }
+    const needle = String(role || '').trim().toLowerCase();
+    for (const candidate of entityRoles) {
+      if (String(candidate).trim().toLowerCase() === needle) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function entityMatchesRoleRules(entity, roleRules, roleIndex) {
+    if (!roleRules?.length) {
+      return true;
+    }
+    for (const rule of roleRules) {
+      if (!entityHasRole(entity.id, rule.role, roleIndex)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   function buildAttributeCatalog(entities, objectTypes) {
@@ -75,6 +136,7 @@
     return (
       Boolean(term.trim()) ||
       filters.attributeRules.length > 0 ||
+      (filters.roleRules?.length ?? 0) > 0 ||
       isRestrictedTypes(filters, totalTypeCount) ||
       Boolean(filters.geographicArea)
     );
@@ -100,6 +162,10 @@
     }
 
     return value.toLowerCase().includes(String(rule.value || '').trim().toLowerCase());
+  }
+
+  function describeRoleRule(rule) {
+    return rule.role;
   }
 
   function describeRule(rule) {
@@ -134,6 +200,14 @@
       );
     }
 
+    if (filters.roleRules?.length) {
+      parts.push(
+        filters.roleRules.length === 1
+          ? describeRoleRule(filters.roleRules[0])
+          : `${filters.roleRules.length} role filters`
+      );
+    }
+
     if (filters.geographicArea?.label) {
       parts.push(filters.geographicArea.label);
     }
@@ -158,6 +232,7 @@
       count += 1;
     }
     count += filters.attributeRules.length;
+    count += filters.roleRules?.length ?? 0;
     if (filters.geographicArea) {
       count += 1;
     }
@@ -178,7 +253,16 @@
     };
   }
 
-  function filterEntities(entities, term, filters, objectTypes, lookup = null, relations = [], limit = 5000) {
+  function filterEntities(
+    entities,
+    term,
+    filters,
+    objectTypes,
+    lookup = null,
+    relations = [],
+    roleIndex = null,
+    limit = 5000
+  ) {
     if (!hasActiveCriteria(term, filters, objectTypes.length)) {
       return [];
     }
@@ -200,6 +284,10 @@
           }
         }
 
+        if (!entityMatchesRoleRules(entity, filters.roleRules, roleIndex)) {
+          return false;
+        }
+
         if (filters.geographicArea && lookup && window.MapLocations) {
           if (!window.MapLocations.entityHasGeoInArea(entity, filters.geographicArea, lookup, relations)) {
             return false;
@@ -215,7 +303,7 @@
       .slice(0, limit);
   }
 
-  function resolveResultMatch(entity, term, filters, lookup = null) {
+  function resolveResultMatch(entity, term, filters, lookup = null, roleIndex = null) {
     if (term.trim()) {
       return window.DisplayNames.resolveMatch(entity, term, buildSearchOptions(filters, lookup));
     }
@@ -230,6 +318,16 @@
           fieldId: rule.fieldId,
           fieldLabel: window.DisplayNames.formatFieldLabel(rule.fieldId),
           value: window.DisplayNames.formatAttributeValue(value, rule.fieldId),
+        };
+      }
+    }
+
+    for (const rule of filters.roleRules || []) {
+      if (entityHasRole(entity.id, rule.role, roleIndex)) {
+        return {
+          fieldId: 'ROLE',
+          fieldLabel: 'Role',
+          value: rule.role,
         };
       }
     }
@@ -270,12 +368,17 @@
     createDefault,
     clone,
     buildAttributeCatalog,
+    buildRoleCatalog,
+    readRelationRoles,
+    entityHasRole,
+    entityMatchesRoleRules,
     registerEntityAttributes,
     getAvailableFields,
     isRestrictedTypes,
     hasActiveCriteria,
     describeSummary,
     describeRule,
+    describeRoleRule,
     activeFilterCount,
     filterEntities,
     resolveResultMatch,
