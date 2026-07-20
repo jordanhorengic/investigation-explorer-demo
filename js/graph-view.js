@@ -214,7 +214,7 @@
     return true;
   }
 
-  function addLink(graphState, from, to, label) {
+  function addLink(graphState, from, to, label, role = null) {
     if (!graphState.nodeIds.has(from) || !graphState.nodeIds.has(to)) {
       return false;
     }
@@ -225,8 +225,73 @@
     }
 
     graphState.linkKeys.add(key);
-    graphState.links.push({ from, to, label });
+    graphState.links.push({ from, to, label, role });
     return true;
+  }
+
+  function formatLinkAnnotation(link) {
+    const text = String(link.role || link.label || '').trim();
+    return text ? truncateLabel(text, 28) : '';
+  }
+
+  function appendGraphLink(parent, link, fromPos, toPos) {
+    const x1 = fromPos.x;
+    const y1 = fromPos.y + 8;
+    const x2 = toPos.x;
+    const y2 = toPos.y + 8;
+    const annotation = formatLinkAnnotation(link);
+
+    const group = createSvgEl('g', {
+      class: 'graph-link-group',
+      'data-from': link.from,
+      'data-to': link.to,
+    });
+
+    group.appendChild(
+      createSvgEl('line', {
+        class: 'graph-link',
+        x1,
+        y1,
+        x2,
+        y2,
+      })
+    );
+
+    if (annotation) {
+      const mx = (x1 + x2) / 2;
+      const my = (y1 + y2) / 2;
+      const paddingX = 6;
+      const paddingY = 3;
+      const charWidth = 5.6;
+      const textWidth = annotation.length * charWidth;
+      const textHeight = 11;
+      const labelGroup = createSvgEl('g', {
+        class: 'graph-link__label',
+        transform: `translate(${mx}, ${my})`,
+      });
+
+      labelGroup.appendChild(
+        createSvgEl('rect', {
+          class: 'graph-link__label-bg',
+          x: -textWidth / 2 - paddingX,
+          y: -textHeight / 2 - paddingY,
+          width: textWidth + paddingX * 2,
+          height: textHeight + paddingY * 2,
+          rx: 4,
+        })
+      );
+
+      const text = createSvgEl('text', {
+        class: 'graph-link__label-text',
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+      });
+      text.textContent = annotation;
+      labelGroup.appendChild(text);
+      group.appendChild(labelGroup);
+    }
+
+    parent.appendChild(group);
   }
 
   function createSvgEl(name, attrs = {}) {
@@ -378,17 +443,7 @@
       if (!from || !to) {
         continue;
       }
-      linksLayer.appendChild(
-        createSvgEl('line', {
-          class: 'graph-link',
-          'data-from': link.from,
-          'data-to': link.to,
-          x1: from.x,
-          y1: from.y + 8,
-          x2: to.x,
-          y2: to.y + 8,
-        })
-      );
+      appendGraphLink(linksLayer, link, from, to);
     }
     viewportGroup.appendChild(linksLayer);
 

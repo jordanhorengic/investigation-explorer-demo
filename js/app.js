@@ -990,7 +990,7 @@
     graphState.linkKeys.clear();
     for (const rel of relations) {
       if (desired.has(rel.from) && desired.has(rel.to)) {
-        GraphView.addLink(graphState, rel.from, rel.to, rel.label);
+        GraphView.addLink(graphState, rel.from, rel.to, rel.label, rel.role ?? null);
       }
     }
 
