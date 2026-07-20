@@ -256,34 +256,23 @@
   }
 
   function formatLinkAnnotationFull(link) {
-    const role = String(link.role || '').trim();
-    if (role) {
-      return role;
-    }
-    return String(link.label || '').trim();
+    return String(link.role || '').trim();
   }
 
-  function formatLinkAnnotation(link, options = {}) {
-    const full = formatLinkAnnotationFull(link);
-    if (!full) {
+  function formatLinkAnnotation(link) {
+    const role = formatLinkAnnotationFull(link);
+    if (!role) {
       return '';
     }
-    const role = String(link.role || '').trim();
-    if (role) {
-      return truncateLabel(role, 22);
-    }
-    if (options.hideGenericLabels) {
-      return '';
-    }
-    return truncateLabel(full, 18);
+    return truncateLabel(role, 22);
   }
 
-  function appendGraphLink(parent, link, fromPos, toPos, options = {}) {
+  function appendGraphLink(parent, link, fromPos, toPos) {
     const x1 = fromPos.x;
     const y1 = fromPos.y + 8;
     const x2 = toPos.x;
     const y2 = toPos.y + 8;
-    const annotation = formatLinkAnnotation(link, options);
+    const annotation = formatLinkAnnotation(link);
 
     const group = createSvgEl('g', {
       class: 'graph-link-group',
@@ -487,16 +476,13 @@
       .map((entity) => createNode(entity, lookup, graphState.seedId));
 
     const linksLayer = createSvgEl('g', { class: 'graph-links' });
-    const labelOptions = {
-      hideGenericLabels: graphState.links.length > 12,
-    };
     for (const link of graphState.links) {
       const from = graphState.positions.get(link.from);
       const to = graphState.positions.get(link.to);
       if (!from || !to) {
         continue;
       }
-      appendGraphLink(linksLayer, link, from, to, labelOptions);
+      appendGraphLink(linksLayer, link, from, to);
     }
     viewportGroup.appendChild(linksLayer);
 
