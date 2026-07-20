@@ -6,6 +6,12 @@
 
   const attributeCatalog = SearchFilters.buildAttributeCatalog(entities, objectTypes);
 
+  const GRAPH_RELATED_MAX_HOPS = 1;
+  const GRAPH_RELATED_EXCLUDED_TYPES = new Set([
+    'Case Event',
+    'Physical Description',
+  ]);
+
   const state = {
     selectedId: null,
     multiSelectedIds: new Set(),
@@ -465,6 +471,15 @@
     return null;
   }
 
+  function buildGraphRelatedFilters(settings) {
+    return {
+      typeFilters: normalizePinTypeFilters(settings),
+      timePeriod: settings.timePeriod,
+      distanceMiles: settings.distanceMiles,
+      excludeTypes: GRAPH_RELATED_EXCLUDED_TYPES,
+    };
+  }
+
   function readRelatedTypeFiltersFromContainer(container) {
     const options = getMapRelatedTypeOptions();
     const selected = new Set();
@@ -876,14 +891,16 @@
         continue;
       }
 
-      const related = MapLocations.collectRelatedEntities(rootEntity, lookup, relations, 2, {
-        typeFilters: normalizePinTypeFilters(settings),
-        timePeriod: settings.timePeriod,
-        distanceMiles: settings.distanceMiles,
-      });
+      const related = MapLocations.collectGraphRelatedEntries(
+        rootEntity,
+        lookup,
+        relations,
+        GRAPH_RELATED_MAX_HOPS,
+        buildGraphRelatedFilters(settings),
+      );
 
       for (const entry of related) {
-        nodeIds.add(entry.entity.id);
+        nodeIds.add(entry.entityId);
       }
     }
 
@@ -963,6 +980,85 @@
     }
   }
 
+  function refreshGraphLinks() {
+    graphState.links = [];
+    graphState.linkKeys.clear();
+
+    function mergeRolesForLink(from, to) {
+      const roles = [];
+      for (const rel of relations) {
+        const matches =
+          (rel.from === from && rel.to === to) || (rel.from === to && rel.to === from);
+        if (matches && rel.role) {
+          roles.push(rel.role);
+        }
+      }
+      return roles;
+    }
+
+    function addMergedLink(from, to, label, fallbackRole = null) {
+      const roles = mergeRolesForLink(from, to);
+      if (roles.length === 0) {
+        GraphView.addLink(graphState, from, to, label, fallbackRole);
+        return;
+      }
+      for (const role of roles) {
+        GraphView.addLink(graphState, from, to, label, role);
+      }
+    }
+
+    const showRelatedActive = anyGraphRootShowsRelated();
+
+    if (!showRelatedActive) {
+      const seenPairs = new Set();
+      for (const rootId of state.graphRoots) {
+        for (const rel of relations) {
+          if (rel.from !== rootId && rel.to !== rootId) {
+            continue;
+          }
+          const otherId = rel.from === rootId ? rel.to : rel.from;
+          if (!graphState.nodeIds.has(otherId)) {
+            continue;
+          }
+          const pairKey = [rootId, otherId].sort().join(':');
+          if (seenPairs.has(pairKey)) {
+            continue;
+          }
+          seenPairs.add(pairKey);
+          addMergedLink(rootId, otherId, rel.label, rel.role ?? null);
+        }
+      }
+      return;
+    }
+
+    for (const rootId of state.graphRoots) {
+      const settings = getPinSettings(rootId);
+      if (!settings.showRelated || !graphState.nodeIds.has(rootId)) {
+        continue;
+      }
+
+      const rootEntity = lookup.get(rootId);
+      if (!rootEntity) {
+        continue;
+      }
+
+      const relatedEntries = MapLocations.collectGraphRelatedEntries(
+        rootEntity,
+        lookup,
+        relations,
+        GRAPH_RELATED_MAX_HOPS,
+        buildGraphRelatedFilters(settings),
+      );
+
+      for (const entry of relatedEntries) {
+        if (!graphState.nodeIds.has(entry.entityId) || entry.entityId === entry.anchorId) {
+          continue;
+        }
+        addMergedLink(entry.anchorId, entry.entityId, entry.label, entry.role ?? null);
+      }
+    }
+  }
+
   function syncGraphRelatedObjects() {
     if (state.graphRoots.size === 0) {
       return;
@@ -984,14 +1080,6 @@
         lookup,
         anchorId ? { anchorId, neighborIndex: graphState.nodeIds.size, neighborTotal: toAdd.length + 1 } : {}
       );
-    }
-
-    graphState.links = [];
-    graphState.linkKeys.clear();
-    for (const rel of relations) {
-      if (desired.has(rel.from) && desired.has(rel.to)) {
-        GraphView.addLink(graphState, rel.from, rel.to, rel.label, rel.role ?? null);
-      }
     }
 
     GraphView.resolveOverlaps(graphState);
@@ -3295,16 +3383,29 @@
       }
     }
 
-    for (const line of els.graphSvg.querySelectorAll('.graph-link')) {
-      const from = graphState.positions.get(line.dataset.from);
-      const to = graphState.positions.get(line.dataset.to);
+    for (const group of els.graphSvg.querySelectorAll('.graph-link-group')) {
+      const from = graphState.positions.get(group.dataset.from);
+      const to = graphState.positions.get(group.dataset.to);
       if (!from || !to) {
         continue;
       }
-      line.setAttribute('x1', from.x);
-      line.setAttribute('y1', from.y + 8);
-      line.setAttribute('x2', to.x);
-      line.setAttribute('y2', to.y + 8);
+
+      const x1 = from.x;
+      const y1 = from.y + 8;
+      const x2 = to.x;
+      const y2 = to.y + 8;
+      const line = group.querySelector('.graph-link');
+      if (line) {
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+      }
+
+      const label = group.querySelector('.graph-link__label');
+      if (label) {
+        label.setAttribute('transform', `translate(${(x1 + x2) / 2}, ${(y1 + y2) / 2})`);
+      }
     }
   }
 
@@ -3355,19 +3456,45 @@
     els.graphNodeTooltip.setAttribute('aria-hidden', 'true');
   }
 
-  function showGraphNodeTooltip(entity, clientX, clientY) {
+  function positionGraphTooltip(clientX, clientY) {
     const frame = els.graphSvg.closest('.graph-frame');
-    if (!frame || !entity) {
+    if (!frame) {
       return;
     }
 
     const rect = frame.getBoundingClientRect();
+    els.graphNodeTooltip.style.left = `${clientX - rect.left}px`;
+    els.graphNodeTooltip.style.top = `${clientY - rect.top}px`;
+  }
+
+  function showGraphNodeTooltip(entity, clientX, clientY) {
+    if (!entity) {
+      return;
+    }
+
     els.graphNodeTooltip.innerHTML = DisplayNames.formatObjectTooltipHtml(
       DisplayNames.displayName(entity, lookup),
       entity.type
     );
-    els.graphNodeTooltip.style.left = `${clientX - rect.left}px`;
-    els.graphNodeTooltip.style.top = `${clientY - rect.top}px`;
+    positionGraphTooltip(clientX, clientY);
+    els.graphNodeTooltip.classList.remove('hidden');
+    els.graphNodeTooltip.setAttribute('aria-hidden', 'false');
+  }
+
+  function showGraphLinkLabelTooltip(labelGroup, clientX, clientY) {
+    const fullLabel = String(labelGroup?.dataset?.fullLabel || '').trim();
+    if (!fullLabel) {
+      return;
+    }
+
+    const displayed =
+      labelGroup.querySelector('.graph-link__label-text')?.textContent?.trim() || '';
+    if (fullLabel === displayed && !displayed.endsWith('…')) {
+      return;
+    }
+
+    els.graphNodeTooltip.textContent = fullLabel;
+    positionGraphTooltip(clientX, clientY);
     els.graphNodeTooltip.classList.remove('hidden');
     els.graphNodeTooltip.setAttribute('aria-hidden', 'false');
   }
@@ -3377,14 +3504,7 @@
       return;
     }
 
-    const frame = els.graphSvg.closest('.graph-frame');
-    if (!frame) {
-      return;
-    }
-
-    const rect = frame.getBoundingClientRect();
-    els.graphNodeTooltip.style.left = `${clientX - rect.left}px`;
-    els.graphNodeTooltip.style.top = `${clientY - rect.top}px`;
+    positionGraphTooltip(clientX, clientY);
   }
 
   function hideGraphContextMenu() {
@@ -3706,6 +3826,8 @@
       els.graphCaption.innerHTML = EmptyStates.render('graph-empty');
       return;
     }
+
+    refreshGraphLinks();
 
     GraphView.renderGraphState(
       els.graphSvg,
@@ -4218,6 +4340,12 @@
   }
 
   els.graphSvg.addEventListener('pointerover', (event) => {
+    const linkLabel = event.target.closest('.graph-link__label');
+    if (linkLabel) {
+      showGraphLinkLabelTooltip(linkLabel, event.clientX, event.clientY);
+      return;
+    }
+
     const node = event.target.closest('.graph-node');
     if (!node) {
       return;
@@ -4233,6 +4361,15 @@
   });
 
   els.graphSvg.addEventListener('pointerout', (event) => {
+    const linkLabel = event.target.closest('.graph-link__label');
+    if (linkLabel) {
+      if (event.relatedTarget && linkLabel.contains(event.relatedTarget)) {
+        return;
+      }
+      hideGraphNodeTooltip();
+      return;
+    }
+
     const node = event.target.closest('.graph-node');
     if (!node) {
       return;

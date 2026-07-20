@@ -179,6 +179,9 @@
   }
 
   function passesFilters(entity, filters = {}, rootEntity = null, lookup = null, relations = null) {
+    if (filters.excludeTypes instanceof Set && filters.excludeTypes.has(entity.type)) {
+      return false;
+    }
     if (filters.typeFilters instanceof Set) {
       if (filters.typeFilters.size === 0) {
         return false;
@@ -934,6 +937,50 @@
     return entries;
   }
 
+  function collectGraphRelatedEntries(rootEntity, lookup, relations, maxHops, filters = {}) {
+    const entries = [];
+    const seen = new Set([rootEntity.id]);
+    let frontier = [rootEntity.id];
+
+    for (let hop = 1; hop <= maxHops; hop += 1) {
+      const next = [];
+      for (const currentId of frontier) {
+        for (const { entityId, rel } of neighbors(currentId, relations)) {
+          if (seen.has(entityId)) {
+            continue;
+          }
+          seen.add(entityId);
+          const related = lookup.get(entityId);
+          if (!related) {
+            continue;
+          }
+          if (passesFilters(related, filters, rootEntity, lookup, relations)) {
+            entries.push({
+              entityId,
+              anchorId: rootEntity.id,
+              label: rel.label,
+              role: rel.role ?? null,
+            });
+          }
+          if (hop < maxHops) {
+            next.push(entityId);
+          }
+        }
+      }
+      frontier = next;
+    }
+
+    return entries;
+  }
+
+  function collectGraphRelatedEntityIds(rootEntity, lookup, relations, maxHops, filters = {}) {
+    return new Set(
+      collectGraphRelatedEntries(rootEntity, lookup, relations, maxHops, filters).map(
+        (entry) => entry.entityId
+      )
+    );
+  }
+
   function resolveRelatedPins(rootEntity, lookup, relations, filters = {}) {
     const relatedEntries = collectRelatedEntities(rootEntity, lookup, relations, 2, filters);
     const pins = [];
@@ -1256,6 +1303,8 @@
     resolveRelatedPins,
     resolvePinsForEntity,
     collectRelatedEntities,
+    collectGraphRelatedEntityIds,
+    collectGraphRelatedEntries,
     findGeographicArea,
     searchGeographicAreas,
     listAllGeographicAreas,

@@ -2077,17 +2077,23 @@ code {
   pointer-events: none;
 }
 
+.graph-link__label {
+  pointer-events: all;
+  cursor: default;
+}
+
 .graph-link__label-bg {
   fill: rgb(247 248 250 / 94%);
   stroke: #dfe3e8;
   stroke-width: 0.8;
+  pointer-events: all;
 }
 
 .graph-link__label-text {
   fill: #5c7080;
   font-size: 9px;
   font-weight: 600;
-  pointer-events: none;
+  pointer-events: all;
 }
 
 .graph-node {

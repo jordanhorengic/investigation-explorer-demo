@@ -89,6 +89,57 @@ const LOCATION_ROLE_BY_REL = {
   Organisation_Niederlassung_Oertlichkeit: 'Branch',
 };
 
+const ROLE_LABEL_MAP = {
+  Halter: 'Vehicle holder',
+  Fahrer: 'Driver',
+  Mitfahrer: 'Passenger',
+  Bearbeiter: 'Case officer',
+  Beschuldigter: 'Accused person',
+  Geschädigter: 'Injured party',
+  Tatverdächtiger: 'Suspect',
+  Zeuge: 'Witness',
+  Wohnsitz: 'Home',
+  Arbeitsstätte: 'Work',
+  Aufenthaltsort: 'Whereabouts',
+  Massnahmeort: 'Measure location',
+  Vorbereitungsort: 'Preparation site',
+  Fluchtfahrzeug: 'Escape vehicle',
+  Tatfahrzeug: 'Offence vehicle',
+  VU_Beteiligter: 'Accident participant',
+  VU_Fahrzeug: 'Accident vehicle',
+  VU_Verletzter: 'Injured person',
+  VU_Beteiligte_Organisation: 'Involved organisation',
+  Komplize: 'Accomplice',
+  Bekannter: 'Associate',
+  Familie: 'Family',
+  Mitglied: 'Member',
+  Mitarbeiter: 'Employee',
+  Geschäftsführer: 'Managing director',
+  Vorstand: 'Board member',
+  Personaldokument: 'Identity document',
+  Anlage: 'Attachment',
+  Anzeige: 'Report',
+  Anzeigender: 'Reporting party',
+  BetroffenePerson: 'Affected person',
+  Hinweis_betrifft_Person: 'Tip relates to person',
+  Geschäftsbeziehung: 'Business relationship',
+};
+
+function translateRoleLabel(rawRole) {
+  const value = String(rawRole ?? '').trim();
+  if (!value) {
+    return null;
+  }
+  if (ROLE_LABEL_MAP[value]) {
+    return ROLE_LABEL_MAP[value];
+  }
+  return value.replaceAll('_', ' ');
+}
+
+function isTableBinding(binding) {
+  return Boolean(binding?.table?.trim()) && !binding?.sql;
+}
+
 function parseEnvFile(filePath) {
   const text = fs.readFileSync(filePath, 'utf8');
   const values = {};
@@ -341,6 +392,248 @@ async function fetchAllRows(baseUrl, token, perspectiveKey, tableName, fieldIds)
     offset += batchSize;
   }
   return rows;
+}
+
+async function fetchOntologyRelationships(baseUrl, token) {
+  return apiGet(
+    baseUrl,
+    token,
+    `/pig-sl-ontology/api/ontology/packages/${encodeURIComponent(PACKAGE_KEY)}/semantic-relationships?withContent=true&limit=500`,
+  );
+}
+
+async function fetchLakeSchemas(baseUrl, token) {
+  return apiGet(
+    baseUrl,
+    token,
+    `/pig-semantic-layer/api/v1/package/${encodeURIComponent(PACKAGE_KEY)}/targets/${encodeURIComponent(TARGET)}/pig/lake/schemas`,
+  );
+}
+
+async function fetchLakeTableNames(baseUrl, token, schemaId) {
+  return apiGet(
+    baseUrl,
+    token,
+    `/pig-semantic-layer/api/v1/package/${encodeURIComponent(PACKAGE_KEY)}` +
+      `/targets/${encodeURIComponent(TARGET)}/pig/lake/schemas/${encodeURIComponent(schemaId)}/tables`,
+  );
+}
+
+async function buildLakeTableIndex(baseUrl, token, lakeSchemas) {
+  const tableToSchemaId = new Map();
+  for (const schema of [...(lakeSchemas ?? [])].reverse()) {
+    if (!schema?.id) {
+      continue;
+    }
+    try {
+      const tables = await fetchLakeTableNames(baseUrl, token, schema.id);
+      for (const tableName of tables ?? []) {
+        if (!tableToSchemaId.has(tableName)) {
+          tableToSchemaId.set(tableName, schema.id);
+        }
+      }
+    } catch (error) {
+      console.warn(`Lake tables unavailable for schema ${schema.name ?? schema.id}: ${error.message.split('\n')[0]}`);
+    }
+  }
+  return tableToSchemaId;
+}
+
+async function queryLakeTable(baseUrl, token, schemaId, sql) {
+  const apiPath =
+    `/pig-semantic-layer/api/v1/package/${encodeURIComponent(PACKAGE_KEY)}` +
+    `/targets/${encodeURIComponent(TARGET)}/pig/lake/schemas/${encodeURIComponent(schemaId)}/query`;
+  return apiPost(baseUrl, token, apiPath, { query: sql });
+}
+
+async function fetchAllLakeRows(baseUrl, token, schemaId, tableName, sourceColumns) {
+  const uniqueColumns = [...new Set(sourceColumns.filter(Boolean))];
+  const columnSql = uniqueColumns.join(', ');
+  const rows = [];
+  let offset = 0;
+
+  while (true) {
+    const result = await queryLakeTable(
+      baseUrl,
+      token,
+      schemaId,
+      `SELECT ${columnSql} FROM ${tableName} LIMIT ${PAGE_SIZE} OFFSET ${offset}`,
+    );
+    if (!Array.isArray(result)) {
+      throw new Error(`Lake query ${tableName} failed: ${JSON.stringify(result).slice(0, 300)}`);
+    }
+    rows.push(...result);
+    if (result.length < PAGE_SIZE) {
+      break;
+    }
+    offset += result.length;
+  }
+
+  return rows;
+}
+
+function resolveLakeSchemaId(binding, lakeSchemas, tableToSchemaId) {
+  const indexed = tableToSchemaId.get(binding.table);
+  if (indexed) {
+    return indexed;
+  }
+  if (binding?.schema) {
+    const direct = (lakeSchemas ?? []).find((schema) => schema.id === binding.schema);
+    if (direct) {
+      return direct.id;
+    }
+  }
+  return null;
+}
+
+function readBindingEndpoints(binding, row) {
+  const mappings = binding.mappingColumns ?? [];
+  const sourceIdMapping = mappings.find((mapping) => mapping.targetColumn === 'ID');
+  const targetIdMapping = mappings.find(
+    (mapping) => mapping.targetColumn !== 'ID' && mapping.targetColumn !== 'ROLLE',
+  );
+  if (!sourceIdMapping || !targetIdMapping) {
+    return null;
+  }
+
+  const fromId = readField(row, sourceIdMapping.sourceColumn);
+  const toId = readField(row, targetIdMapping.sourceColumn);
+  if (!fromId || !toId) {
+    return null;
+  }
+
+  return { from: String(fromId), to: String(toId) };
+}
+
+function readBindingRole(binding, row) {
+  const roleMapping = (binding.mappingColumns ?? []).find((mapping) => mapping.targetColumn === 'ROLLE');
+  if (!roleMapping) {
+    return null;
+  }
+  return translateRoleLabel(readField(row, roleMapping.sourceColumn));
+}
+
+function addRoleToIndex(index, key, role) {
+  if (!role) {
+    return;
+  }
+  if (!index.has(key)) {
+    index.set(key, new Set());
+  }
+  index.get(key).add(role);
+}
+
+function formatCombinedRolesForExport(roles) {
+  const unique = [...roles];
+  if (unique.length <= 2) {
+    return unique.join(' · ');
+  }
+  return `${unique.slice(0, 2).join(' · ')} +${unique.length - 2}`;
+}
+
+async function buildBindingRoleIndex(baseUrl, token, lakeSchemas, tableToSchemaId) {
+  const pairRoles = new Map();
+  const typedRoles = new Map();
+  const ontologyNodes = await fetchOntologyRelationships(baseUrl, token);
+
+  for (const node of ontologyNodes ?? []) {
+    const relationshipKey = node.key ?? node.name;
+    const content = node.content ?? node;
+    const binding = (content.bindings ?? []).find(isTableBinding);
+    if (!relationshipKey || !binding) {
+      continue;
+    }
+
+    const hasRoleAttribute = (content.attributes ?? []).some((attribute) => attribute.id === 'ROLLE');
+    if (!hasRoleAttribute) {
+      continue;
+    }
+
+    const schemaId = resolveLakeSchemaId(binding, lakeSchemas, tableToSchemaId);
+    if (!schemaId) {
+      console.warn(`Binding table ${binding.table} has no accessible lake schema`);
+      continue;
+    }
+
+    const sourceColumns = (binding.mappingColumns ?? []).map((mapping) => mapping.sourceColumn).filter(Boolean);
+    if (sourceColumns.length === 0) {
+      continue;
+    }
+
+    try {
+      const rows = await fetchAllLakeRows(baseUrl, token, schemaId, binding.table, sourceColumns);
+      console.log(`Binding roles ${binding.table} (${relationshipKey}): ${rows.length} rows`);
+
+      for (const row of rows) {
+        const endpoints = readBindingEndpoints(binding, row);
+        const role = readBindingRole(binding, row);
+        if (!endpoints || !role) {
+          continue;
+        }
+        addRoleToIndex(pairRoles, `${endpoints.from}|${endpoints.to}`, role);
+        addRoleToIndex(typedRoles, `${endpoints.from}|${endpoints.to}|${relationshipKey}`, role);
+      }
+    } catch (error) {
+      console.warn(`Binding table ${binding.table} unavailable: ${error.message.split('\n')[0]}`);
+    }
+  }
+
+  return { pairRoles, typedRoles };
+}
+
+function enrichRelationsWithBindingRoles(relations, roleIndex) {
+  let enriched = 0;
+
+  for (const relation of relations) {
+    const typedKey = `${relation.from}|${relation.to}|${relation.relationshipType || relation.label || ''}`;
+    const pairKey = `${relation.from}|${relation.to}`;
+    const roles = new Set([
+      ...(roleIndex.typedRoles.get(typedKey) ?? []),
+      ...(roleIndex.pairRoles.get(pairKey) ?? []),
+    ]);
+
+    if (roles.size === 0) {
+      continue;
+    }
+
+    const roleList = [...roles];
+    relation.roles = roleList;
+    relation.role = formatCombinedRolesForExport(roleList);
+    enriched += 1;
+
+    if (RELATIONSHIP_OBJECT_TYPES.has(relation.relationshipType)) {
+      relation.kind = 'location';
+    }
+  }
+
+  return enriched;
+}
+
+function dedupeRelations(relations) {
+  const byFullKey = new Map();
+  const basesWithRole = new Set();
+
+  for (const relation of relations) {
+    const baseKey = `${relation.from}|${relation.to}|${relation.relationshipType || relation.label}`;
+    const fullKey = `${baseKey}|${relation.role || ''}`;
+    if (!byFullKey.has(fullKey)) {
+      byFullKey.set(fullKey, relation);
+    }
+    if (relation.role) {
+      basesWithRole.add(baseKey);
+    }
+  }
+
+  const deduped = [];
+  for (const relation of byFullKey.values()) {
+    const baseKey = `${relation.from}|${relation.to}|${relation.relationshipType || relation.label}`;
+    if (!relation.role && basesWithRole.has(baseKey)) {
+      continue;
+    }
+    deduped.push(relation);
+  }
+
+  return deduped;
 }
 
 function rowToAttributes(row, fieldIds) {
@@ -801,21 +1094,21 @@ async function main() {
 
   const fkRelationIndex = buildFkRelationIndex(pig);
   relations.push(...inferRelationsFromForeignKeys(entities, entityById, fkRelationIndex));
+
+  const lakeSchemas = await fetchLakeSchemas(baseUrl, token);
+  const lakeTableIndex = await buildLakeTableIndex(baseUrl, token, lakeSchemas);
+  const bindingRoleIndex = await buildBindingRoleIndex(baseUrl, token, lakeSchemas, lakeTableIndex);
+  const enrichedCount = enrichRelationsWithBindingRoles(relations, bindingRoleIndex);
+  console.log(`Relations enriched with binding roles: ${enrichedCount}`);
+
   applyPersonLocations(entities, relations);
 
   const documentsEnriched = attachDocumentsFromAttributes(entities, entityById);
   console.log(`Document attachments synthesized: ${documentsEnriched}`);
 
-  const dedupedRelations = [];
-  const relationKeys = new Set();
-  for (const relation of relations) {
-    const key = `${relation.from}|${relation.to}|${relation.relationshipType || relation.label}|${relation.role || ''}`;
-    if (relationKeys.has(key)) {
-      continue;
-    }
-    relationKeys.add(key);
-    dedupedRelations.push(relation);
-  }
+  const dedupedRelations = dedupeRelations(relations);
+  const withRole = dedupedRelations.filter((relation) => relation.role).length;
+  console.log(`Relations with role label: ${withRole}`);
 
   const exportPayload = {
     exportedAt: new Date().toISOString(),

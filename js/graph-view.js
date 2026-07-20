@@ -52,6 +52,17 @@
     return [from, to].sort().join(':');
   }
 
+  function formatCombinedRoles(roles) {
+    const unique = [...new Set(roles.map((role) => String(role || '').trim()).filter(Boolean))];
+    if (unique.length === 0) {
+      return null;
+    }
+    if (unique.length <= 2) {
+      return unique.join(' · ');
+    }
+    return `${unique.slice(0, 2).join(' · ')} +${unique.length - 2}`;
+  }
+
   function createGraphState() {
     return {
       nodeIds: new Set(),
@@ -76,9 +87,9 @@
     const links = [];
     for (const rel of relations) {
       if (rel.from === entityId) {
-        links.push({ from: entityId, to: rel.to, label: rel.label });
+        links.push({ from: entityId, to: rel.to, label: rel.label, role: rel.role ?? null });
       } else if (rel.to === entityId) {
-        links.push({ from: rel.from, to: entityId, label: rel.label });
+        links.push({ from: rel.from, to: entityId, label: rel.label, role: rel.role ?? null });
       }
     }
     return links;
@@ -220,26 +231,59 @@
     }
 
     const key = linkKey(from, to);
-    if (graphState.linkKeys.has(key)) {
+    const normalizedRole = String(role || '').trim() || null;
+    const existing = graphState.links.find((link) => linkKey(link.from, link.to) === key);
+
+    if (existing) {
+      if (normalizedRole) {
+        const roles = existing.roles ?? (existing.role ? [existing.role] : []);
+        if (!roles.includes(normalizedRole)) {
+          roles.push(normalizedRole);
+          existing.roles = roles;
+          existing.role = formatCombinedRoles(roles);
+        }
+      }
       return false;
     }
 
     graphState.linkKeys.add(key);
-    graphState.links.push({ from, to, label, role });
+    const link = { from, to, label, role: normalizedRole };
+    if (normalizedRole) {
+      link.roles = [normalizedRole];
+    }
+    graphState.links.push(link);
     return true;
   }
 
-  function formatLinkAnnotation(link) {
-    const text = String(link.role || link.label || '').trim();
-    return text ? truncateLabel(text, 28) : '';
+  function formatLinkAnnotationFull(link) {
+    const role = String(link.role || '').trim();
+    if (role) {
+      return role;
+    }
+    return String(link.label || '').trim();
   }
 
-  function appendGraphLink(parent, link, fromPos, toPos) {
+  function formatLinkAnnotation(link, options = {}) {
+    const full = formatLinkAnnotationFull(link);
+    if (!full) {
+      return '';
+    }
+    const role = String(link.role || '').trim();
+    if (role) {
+      return truncateLabel(role, 22);
+    }
+    if (options.hideGenericLabels) {
+      return '';
+    }
+    return truncateLabel(full, 18);
+  }
+
+  function appendGraphLink(parent, link, fromPos, toPos, options = {}) {
     const x1 = fromPos.x;
     const y1 = fromPos.y + 8;
     const x2 = toPos.x;
     const y2 = toPos.y + 8;
-    const annotation = formatLinkAnnotation(link);
+    const annotation = formatLinkAnnotation(link, options);
 
     const group = createSvgEl('g', {
       class: 'graph-link-group',
@@ -254,6 +298,9 @@
         y1,
         x2,
         y2,
+        stroke: '#b8c2cc',
+        'stroke-width': 1.6,
+        'stroke-linecap': 'round',
       })
     );
 
@@ -265,9 +312,11 @@
       const charWidth = 5.6;
       const textWidth = annotation.length * charWidth;
       const textHeight = 11;
+      const fullAnnotation = formatLinkAnnotationFull(link);
       const labelGroup = createSvgEl('g', {
         class: 'graph-link__label',
         transform: `translate(${mx}, ${my})`,
+        'data-full-label': fullAnnotation,
       });
 
       labelGroup.appendChild(
@@ -288,6 +337,7 @@
       });
       text.textContent = annotation;
       labelGroup.appendChild(text);
+
       group.appendChild(labelGroup);
     }
 
@@ -437,13 +487,16 @@
       .map((entity) => createNode(entity, lookup, graphState.seedId));
 
     const linksLayer = createSvgEl('g', { class: 'graph-links' });
+    const labelOptions = {
+      hideGenericLabels: graphState.links.length > 12,
+    };
     for (const link of graphState.links) {
       const from = graphState.positions.get(link.from);
       const to = graphState.positions.get(link.to);
       if (!from || !to) {
         continue;
       }
-      appendGraphLink(linksLayer, link, from, to);
+      appendGraphLink(linksLayer, link, from, to, labelOptions);
     }
     viewportGroup.appendChild(linksLayer);
 
