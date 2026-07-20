@@ -2358,6 +2358,9 @@
       if (VizSearchVariant.get() === 'dock') {
         return !VizSearchVariant.isDockCollapsed();
       }
+      if (VizSearchVariant.get() === 'dropdown') {
+        return VizSearchVariant.isResultsExpanded();
+      }
       if (VizSearchVariant.needsExplicitOpen()) {
         return state.vizSearchSessionOpen && VizSearchVariant.isResultsExpanded();
       }
@@ -2508,8 +2511,10 @@
       if (ctx) {
         if (isVizDropdownCommandActive()) {
           VizSearchVariant.updateOpenState(false, ctx);
-        } else if (state.vizSearchSessionOpen && hasSearchCriteria()) {
+          state.vizSearchSessionOpen = false;
+        } else if (hasSearchCriteria()) {
           VizSearchVariant.updateOpenState(true, ctx);
+          state.vizSearchSessionOpen = true;
         }
       }
       VizSearchVariant.syncDropdownHostPosition(ctx || state.vizSearchContext);
@@ -2630,6 +2635,18 @@
         afterVizAdd('graph');
       }
     }
+  }
+
+  function attachVizResultActivation(card, entityId, context, event) {
+    if (context !== 'map' && context !== 'graph') {
+      return;
+    }
+    if (event?.button !== undefined && event.button !== 0) {
+      return;
+    }
+    event?.preventDefault();
+    event?.stopPropagation();
+    handleSearchResultSelect(entityId, context, event);
   }
 
   function groupResultsByType(items) {
@@ -2801,7 +2818,13 @@
         </div>
         ${status}
       `;
+      card.addEventListener('mousedown', (event) => {
+        attachVizResultActivation(card, entity.id, context, event);
+      });
       card.addEventListener('click', (event) => {
+        if (context === 'map' || context === 'graph') {
+          return;
+        }
         event.stopPropagation();
         handleSearchResultSelect(entity.id, context, event);
       });
@@ -2847,7 +2870,13 @@
       </div>
     `;
 
+    card.addEventListener('mousedown', (event) => {
+      attachVizResultActivation(card, entity.id, context, event);
+    });
     card.addEventListener('click', (event) => {
+      if (context === 'map' || context === 'graph') {
+        return;
+      }
       event.stopPropagation();
       handleSearchResultSelect(entity.id, context, event);
     });
@@ -3925,6 +3954,9 @@
     }
     if (VizSearchVariant.get() === 'dock') {
       return !VizSearchVariant.isDockCollapsed();
+    }
+    if (VizSearchVariant.get() === 'dropdown') {
+      return VizSearchVariant.isResultsExpanded();
     }
     if (VizSearchVariant.needsExplicitOpen()) {
       return state.vizSearchSessionOpen && VizSearchVariant.isResultsExpanded();

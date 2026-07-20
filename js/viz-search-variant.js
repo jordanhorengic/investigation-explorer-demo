@@ -540,6 +540,9 @@
     };
     panel?.addEventListener('wheel', stopWheel, { passive: true });
     results?.addEventListener('wheel', stopWheel, { passive: true });
+    panel?.addEventListener('mousedown', (event) => {
+      event.stopPropagation();
+    });
     panel?.addEventListener('click', (event) => {
       event.stopPropagation();
     });
