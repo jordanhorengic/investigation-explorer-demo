@@ -2793,20 +2793,6 @@
     renderGroupedSearchResults(items, container, context);
   }
 
-  function formatAttributeValue(value) {
-    if (value === null || value === undefined || value === '') {
-      return '—';
-    }
-    const text = String(value);
-    const parsed = Date.parse(text);
-    if (!Number.isNaN(parsed) && /^\d{4}-\d{2}-\d{2}/.test(text)) {
-      return text.includes('T')
-        ? new Date(parsed).toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' })
-        : new Date(parsed).toLocaleDateString('de-DE');
-    }
-    return text;
-  }
-
   function updateInspectorPanelContext() {
     const onMap = state.activeView === 'map';
     const onGraph = state.activeView === 'graph';
@@ -2873,7 +2859,7 @@
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${row.isKey ? '<span class="instance-table__key-icon">KEY</span>' : ''}${row.fieldId}</td>
-        <td>${formatAttributeValue(row.value)}</td>
+        <td>${DisplayNames.formatAttributeValue(row.value, row.fieldId)}</td>
       `;
       els.inspectorAttributes.appendChild(tr);
     }

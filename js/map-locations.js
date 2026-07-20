@@ -153,10 +153,11 @@
       return false;
     }
 
-    const parsed = Date.parse(dateValue);
-    if (Number.isNaN(parsed)) {
+    const parsedDate = window.DisplayNames.parseTimestamp(dateValue);
+    if (!parsedDate) {
       return false;
     }
+    const parsed = parsedDate.getTime();
 
     const monthsByPeriod = {
       '1m': 1,

@@ -229,7 +229,7 @@
         return {
           fieldId: rule.fieldId,
           fieldLabel: window.DisplayNames.formatFieldLabel(rule.fieldId),
-          value: value || '—',
+          value: window.DisplayNames.formatAttributeValue(value, rule.fieldId),
         };
       }
     }

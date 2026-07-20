@@ -25,26 +25,96 @@
     return `${value.slice(0, MATCH_VALUE_MAX_LENGTH - 1).trimEnd()}…`;
   }
 
-  function formatDate(value) {
-    if (!value) {
+  const NON_DATE_FIELDS = new Set([
+    'BAUJAHR',
+    'MANDANT',
+    'PLZ',
+    'HAUSNUMMER',
+    'FUNDORT_PLZ',
+    'FUNDORT_HAUSNUMMER',
+    'STEUER_ID',
+  ]);
+
+  function isDateTimeField(fieldId) {
+    return /ZEITSTEMPEL|UNFALL_DATUM_ZEIT|TATZEIT_|ENDE_DATUM/.test(fieldId);
+  }
+
+  function isDateField(fieldId) {
+    if (!fieldId || NON_DATE_FIELDS.has(fieldId)) {
+      return false;
+    }
+    if (/^ANZAHL_/.test(fieldId)) {
+      return false;
+    }
+    if (/^(GEO_|FUNDORT_GEO_)/.test(fieldId)) {
+      return false;
+    }
+    if (/_KG$|_EUR$|_CM$|_KW$|_CCM$|_MONATE$|PUNKTE|SCHADEN|BUSSGELD|GEWICHT|LEISTUNG|HUBRAUM|GESCHOSS|STEUER/.test(fieldId)) {
+      return false;
+    }
+    return (
+      isDateTimeField(fieldId) ||
+      /(?:DATUM|ERSTZULASSUNG|GEBURTSDATUM|EXTRAKTIONSDATUM|GUELTIG_|_AM$|_SEIT$)/.test(fieldId)
+    );
+  }
+
+  function parseTimestamp(value) {
+    if (value === null || value === undefined || value === '') {
       return null;
     }
-    const parsed = Date.parse(value);
-    if (Number.isNaN(parsed)) {
-      return value;
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      const milliseconds = value < 1e12 ? value * 1000 : value;
+      const date = new Date(milliseconds);
+      return Number.isNaN(date.getTime()) ? null : date;
     }
-    return new Date(parsed).toLocaleDateString('de-DE');
+
+    const text = String(value).trim();
+    if (/^\d{10,13}$/.test(text)) {
+      const numeric = Number(text);
+      const milliseconds = text.length <= 10 ? numeric * 1000 : numeric;
+      const date = new Date(milliseconds);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    const parsed = Date.parse(text);
+    if (Number.isNaN(parsed)) {
+      return null;
+    }
+    return new Date(parsed);
+  }
+
+  function formatDate(value) {
+    const date = parseTimestamp(value);
+    if (!date) {
+      return value ? String(value) : null;
+    }
+    return date.toLocaleDateString('de-DE');
   }
 
   function formatDateTime(value) {
-    if (!value) {
-      return null;
+    const date = parseTimestamp(value);
+    if (!date) {
+      return value ? String(value) : null;
     }
-    const parsed = Date.parse(value);
-    if (Number.isNaN(parsed)) {
-      return value;
+    return date.toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' });
+  }
+
+  function formatAttributeValue(value, fieldId) {
+    if (value === null || value === undefined || value === '') {
+      return '—';
     }
-    return new Date(parsed).toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' });
+
+    if (fieldId && isDateField(fieldId)) {
+      return isDateTimeField(fieldId) ? formatDateTime(value) : formatDate(value);
+    }
+
+    const text = String(value);
+    if (/^\d{4}-\d{2}-\d{2}/.test(text)) {
+      return text.includes('T') ? formatDateTime(text) : formatDate(text);
+    }
+
+    return text;
   }
 
   const ENTITY_ID_PATTERN = /^[0-9a-f]{4,12}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
@@ -309,7 +379,7 @@
       candidates.push({
         fieldId,
         fieldLabel,
-        value: truncateMatchValue(value),
+        value: truncateMatchValue(formatAttributeValue(rawValue, fieldId)),
         priority: 0,
       });
     }
@@ -388,10 +458,14 @@
 
   window.DisplayNames = {
     displayName,
+    formatAttributeValue,
+    formatDate,
+    formatDateTime,
     formatEntityTooltip,
     formatMapPinTooltip,
     formatMapPinTooltipHtml,
     formatObjectTooltipHtml,
+    parseTimestamp,
     resolveMatch,
     entityMatchesSearch,
     formatFieldLabel,
