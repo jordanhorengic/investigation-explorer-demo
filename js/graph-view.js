@@ -229,41 +229,6 @@
     return true;
   }
 
-  function expandRelationships(graphState, entityId, lookup, relations) {
-    if (!graphState.nodeIds.has(entityId)) {
-      addNode(graphState, entityId, lookup);
-    }
-
-    const directLinks = getDirectRelationLinks(entityId, relations);
-    let addedNodes = 0;
-    let addedLinks = 0;
-    const neighborTotal = directLinks.length;
-
-    for (const link of directLinks) {
-      const otherId = link.from === entityId ? link.to : link.from;
-      if (!lookup.has(otherId)) {
-        continue;
-      }
-      if (!graphState.nodeIds.has(otherId)) {
-        if (
-          addNode(graphState, otherId, lookup, {
-            anchorId: entityId,
-            neighborIndex: directLinks.indexOf(link),
-            neighborTotal,
-          })
-        ) {
-          addedNodes += 1;
-        }
-      }
-      if (addLink(graphState, link.from, link.to, link.label)) {
-        addedLinks += 1;
-      }
-    }
-
-    resolveOverlaps(graphState);
-    return { addedNodes, addedLinks };
-  }
-
   function createSvgEl(name, attrs = {}) {
     const el = document.createElementNS(SVG_NS, name);
     for (const [key, value] of Object.entries(attrs)) {
@@ -463,7 +428,6 @@
     addNode,
     removeNode,
     addLink,
-    expandRelationships,
     getDirectRelationLinks,
     resolveOverlaps,
     setNodePosition,

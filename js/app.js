@@ -195,7 +195,6 @@
     graphNodeTooltip: document.getElementById('graph-node-tooltip'),
     graphContextMenu: document.getElementById('graph-context-menu'),
     graphContextDetails: document.getElementById('graph-context-details'),
-    graphContextExpand: document.getElementById('graph-context-expand'),
     graphContextMap: document.getElementById('graph-context-map'),
     graphContextRemove: document.getElementById('graph-context-remove'),
     graphContextRelatedSection: document.getElementById('graph-context-related-section'),
@@ -3612,13 +3611,11 @@
     setContextMenuLabel(els.graphContextMap, 'Show on map', count);
     setContextMenuLabel(els.graphContextDetails, 'Open object details', count);
     setContextMenuLabel(els.graphContextRemove, 'Remove object', count);
-    setContextMenuLabel(els.graphContextExpand, 'Expand relationships', count);
 
     if (detailsOnly) {
       els.graphContextDetails.classList.remove('hidden');
       els.graphContextRelatedSection.classList.add('hidden');
       els.graphContextRelatedDivider.classList.add('hidden');
-      els.graphContextExpand.classList.add('hidden');
       els.graphContextMap.classList.add('hidden');
       els.graphContextRemove.classList.add('hidden');
       divider?.classList.add('hidden');
@@ -3628,7 +3625,6 @@
       els.graphContextRelatedDivider.classList.remove('hidden');
       els.graphContextRelatedLabel.textContent = `Show related objects (${count} selected)`;
       writeRelatedSettingsToUI(settings, 'graph-menu');
-      els.graphContextExpand.classList.remove('hidden');
       els.graphContextMap.classList.remove('hidden');
       els.graphContextRemove.classList.remove('hidden');
       divider?.classList.remove('hidden');
@@ -3638,7 +3634,6 @@
       els.graphContextRelatedDivider.classList.remove('hidden');
       els.graphContextRelatedLabel.textContent = 'Show related objects';
       writeRelatedSettingsToUI(settings, 'graph-menu');
-      els.graphContextExpand.classList.remove('hidden');
       els.graphContextMap.classList.remove('hidden');
       els.graphContextRemove.classList.remove('hidden');
       divider?.classList.remove('hidden');
@@ -3745,42 +3740,6 @@
 
     reconcileGraphAfterRemoval(options);
     return true;
-  }
-
-  function expandGraphFromNode(entityId, options = {}) {
-    return expandGraphFromNodes([entityId], options);
-  }
-
-  function expandGraphFromNodes(entityIds, options = {}) {
-    let lastId = null;
-
-    for (const entityId of entityIds) {
-      if (!lookup.has(entityId)) {
-        continue;
-      }
-
-      if (!graphState.nodeIds.has(entityId)) {
-        GraphView.addNode(graphState, entityId, lookup);
-        state.graphRoots.add(entityId);
-      }
-
-      GraphView.expandRelationships(graphState, entityId, lookup, relations);
-      lastId = entityId;
-    }
-
-    if (!lastId) {
-      return { addedNodes: 0, addedLinks: 0 };
-    }
-
-    state.selectedId = lastId;
-    renderGraphView();
-    refreshSearchResults();
-
-    if (options.openDetails) {
-      renderInspector(lookup.get(lastId));
-    }
-
-    return { addedNodes: 0, addedLinks: 0 };
   }
 
   function clearGraphView() {
@@ -4175,14 +4134,6 @@
     const entityId = takeGraphContextEntityId();
     if (entityId) {
       selectEntity(entityId);
-    }
-  });
-
-  els.graphContextExpand.addEventListener('click', (event) => {
-    event.stopPropagation();
-    const ids = takeGraphContextSelectionIds();
-    if (ids.length > 0) {
-      expandGraphFromNodes(ids, { openDetails: false });
     }
   });
 
