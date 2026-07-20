@@ -2677,6 +2677,18 @@
       handleSearchResultSelect(entity.id, context, event);
     });
 
+    if (context === 'map' || context === 'graph') {
+      card.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+        const menuOptions = { detailsOnly: true };
+        if (context === 'map') {
+          showMapContextMenu(entity.id, event.clientX, event.clientY, null, menuOptions);
+        } else {
+          showGraphContextMenu(entity.id, event.clientX, event.clientY, null, menuOptions);
+        }
+      });
+    }
+
     const addGraphButton = card.querySelector('.result-card__add-graph');
     if (addGraphButton) {
       addGraphButton.addEventListener('click', (event) => {
@@ -3569,20 +3581,39 @@
     setContextMenuLabel(els.mapContextGraph, 'Add to graph', count);
     setContextMenuLabel(els.mapContextDetails, 'Open object details', count);
     setContextMenuLabel(els.mapContextRemove, 'Remove object', count);
-    els.mapContextDetails.classList.toggle('hidden', detailsOnly || isMulti);
-    els.mapContextRelatedSection.classList.toggle('hidden', detailsOnly);
-    els.mapContextRelatedDivider.classList.toggle('hidden', detailsOnly);
-    if (!detailsOnly) {
-      els.mapContextRelatedLabel.textContent = isMulti
-        ? `Show related objects (${count} selected)`
-        : 'Show related objects';
+
+    if (detailsOnly) {
+      els.mapContextDetails.classList.remove('hidden');
+      els.mapContextRelatedSection.classList.add('hidden');
+      els.mapContextRelatedDivider.classList.add('hidden');
+      setContextMenuItemsVisibility(
+        els.mapContextMenu,
+        ['map-context-graph', 'map-context-remove'],
+        true
+      );
+    } else if (isMulti) {
+      els.mapContextDetails.classList.add('hidden');
+      els.mapContextRelatedSection.classList.remove('hidden');
+      els.mapContextRelatedDivider.classList.remove('hidden');
+      els.mapContextRelatedLabel.textContent = `Show related objects (${count} selected)`;
       writeRelatedSettingsToUI(settings, 'menu');
+      setContextMenuItemsVisibility(
+        els.mapContextMenu,
+        ['map-context-graph', 'map-context-remove'],
+        false
+      );
+    } else {
+      els.mapContextDetails.classList.remove('hidden');
+      els.mapContextRelatedSection.classList.remove('hidden');
+      els.mapContextRelatedDivider.classList.remove('hidden');
+      els.mapContextRelatedLabel.textContent = 'Show related objects';
+      writeRelatedSettingsToUI(settings, 'menu');
+      setContextMenuItemsVisibility(
+        els.mapContextMenu,
+        ['map-context-graph', 'map-context-remove'],
+        false
+      );
     }
-    setContextMenuItemsVisibility(
-      els.mapContextMenu,
-      ['map-context-graph', 'map-context-remove'],
-      detailsOnly
-    );
 
     openContextMenu(els.mapContextMenu, clientX, clientY);
   }
