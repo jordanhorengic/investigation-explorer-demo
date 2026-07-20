@@ -198,6 +198,15 @@
     graphContextExpand: document.getElementById('graph-context-expand'),
     graphContextMap: document.getElementById('graph-context-map'),
     graphContextRemove: document.getElementById('graph-context-remove'),
+    graphContextRelatedSection: document.getElementById('graph-context-related-section'),
+    graphContextRelatedLabel: document.getElementById('graph-context-related-label'),
+    graphContextRelatedDivider: document.getElementById('graph-context-related-divider'),
+    graphMenuShowRelated: document.getElementById('graph-menu-show-related'),
+    graphMenuRelatedRow: document.getElementById('graph-menu-related-row'),
+    graphMenuRelatedTypeFilters: document.getElementById('graph-menu-related-type-filters'),
+    graphMenuRelatedFiltersFlyout: document.getElementById('graph-menu-related-filters-flyout'),
+    graphMenuRelatedTimePeriod: document.getElementById('graph-menu-related-time-period'),
+    graphMenuRelatedDistance: document.getElementById('graph-menu-related-distance'),
     btnGraphClear: document.getElementById('btn-graph-clear'),
     btnGraphZoomIn: document.getElementById('btn-graph-zoom-in'),
     btnGraphZoomOut: document.getElementById('btn-graph-zoom-out'),
@@ -246,12 +255,46 @@
       };
     }
 
+    if (source === 'graph-menu') {
+      return {
+        showRelated: els.graphMenuShowRelated,
+        relatedRow: els.graphMenuRelatedRow,
+        typeFilters: els.graphMenuRelatedTypeFilters,
+        timePeriod: els.graphMenuRelatedTimePeriod,
+        distance: els.graphMenuRelatedDistance,
+      };
+    }
+
     return {
       showRelated: els.showRelatedObjects,
       filters: els.relatedObjectFilters,
       typeFilters: els.relatedTypeFilters,
       timePeriod: els.relatedTimePeriod,
       distance: els.relatedDistance,
+    };
+  }
+
+  function getContextMenuRelatedConfig(context) {
+    if (context === 'graph') {
+      return {
+        context,
+        menu: els.graphContextMenu,
+        row: els.graphMenuRelatedRow,
+        flyout: els.graphMenuRelatedFiltersFlyout,
+        typeFilters: els.graphMenuRelatedTypeFilters,
+        idPrefix: 'graph-menu-related-type',
+        onChange: applyGraphContextMenuRelatedOptions,
+      };
+    }
+
+    return {
+      context: 'map',
+      menu: els.mapContextMenu,
+      row: els.menuRelatedRow,
+      flyout: els.menuRelatedFiltersFlyout,
+      typeFilters: els.menuRelatedTypeFilters,
+      idPrefix: 'menu-related-type',
+      onChange: applyContextMenuRelatedOptions,
     };
   }
 
@@ -513,7 +556,6 @@
         event.stopPropagation();
         const open = ui.panel.classList.contains('hidden');
         closeMenuRelatedFlyouts();
-        closeRelatedTypeMultiselect(els.menuRelatedTypeFilters);
         closeRelatedTypeMultiselect(els.relatedTypeFilters);
         ui.panel.classList.toggle('hidden', !open);
         ui.trigger.setAttribute('aria-expanded', String(open));
@@ -567,31 +609,35 @@
     closeRelatedTypeMultiselect(container);
   }
 
-  function renderMenuRelatedTypeFilters(activeFilters) {
-    renderRelatedTypeMultiselect(els.menuRelatedTypeFilters, activeFilters, {
-      idPrefix: 'menu-related-type',
-      onChange: applyContextMenuRelatedOptions,
-      onOpen: () => requestAnimationFrame(() => positionMenuRelatedFlyout()),
+  function renderMenuRelatedTypeFilters(activeFilters, context = 'map') {
+    const config = getContextMenuRelatedConfig(context);
+    renderRelatedTypeMultiselect(config.typeFilters, activeFilters, {
+      idPrefix: config.idPrefix,
+      onChange: config.onChange,
+      onOpen: () => requestAnimationFrame(() => positionMenuRelatedFlyout(context)),
       stopPropagation: true,
     });
   }
 
-  function syncMenuRelatedFiltersFlyout(settings) {
-    renderMenuRelatedTypeFilters(normalizePinTypeFilters(settings));
-    els.menuRelatedTimePeriod.value = settings.timePeriod || 'all';
-    els.menuRelatedDistance.value = formatDistanceMiles(settings.distanceMiles);
+  function syncContextMenuRelatedFiltersFlyout(settings, context = 'map') {
+    const config = getContextMenuRelatedConfig(context);
+    renderMenuRelatedTypeFilters(normalizePinTypeFilters(settings), context);
+    const ui = getRelatedUiElements(context === 'graph' ? 'graph-menu' : 'menu');
+    ui.timePeriod.value = settings.timePeriod || 'all';
+    ui.distance.value = formatDistanceMiles(settings.distanceMiles);
 
-    if (openMenuRelatedFlyout) {
-      requestAnimationFrame(() => positionMenuRelatedFlyout());
+    if (openMenuRelatedFlyoutContext === context) {
+      requestAnimationFrame(() => positionMenuRelatedFlyout(context));
     }
   }
 
-  let openMenuRelatedFlyout = false;
+  let openMenuRelatedFlyoutContext = null;
 
-  function positionMenuRelatedFlyout() {
-    const flyout = els.menuRelatedFiltersFlyout;
-    const anchor = els.menuRelatedRow;
-    const menu = els.mapContextMenu;
+  function positionMenuRelatedFlyout(context = openMenuRelatedFlyoutContext || 'map') {
+    const config = getContextMenuRelatedConfig(context);
+    const flyout = config.flyout;
+    const anchor = config.row;
+    const menu = config.menu;
     if (!flyout || !anchor || !menu) {
       return;
     }
@@ -627,20 +673,42 @@
 
   function closeMenuRelatedFlyouts() {
     closeRelatedTypeMultiselect(els.menuRelatedTypeFilters);
+    closeRelatedTypeMultiselect(els.graphMenuRelatedTypeFilters);
     els.menuRelatedFiltersFlyout?.classList.add('hidden');
+    els.graphMenuRelatedFiltersFlyout?.classList.add('hidden');
     els.menuRelatedRow?.classList.remove('is-open');
-    openMenuRelatedFlyout = false;
+    els.graphMenuRelatedRow?.classList.remove('is-open');
+    openMenuRelatedFlyoutContext = null;
   }
 
-  function openMenuRelatedFlyoutPanel() {
-    if (!els.menuRelatedFiltersFlyout || !els.menuShowRelated.checked) {
+  function openMenuRelatedFlyoutPanel(context = 'map') {
+    const config = getContextMenuRelatedConfig(context);
+    const ui = getRelatedUiElements(context === 'graph' ? 'graph-menu' : 'menu');
+    if (!config.flyout || !ui.showRelated.checked) {
       return;
     }
 
-    openMenuRelatedFlyout = true;
-    els.menuRelatedRow?.classList.add('is-open');
-    positionMenuRelatedFlyout();
-    requestAnimationFrame(() => positionMenuRelatedFlyout());
+    openMenuRelatedFlyoutContext = context;
+    config.row?.classList.add('is-open');
+    positionMenuRelatedFlyout(context);
+    requestAnimationFrame(() => positionMenuRelatedFlyout(context));
+  }
+
+  function updateContextMenuRelatedFilterVisibility(context = 'map') {
+    const config = getContextMenuRelatedConfig(context);
+    const ui = getRelatedUiElements(context === 'graph' ? 'graph-menu' : 'menu');
+    const enabled = ui.showRelated.checked;
+    config.row?.classList.toggle('is-enabled', enabled);
+    config.row?.classList.toggle('is-checked', enabled);
+
+    if (enabled) {
+      openMenuRelatedFlyoutPanel(context);
+      return;
+    }
+
+    if (openMenuRelatedFlyoutContext === context) {
+      closeMenuRelatedFlyouts();
+    }
   }
 
   function renderRelatedTypeFilters(activeFilters) {
@@ -671,9 +739,9 @@
     ui.timePeriod.value = settings.timePeriod || 'all';
     ui.distance.value = formatDistanceMiles(settings.distanceMiles);
 
-    if (target === 'menu') {
-      syncMenuRelatedFiltersFlyout(settings);
-      updateMenuRelatedFilterVisibility();
+    if (target === 'menu' || target === 'graph-menu') {
+      syncContextMenuRelatedFiltersFlyout(settings, target === 'graph-menu' ? 'graph' : 'map');
+      updateContextMenuRelatedFilterVisibility(target === 'graph-menu' ? 'graph' : 'map');
       return;
     }
 
@@ -682,16 +750,11 @@
   }
 
   function updateMenuRelatedFilterVisibility() {
-    const enabled = els.menuShowRelated.checked;
-    els.menuRelatedRow?.classList.toggle('is-enabled', enabled);
-    els.menuRelatedRow?.classList.toggle('is-checked', enabled);
+    updateContextMenuRelatedFilterVisibility('map');
+  }
 
-    if (enabled) {
-      openMenuRelatedFlyoutPanel();
-      return;
-    }
-
-    closeMenuRelatedFlyouts();
+  function updateGraphMenuRelatedFilterVisibility() {
+    updateContextMenuRelatedFilterVisibility('graph');
   }
 
   function getPinSettings(entityId) {
@@ -1888,13 +1951,13 @@
     );
   }
 
-  function applyContextMenuRelatedOptions() {
-    const ids = mapContextSelectionIds.filter((entityId) => lookup.has(entityId));
+  function applyVizContextMenuRelatedOptions(selectionIds, uiSource) {
+    const ids = selectionIds.filter((entityId) => lookup.has(entityId));
     if (ids.length === 0) {
       return;
     }
 
-    const settings = readRelatedSettingsFromUI('menu');
+    const settings = readRelatedSettingsFromUI(uiSource);
     for (const entityId of ids) {
       applyRelatedSettingsForEntity(entityId, settings, {
         skipRender: true,
@@ -1909,7 +1972,18 @@
 
     if (state.activeView === 'map') {
       renderMapPins({ preserveView: true });
+    } else if (state.activeView === 'graph') {
+      syncGraphRelatedObjects();
+      refreshSearchResults();
     }
+  }
+
+  function applyContextMenuRelatedOptions() {
+    applyVizContextMenuRelatedOptions(mapContextSelectionIds, 'menu');
+  }
+
+  function applyGraphContextMenuRelatedOptions() {
+    applyVizContextMenuRelatedOptions(graphContextSelectionIds, 'graph-menu');
   }
 
   function clearMultiSelection() {
@@ -3318,6 +3392,9 @@
     els.graphContextMenu.classList.add('hidden');
     graphContextEntityId = null;
     graphContextSelectionIds = [];
+    if (openMenuRelatedFlyoutContext === 'graph') {
+      closeMenuRelatedFlyouts();
+    }
     if (openContextMenuState?.menu === els.graphContextMenu) {
       openContextMenuState = null;
     }
@@ -3380,7 +3457,8 @@
     return Boolean(
       target.closest('#map-context-menu') ||
         target.closest('#graph-context-menu') ||
-        target.closest('#menu-related-filters-flyout')
+        target.closest('#menu-related-filters-flyout') ||
+        target.closest('#graph-menu-related-filters-flyout')
     );
   }
 
@@ -3402,6 +3480,7 @@
       els.mapContextMenu,
       els.graphContextMenu,
       els.menuRelatedFiltersFlyout,
+      els.graphMenuRelatedFiltersFlyout,
     ]) {
       if (menu && menu.parentElement !== document.body) {
         document.body.appendChild(menu);
@@ -3419,11 +3498,19 @@
       if (els.menuRelatedTypeFilters && !els.menuRelatedTypeFilters.contains(event.target)) {
         closeRelatedTypeMultiselect(els.menuRelatedTypeFilters);
       }
+      if (els.graphMenuRelatedTypeFilters && !els.graphMenuRelatedTypeFilters.contains(event.target)) {
+        closeRelatedTypeMultiselect(els.graphMenuRelatedTypeFilters);
+      }
 
-      const inMenu = els.mapContextMenu?.contains(event.target);
-      const inFlyout = els.menuRelatedFiltersFlyout?.contains(event.target);
+      const inMapMenu = els.mapContextMenu?.contains(event.target);
+      const inMapFlyout = els.menuRelatedFiltersFlyout?.contains(event.target);
+      const inGraphMenu = els.graphContextMenu?.contains(event.target);
+      const inGraphFlyout = els.graphMenuRelatedFiltersFlyout?.contains(event.target);
 
-      if (openMenuRelatedFlyout && !inMenu && !inFlyout) {
+      if (openMenuRelatedFlyoutContext === 'map' && !inMapMenu && !inMapFlyout) {
+        closeMenuRelatedFlyouts();
+      }
+      if (openMenuRelatedFlyoutContext === 'graph' && !inGraphMenu && !inGraphFlyout) {
         closeMenuRelatedFlyouts();
       }
 
@@ -3481,8 +3568,8 @@
       openContextMenuState.y
     );
 
-    if (openMenuRelatedFlyout) {
-      positionMenuRelatedFlyout();
+    if (openMenuRelatedFlyoutContext) {
+      positionMenuRelatedFlyout(openMenuRelatedFlyoutContext);
     }
   }
 
@@ -3518,7 +3605,9 @@
         : getContextSelectionIds();
     const count = graphContextSelectionIds.length;
     const isMulti = count > 1;
-    const divider = els.graphContextMenu?.querySelector('.context-menu__divider');
+    const settings =
+      count === 1 ? getPinSettings(entityId) : getBulkRelatedSettings(graphContextSelectionIds);
+    const divider = els.graphContextMenu?.querySelector('.context-menu__divider:not(#graph-context-related-divider)');
 
     setContextMenuLabel(els.graphContextMap, 'Show on map', count);
     setContextMenuLabel(els.graphContextDetails, 'Open object details', count);
@@ -3527,18 +3616,28 @@
 
     if (detailsOnly) {
       els.graphContextDetails.classList.remove('hidden');
+      els.graphContextRelatedSection.classList.add('hidden');
+      els.graphContextRelatedDivider.classList.add('hidden');
       els.graphContextExpand.classList.add('hidden');
       els.graphContextMap.classList.add('hidden');
       els.graphContextRemove.classList.add('hidden');
       divider?.classList.add('hidden');
     } else if (isMulti) {
       els.graphContextDetails.classList.add('hidden');
+      els.graphContextRelatedSection.classList.remove('hidden');
+      els.graphContextRelatedDivider.classList.remove('hidden');
+      els.graphContextRelatedLabel.textContent = `Show related objects (${count} selected)`;
+      writeRelatedSettingsToUI(settings, 'graph-menu');
       els.graphContextExpand.classList.remove('hidden');
       els.graphContextMap.classList.remove('hidden');
       els.graphContextRemove.classList.remove('hidden');
       divider?.classList.remove('hidden');
     } else {
       els.graphContextDetails.classList.remove('hidden');
+      els.graphContextRelatedSection.classList.remove('hidden');
+      els.graphContextRelatedDivider.classList.remove('hidden');
+      els.graphContextRelatedLabel.textContent = 'Show related objects';
+      writeRelatedSettingsToUI(settings, 'graph-menu');
       els.graphContextExpand.classList.remove('hidden');
       els.graphContextMap.classList.remove('hidden');
       els.graphContextRemove.classList.remove('hidden');
@@ -3776,6 +3875,8 @@
 
   function initRelatedTypeFilters() {
     renderRelatedTypeFilters(null);
+    renderMenuRelatedTypeFilters(null, 'map');
+    renderMenuRelatedTypeFilters(null, 'graph');
   }
 
   function syncWorkbenchTabs() {
@@ -4126,6 +4227,24 @@
   });
   els.mapContextRelatedSection?.addEventListener('mousedown', (event) => event.stopPropagation());
   els.mapContextRelatedSection?.addEventListener('click', (event) => event.stopPropagation());
+
+  els.graphMenuShowRelated.addEventListener('click', (event) => {
+    event.stopPropagation();
+  });
+  els.graphMenuShowRelated.addEventListener('change', () => {
+    updateGraphMenuRelatedFilterVisibility();
+    applyGraphContextMenuRelatedOptions();
+  });
+  els.graphMenuRelatedTimePeriod.addEventListener('change', applyGraphContextMenuRelatedOptions);
+  els.graphMenuRelatedDistance.addEventListener('change', applyGraphContextMenuRelatedOptions);
+  els.graphMenuRelatedRow?.addEventListener('mousedown', (event) => event.stopPropagation());
+  els.graphMenuRelatedFiltersFlyout?.addEventListener('mousedown', (event) => event.stopPropagation());
+  els.graphMenuRelatedFiltersFlyout?.addEventListener('click', (event) => event.stopPropagation());
+  els.graphMenuRelatedFiltersFlyout?.addEventListener('wheel', (event) => event.stopPropagation(), {
+    passive: true,
+  });
+  els.graphContextRelatedSection?.addEventListener('mousedown', (event) => event.stopPropagation());
+  els.graphContextRelatedSection?.addEventListener('click', (event) => event.stopPropagation());
 
   els.mapContextGraph.addEventListener('click', (event) => {
     event.stopPropagation();

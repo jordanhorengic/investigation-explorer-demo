@@ -330,6 +330,56 @@
                       </span>
                       <span class="context-menu__label">Open object details</span>
                     </button>
+                    <div id="graph-context-related-section" class="context-menu__section hidden">
+                      <div class="context-menu__divider context-menu__divider--section" aria-hidden="true"></div>
+                      <div id="graph-menu-related-row" class="context-menu__item context-menu__item--related">
+                        <span class="context-menu__icon" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                            <circle cx="7" cy="7" r="3"/>
+                            <circle cx="17" cy="17" r="3"/>
+                            <path d="M9.5 9.5 14.5 14.5"/>
+                          </svg>
+                        </span>
+                        <label id="graph-context-related-label" class="context-menu__label" for="graph-menu-show-related">Show related objects</label>
+                        <label class="context-menu__check">
+                          <input id="graph-menu-show-related" type="checkbox" />
+                          <span class="context-menu__check-mark"></span>
+                        </label>
+                      </div>
+                    </div>
+                    <div id="graph-menu-related-filters-flyout" class="context-menu context-menu--flyout hidden" role="dialog" aria-label="Related filters">
+                      <div class="context-menu__flyout-form">
+                        <div class="context-menu__field">
+                          <span class="context-menu__field-label">Object types</span>
+                          <div id="graph-menu-related-type-filters" class="type-multiselect"></div>
+                        </div>
+                        <label class="context-menu__field" for="graph-menu-related-time-period">
+                          <span class="context-menu__field-label">Time period</span>
+                          <select id="graph-menu-related-time-period" class="context-menu__select">
+                            <option value="all">All time</option>
+                            <option value="1m">Last 30 days</option>
+                            <option value="3m">Last 3 months</option>
+                            <option value="6m">Last 6 months</option>
+                            <option value="12m">Last 12 months</option>
+                            <option value="24m">Last 24 months</option>
+                            <option value="36m">Last 3 years</option>
+                            <option value="5y">Last 5 years</option>
+                          </select>
+                        </label>
+                        <label class="context-menu__field" for="graph-menu-related-distance">
+                          <span class="context-menu__field-label">Distance</span>
+                          <select id="graph-menu-related-distance" class="context-menu__select">
+                            <option value="">Any distance</option>
+                            <option value="1">Within 1 mile</option>
+                            <option value="5">Within 5 miles</option>
+                            <option value="10">Within 10 miles</option>
+                            <option value="25">Within 25 miles</option>
+                            <option value="50">Within 50 miles</option>
+                          </select>
+                        </label>
+                      </div>
+                    </div>
+                    <div id="graph-context-related-divider" class="context-menu__divider hidden" role="separator" aria-hidden="true"></div>
                     <button id="graph-context-expand" class="context-menu__item" type="button" role="menuitem">
                       <span class="context-menu__icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
@@ -617,6 +667,6 @@
     <script src="./js/empty-states.js?v=20260716w"></script>
     <script src="./js/graph-view.js"></script>
     <script src="./js/new-object.js"></script>
-    <script src="./js/app.js?v=20260720c"></script>
+    <script src="./js/app.js?v=20260720d"></script>
   </body>
 </html>
