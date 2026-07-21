@@ -49,7 +49,100 @@
   }
 
   function linkKey(from, to) {
-    return [from, to].sort().join(':');
+    return `${from}|${to}`;
+  }
+
+  const LINK_ANCHOR_OFFSET_Y = 8;
+  const SOURCE_CLEARANCE = 30;
+  const TARGET_CLEARANCE = 38;
+  const ARROW_LENGTH = 10;
+  const ARROW_WIDTH = 8;
+  const LABEL_FRACTION = 0.34;
+  const LABEL_NORMAL_OFFSET = 11;
+
+  function computeLinkGeometry(fromPos, toPos) {
+    const sx = fromPos.x;
+    const sy = fromPos.y + LINK_ANCHOR_OFFSET_Y;
+    const tx = toPos.x;
+    const ty = toPos.y + LINK_ANCHOR_OFFSET_Y;
+    const dx = tx - sx;
+    const dy = ty - sy;
+    const length = Math.hypot(dx, dy) || 1;
+    const ux = dx / length;
+    const uy = dy / length;
+    const nx = -uy;
+    const ny = ux;
+    const minLength = SOURCE_CLEARANCE + TARGET_CLEARANCE + ARROW_LENGTH + 6;
+
+    let x1 = sx;
+    let y1 = sy;
+    let tipX = tx;
+    let tipY = ty;
+
+    if (length > minLength) {
+      x1 = sx + ux * SOURCE_CLEARANCE;
+      y1 = sy + uy * SOURCE_CLEARANCE;
+      tipX = tx - ux * TARGET_CLEARANCE;
+      tipY = ty - uy * TARGET_CLEARANCE;
+    }
+
+    const baseX = tipX - ux * ARROW_LENGTH;
+    const baseY = tipY - uy * ARROW_LENGTH;
+    const labelOffset = length > 96 ? LABEL_NORMAL_OFFSET : length > 64 ? 7 : 0;
+    const lx = sx + dx * LABEL_FRACTION + nx * labelOffset;
+    const ly = sy + dy * LABEL_FRACTION + ny * labelOffset;
+
+    return {
+      sx,
+      sy,
+      tx,
+      ty,
+      x1,
+      y1,
+      x2: baseX,
+      y2: baseY,
+      tipX,
+      tipY,
+      ux,
+      uy,
+      lx,
+      ly,
+    };
+  }
+
+  function arrowHeadPath(geometry) {
+    const { tipX, tipY, ux, uy } = geometry;
+    const px = -uy;
+    const py = ux;
+    const halfW = ARROW_WIDTH / 2;
+    const backX = tipX - ux * ARROW_LENGTH;
+    const backY = tipY - uy * ARROW_LENGTH;
+    return `M ${tipX} ${tipY} L ${backX + px * halfW} ${backY + py * halfW} L ${backX - px * halfW} ${backY - py * halfW} Z`;
+  }
+
+  function ensureLinkArrowMarker(defs) {
+    // Legacy marker retained for compatibility; arrows are rendered explicitly now.
+    if (defs.querySelector('#graph-link-arrow')) {
+      return;
+    }
+
+    const marker = createSvgEl('marker', {
+      id: 'graph-link-arrow',
+      viewBox: '0 0 10 10',
+      refX: 9,
+      refY: 5,
+      markerWidth: 5,
+      markerHeight: 5,
+      orient: 'auto',
+      markerUnits: 'strokeWidth',
+    });
+    marker.appendChild(
+      createSvgEl('path', {
+        d: 'M 0 1.5 L 9 5 L 0 8.5 Z',
+        fill: '#738596',
+      })
+    );
+    defs.appendChild(marker);
   }
 
   function formatCombinedRoles(roles) {
@@ -86,10 +179,8 @@
   function getDirectRelationLinks(entityId, relations) {
     const links = [];
     for (const rel of relations) {
-      if (rel.from === entityId) {
-        links.push({ from: entityId, to: rel.to, label: rel.label, role: rel.role ?? null });
-      } else if (rel.to === entityId) {
-        links.push({ from: rel.from, to: entityId, label: rel.label, role: rel.role ?? null });
+      if (rel.from === entityId || rel.to === entityId) {
+        links.push({ from: rel.from, to: rel.to, label: rel.label, role: rel.role ?? null });
       }
     }
     return links;
@@ -267,11 +358,43 @@
     return truncateLabel(role, 22);
   }
 
-  function appendGraphLink(parent, link, fromPos, toPos) {
-    const x1 = fromPos.x;
-    const y1 = fromPos.y + 8;
-    const x2 = toPos.x;
-    const y2 = toPos.y + 8;
+  function updateGraphLinkGeometry(group, fromPos, toPos, svgEl = null) {
+    const geometry = computeLinkGeometry(fromPos, toPos);
+    const line = group.querySelector('.graph-link');
+    if (line) {
+      line.setAttribute('x1', geometry.x1);
+      line.setAttribute('y1', geometry.y1);
+      line.setAttribute('x2', geometry.x2);
+      line.setAttribute('y2', geometry.y2);
+    }
+
+    const label = group.querySelector('.graph-link__label');
+    if (label) {
+      label.setAttribute('transform', `translate(${geometry.lx}, ${geometry.ly})`);
+    }
+
+    const arrowSelector = `.graph-link__arrowhead[data-from="${group.dataset.from}"][data-to="${group.dataset.to}"]`;
+    const arrow =
+      group.querySelector('.graph-link__arrowhead') ||
+      (svgEl ? svgEl.querySelector(arrowSelector) : null);
+    if (arrow) {
+      arrow.setAttribute('d', arrowHeadPath(geometry));
+    }
+  }
+
+  function appendGraphLinkArrow(parent, link, geometry) {
+    parent.appendChild(
+      createSvgEl('path', {
+        class: 'graph-link__arrowhead',
+        d: arrowHeadPath(geometry),
+        'data-from': link.from,
+        'data-to': link.to,
+      })
+    );
+  }
+
+  function appendGraphLink(parent, link, fromPos, toPos, arrowsLayer = null) {
+    const geometry = computeLinkGeometry(fromPos, toPos);
     const annotation = formatLinkAnnotation(link);
 
     const group = createSvgEl('g', {
@@ -283,10 +406,10 @@
     group.appendChild(
       createSvgEl('line', {
         class: 'graph-link',
-        x1,
-        y1,
-        x2,
-        y2,
+        x1: geometry.x1,
+        y1: geometry.y1,
+        x2: geometry.x2,
+        y2: geometry.y2,
         stroke: '#b8c2cc',
         'stroke-width': 1.6,
         'stroke-linecap': 'round',
@@ -294,8 +417,6 @@
     );
 
     if (annotation) {
-      const mx = (x1 + x2) / 2;
-      const my = (y1 + y2) / 2;
       const paddingX = 6;
       const paddingY = 3;
       const charWidth = 5.6;
@@ -304,8 +425,10 @@
       const fullAnnotation = formatLinkAnnotationFull(link);
       const labelGroup = createSvgEl('g', {
         class: 'graph-link__label',
-        transform: `translate(${mx}, ${my})`,
+        transform: `translate(${geometry.lx}, ${geometry.ly})`,
         'data-full-label': fullAnnotation,
+        'data-from': link.from,
+        'data-to': link.to,
       });
 
       labelGroup.appendChild(
@@ -331,6 +454,9 @@
     }
 
     parent.appendChild(group);
+    if (arrowsLayer) {
+      appendGraphLinkArrow(arrowsLayer, link, geometry);
+    }
   }
 
   function createSvgEl(name, attrs = {}) {
@@ -359,6 +485,7 @@
       })
     );
     defs.appendChild(pattern);
+    ensureLinkArrowMarker(defs);
     parent.appendChild(defs);
 
     parent.appendChild(createSvgEl('rect', { x: 0, y: 0, width: WIDTH, height: HEIGHT, fill: '#f7f8fa' }));
@@ -476,6 +603,7 @@
       .map((entity) => createNode(entity, lookup, graphState.seedId));
 
     const linksLayer = createSvgEl('g', { class: 'graph-links' });
+    const linkGeometries = [];
     for (const link of graphState.links) {
       const from = graphState.positions.get(link.from);
       const to = graphState.positions.get(link.to);
@@ -483,6 +611,7 @@
         continue;
       }
       appendGraphLink(linksLayer, link, from, to);
+      linkGeometries.push({ link, from, to });
     }
     viewportGroup.appendChild(linksLayer);
 
@@ -495,6 +624,12 @@
       appendIsometricNode(nodesLayer, node, position, selectedId, multiSelectedIds);
     }
     viewportGroup.appendChild(nodesLayer);
+
+    const arrowsLayer = createSvgEl('g', { class: 'graph-link-arrows' });
+    for (const entry of linkGeometries) {
+      appendGraphLinkArrow(arrowsLayer, entry.link, computeLinkGeometry(entry.from, entry.to));
+    }
+    viewportGroup.appendChild(arrowsLayer);
     svgEl.appendChild(viewportGroup);
 
     return { nodeCount: nodes.length, linkCount: graphState.links.length };
@@ -525,6 +660,7 @@
     getDirectRelationLinks,
     resolveOverlaps,
     setNodePosition,
+    updateGraphLinkGeometry,
     renderGraphState,
     clearGraphSvg,
   };

@@ -990,9 +990,12 @@
     function mergeRolesForLink(from, to) {
       const roles = [];
       for (const rel of relations) {
-        const matches =
-          (rel.from === from && rel.to === to) || (rel.from === to && rel.to === from);
-        if (matches && rel.role) {
+        if (rel.from !== from || rel.to !== to) {
+          continue;
+        }
+        if (Array.isArray(rel.roles) && rel.roles.length > 0) {
+          roles.push(...rel.roles);
+        } else if (rel.role) {
           roles.push(rel.role);
         }
       }
@@ -1023,12 +1026,12 @@
           if (!graphState.nodeIds.has(otherId)) {
             continue;
           }
-          const pairKey = [rootId, otherId].sort().join(':');
+          const pairKey = `${rel.from}|${rel.to}`;
           if (seenPairs.has(pairKey)) {
             continue;
           }
           seenPairs.add(pairKey);
-          addMergedLink(rootId, otherId, rel.label, rel.role ?? null);
+          addMergedLink(rel.from, rel.to, rel.label, rel.role ?? null);
         }
       }
       return;
@@ -1057,7 +1060,7 @@
         if (!graphState.nodeIds.has(entry.entityId) || entry.entityId === entry.anchorId) {
           continue;
         }
-        addMergedLink(entry.anchorId, entry.entityId, entry.label, entry.role ?? null);
+        addMergedLink(entry.from, entry.to, entry.label, entry.role ?? null);
       }
     }
   }
@@ -3433,22 +3436,7 @@
         continue;
       }
 
-      const x1 = from.x;
-      const y1 = from.y + 8;
-      const x2 = to.x;
-      const y2 = to.y + 8;
-      const line = group.querySelector('.graph-link');
-      if (line) {
-        line.setAttribute('x1', x1);
-        line.setAttribute('y1', y1);
-        line.setAttribute('x2', x2);
-        line.setAttribute('y2', y2);
-      }
-
-      const label = group.querySelector('.graph-link__label');
-      if (label) {
-        label.setAttribute('transform', `translate(${(x1 + x2) / 2}, ${(y1 + y2) / 2})`);
-      }
+      GraphView.updateGraphLinkGeometry(group, from, to, els.graphSvg);
     }
   }
 

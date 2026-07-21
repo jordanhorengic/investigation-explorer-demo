@@ -958,6 +958,8 @@
             entries.push({
               entityId,
               anchorId: rootEntity.id,
+              from: rel.from,
+              to: rel.to,
               label: rel.label,
               role: rel.role ?? null,
             });
