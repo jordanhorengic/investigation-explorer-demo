@@ -89,6 +89,43 @@ const LOCATION_ROLE_BY_REL = {
   Organisation_Niederlassung_Oertlichkeit: 'Branch',
 };
 
+const CONNECTION_TYPE_BY_RELATIONSHIP = {
+  Person_Wohnsitz_Oertlichkeit: 'residence',
+  Person_Arbeitsstaette_Oertlichkeit: 'workplace',
+  Person_Aufenthaltsort_Oertlichkeit: 'last sighting',
+  Organisation_Sitz_Oertlichkeit: 'headquarters',
+  Organisation_Niederlassung_Oertlichkeit: 'branch',
+  Straftat_Tatort_Oertlichkeit: 'crime scene',
+  Ordnungswidrigkeit_Tatort_Oertlichkeit: 'offence scene',
+  Verkehrsunfall_Ort_Oertlichkeit: 'accident location',
+  Verkehrsunfall_Unfallort_Oertlichkeit: 'accident location',
+  Massnahme_Massnahmeort_Oertlichkeit: 'measure location',
+  Straftat_Fluchtweg_Oertlichkeit: 'escape route',
+  Straftat_Vorbereitungsort_Oertlichkeit: 'preparation site',
+  Dokumente_Oertlichkeit: 'found at',
+};
+
+const CONNECTION_TYPE_BY_ROLE = {
+  Home: 'residence',
+  Work: 'workplace',
+  Whereabouts: 'last sighting',
+  Headquarter: 'headquarters',
+  Branch: 'branch',
+  'Measure location': 'measure location',
+  'Preparation site': 'preparation site',
+};
+
+const FK_LOCATION_CONNECTIONS = [
+  { types: ['Organisation'], field: 'SITZ_OERTLICHKEIT_ID', type: 'headquarters' },
+  { types: ['Criminal Offence'], field: 'TATORT_ID', type: 'crime scene' },
+  { types: ['Regulatory Offence'], field: 'TATORT_ID', type: 'offence scene' },
+  { types: ['Traffic Accident'], field: 'ORT_ID', type: 'accident location' },
+  { types: ['Police Measure'], field: 'ORT_ID', type: 'measure location' },
+  { types: ['Firearm'], field: 'FUNDORT_OERTLICHKEIT_ID', type: 'found at' },
+  { types: ['Firearm'], field: 'FUNDORT_ID', type: 'found at' },
+  { types: ['Documents'], field: 'FUNDORT_OERTLICHKEIT_ID', type: 'found at' },
+];
+
 const ROLE_LABEL_MAP = {
   Halter: 'Vehicle holder',
   Fahrer: 'Driver',
@@ -235,7 +272,7 @@ async function ensurePerspectiveLoaded(baseUrl, token, perspectiveKey) {
   console.log('Loading perspective cache...');
   await apiPut(baseUrl, token, `${base}/load`);
 
-  for (let attempt = 0; attempt < 20; attempt += 1) {
+  for (let attempt = 0; attempt < 45; attempt += 1) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     const status = await apiGet(baseUrl, token, `${base}/load/terminal-status`);
     if (status.phase === 'SUCCESS' || status.status === 'COMPLETED') {
@@ -531,9 +568,10 @@ function formatCombinedRolesForExport(roles) {
   return `${unique.slice(0, 2).join(' · ')} +${unique.length - 2}`;
 }
 
-async function buildBindingRoleIndex(baseUrl, token, lakeSchemas, tableToSchemaId) {
+async function buildBindingRoleIndex(baseUrl, token, lakeSchemas, tableToSchemaId, entityById = null) {
   const pairRoles = new Map();
   const typedRoles = new Map();
+  const locationConnections = new Map();
   const ontologyNodes = await fetchOntologyRelationships(baseUrl, token);
 
   for (const node of ontologyNodes ?? []) {
@@ -572,13 +610,24 @@ async function buildBindingRoleIndex(baseUrl, token, lakeSchemas, tableToSchemaI
         }
         addRoleToIndex(pairRoles, `${endpoints.from}|${endpoints.to}`, role);
         addRoleToIndex(typedRoles, `${endpoints.from}|${endpoints.to}|${relationshipKey}`, role);
+
+        if (entityById) {
+          appendBindingLocationConnection(
+            locationConnections,
+            entityById,
+            endpoints.from,
+            endpoints.to,
+            relationshipKey,
+            role,
+          );
+        }
       }
     } catch (error) {
       console.warn(`Binding table ${binding.table} unavailable: ${error.message.split('\n')[0]}`);
     }
   }
 
-  return { pairRoles, typedRoles };
+  return { pairRoles, typedRoles, locationConnections };
 }
 
 function enrichRelationsWithBindingRoles(relations, roleIndex) {
@@ -855,6 +904,199 @@ function applyPersonLocations(entities, relations) {
   }
 }
 
+function connectionTypeFromRelation(relation) {
+  const relationshipType = relation.relationshipType || relation.label || '';
+  if (CONNECTION_TYPE_BY_RELATIONSHIP[relationshipType]) {
+    return CONNECTION_TYPE_BY_RELATIONSHIP[relationshipType];
+  }
+  if (relation.role && CONNECTION_TYPE_BY_ROLE[relation.role]) {
+    return CONNECTION_TYPE_BY_ROLE[relation.role];
+  }
+  if (relation.role) {
+    return String(relation.role).trim().toLowerCase();
+  }
+  if (/crime scene|tatort/i.test(relationshipType)) {
+    return 'crime scene';
+  }
+  if (/offence scene|ordnungswidrigkeit/i.test(relationshipType)) {
+    return 'offence scene';
+  }
+  if (/accident|unfall/i.test(relationshipType)) {
+    return 'accident location';
+  }
+  if (/found|fundort|dokumente/i.test(relationshipType)) {
+    return 'found at';
+  }
+  return 'location';
+}
+
+function upsertOertlichkeitConnection(connections, seen, { type, id, primary = false }) {
+  const locationId = String(id || '').trim();
+  const connectionType = String(type || '').trim();
+  if (!locationId || !connectionType) {
+    return;
+  }
+
+  const key = `${connectionType}|${locationId}`;
+  if (seen.has(key)) {
+    if (primary) {
+      const existing = connections.find((entry) => entry.type === connectionType && entry.id === locationId);
+      if (existing) {
+        existing.primary = true;
+      }
+    }
+    return;
+  }
+
+  seen.add(key);
+  const entry = { type: connectionType, id: locationId };
+  if (primary) {
+    entry.primary = true;
+  }
+  connections.push(entry);
+}
+
+function normalizeOertlichkeitPrimary(connections) {
+  if (!connections.length) {
+    return;
+  }
+  const primaryEntries = connections.filter((entry) => entry.primary);
+  if (primaryEntries.length === 0) {
+    connections[0].primary = true;
+    return;
+  }
+  if (primaryEntries.length === 1) {
+    return;
+  }
+  let kept = false;
+  for (const entry of connections) {
+    if (!entry.primary) {
+      continue;
+    }
+    if (kept) {
+      delete entry.primary;
+    } else {
+      kept = true;
+    }
+  }
+}
+
+function appendBindingLocationConnection(
+  locationConnections,
+  entityById,
+  fromId,
+  toId,
+  relationshipKey,
+  role,
+) {
+  const fromEntity = entityById.get(fromId);
+  const toEntity = entityById.get(toId);
+  if (!fromEntity || !toEntity || toEntity.type !== 'Location') {
+    return;
+  }
+
+  let connectionType = CONNECTION_TYPE_BY_RELATIONSHIP[relationshipKey];
+  if (!connectionType && role) {
+    connectionType = CONNECTION_TYPE_BY_ROLE[role] || String(role).trim().toLowerCase();
+  }
+  if (!connectionType) {
+    return;
+  }
+
+  if (!locationConnections.has(fromEntity.id)) {
+    locationConnections.set(fromEntity.id, []);
+  }
+
+  const connections = locationConnections.get(fromEntity.id);
+  const seen = new Set(connections.map((entry) => `${entry.type}|${entry.id}`));
+  upsertOertlichkeitConnection(connections, seen, {
+    type: connectionType,
+    id: toId,
+    primary:
+      connectionType === 'residence' ||
+      connectionType === 'headquarters' ||
+      connectionType === 'found at' ||
+      connectionType === 'crime scene' ||
+      connectionType === 'offence scene' ||
+      connectionType === 'accident location',
+  });
+}
+
+function mergeBindingLocationConnections(entities, locationConnections) {
+  let merged = 0;
+  for (const entity of entities) {
+    const bindingConnections = locationConnections.get(entity.id);
+    if (!bindingConnections?.length) {
+      continue;
+    }
+    if (!entity.Oertlichkeiten) {
+      entity.Oertlichkeiten = [];
+    }
+    const seen = new Set(entity.Oertlichkeiten.map((entry) => `${entry.type}|${entry.id}`));
+    for (const connection of bindingConnections) {
+      upsertOertlichkeitConnection(entity.Oertlichkeiten, seen, connection);
+    }
+    normalizeOertlichkeitPrimary(entity.Oertlichkeiten);
+    merged += 1;
+  }
+  return merged;
+}
+
+function applyOertlichkeiten(entities, relations, entityById) {
+  let enriched = 0;
+
+  for (const entity of entities) {
+    if (entity.type === 'Location') {
+      continue;
+    }
+
+    const connections = [];
+    const seen = new Set();
+
+    for (const rule of FK_LOCATION_CONNECTIONS) {
+      if (!rule.types.includes(entity.type)) {
+        continue;
+      }
+      const locationId = entity.attributes?.[rule.field] || (rule.field === 'locationId' ? entity.locationId : null);
+      if (!locationId) {
+        continue;
+      }
+      const location = entityById.get(String(locationId));
+      if (!location || location.type !== 'Location') {
+        continue;
+      }
+      upsertOertlichkeitConnection(connections, seen, {
+        type: rule.type,
+        id: String(locationId),
+        primary: true,
+      });
+    }
+
+    for (const relation of relations) {
+      if (relation.from !== entity.id) {
+        continue;
+      }
+      const location = entityById.get(relation.to);
+      if (!location || location.type !== 'Location') {
+        continue;
+      }
+      upsertOertlichkeitConnection(connections, seen, {
+        type: connectionTypeFromRelation(relation),
+        id: relation.to,
+        primary: relation.role === 'Home' || relation.role === 'Headquarter',
+      });
+    }
+
+    normalizeOertlichkeitPrimary(connections);
+    if (connections.length > 0) {
+      entity.Oertlichkeiten = connections;
+      enriched += 1;
+    }
+  }
+
+  return enriched;
+}
+
 function attachmentFromFileRow(tableName, row, parentEntity) {
   const fileName = readField(row, 'FILE_NAME') || readField(row, 'DATEINAME') || readField(row, 'NAME');
   if (!fileName) {
@@ -957,7 +1199,94 @@ function attachDocumentsFromAttributes(entities, entityById) {
   return attached;
 }
 
+function writeExportFiles(payload) {
+  const jsonPath = path.join(ROOT, 'data/context-model-export.json');
+  fs.writeFileSync(jsonPath, `${JSON.stringify(payload, null, 2)}\n`);
+
+  const jsPath = path.join(ROOT, 'data/context-model-export.js');
+  fs.writeFileSync(
+    jsPath,
+    `window.INVESTIGATION_MOCK = ${JSON.stringify(
+      {
+        objectTypes: payload.objectTypes,
+        entities: payload.entities,
+        relations: payload.relations,
+      },
+      null,
+      2,
+    )};\n`,
+  );
+
+  console.log(`- ${jsonPath}`);
+  console.log(`- ${jsPath}`);
+}
+
+function enrichLocationsOnly() {
+  const jsonPath = path.join(ROOT, 'data/context-model-export.json');
+  const payload = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+  const entityById = new Map(payload.entities.map((entity) => [entity.id, entity]));
+
+  for (const entity of payload.entities) {
+    delete entity.Oertlichkeiten;
+  }
+
+  applyPersonLocations(payload.entities, payload.relations);
+  const oertlichkeitenCount = applyOertlichkeiten(payload.entities, payload.relations, entityById);
+  payload.exportedAt = new Date().toISOString();
+
+  console.log(`Entities with Oertlichkeiten: ${oertlichkeitenCount}`);
+  writeExportFiles(payload);
+  console.log(`Wrote ${payload.entities.length} entities and ${payload.relations.length} relations`);
+}
+
+async function enrichLocationsFromBindingTables(envPath) {
+  const env = parseEnvFile(envPath);
+  const baseUrl = (env.EMS_TEAM || '').replace(/\/$/, '');
+  const token = env.EMS_TOKEN;
+  if (!baseUrl || !token) {
+    throw new Error(`Missing EMS_TEAM or EMS_TOKEN in ${envPath}`);
+  }
+
+  const jsonPath = path.join(ROOT, 'data/context-model-export.json');
+  const payload = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+  const entityById = new Map(payload.entities.map((entity) => [entity.id, entity]));
+
+  for (const entity of payload.entities) {
+    delete entity.Oertlichkeiten;
+  }
+
+  const lakeSchemas = await fetchLakeSchemas(baseUrl, token);
+  const lakeTableIndex = await buildLakeTableIndex(baseUrl, token, lakeSchemas);
+  const bindingRoleIndex = await buildBindingRoleIndex(
+    baseUrl,
+    token,
+    lakeSchemas,
+    lakeTableIndex,
+    entityById,
+  );
+
+  applyPersonLocations(payload.entities, payload.relations);
+  applyOertlichkeiten(payload.entities, payload.relations, entityById);
+  const bindingMerged = mergeBindingLocationConnections(payload.entities, bindingRoleIndex.locationConnections);
+  payload.exportedAt = new Date().toISOString();
+
+  console.log(`Binding-table Oertlichkeiten merged: ${bindingMerged}`);
+  console.log(`Entities with Oertlichkeiten: ${payload.entities.filter((entity) => entity.Oertlichkeiten?.length).length}`);
+  writeExportFiles(payload);
+  console.log(`Wrote ${payload.entities.length} entities and ${payload.relations.length} relations`);
+}
+
 async function main() {
+  if (process.argv.includes('--enrich-locations-only')) {
+    const envArgIndex = process.argv.indexOf('--env');
+    if (envArgIndex >= 0) {
+      await enrichLocationsFromBindingTables(process.argv[envArgIndex + 1]);
+    } else {
+      enrichLocationsOnly();
+    }
+    return;
+  }
+
   const envArgIndex = process.argv.indexOf('--env');
   const envPath =
     envArgIndex >= 0 ? process.argv[envArgIndex + 1] : path.join(process.env.HOME, 'Projects/celonis/ems-frontend/.local.env');
@@ -1097,7 +1426,13 @@ async function main() {
 
   const lakeSchemas = await fetchLakeSchemas(baseUrl, token);
   const lakeTableIndex = await buildLakeTableIndex(baseUrl, token, lakeSchemas);
-  const bindingRoleIndex = await buildBindingRoleIndex(baseUrl, token, lakeSchemas, lakeTableIndex);
+  const bindingRoleIndex = await buildBindingRoleIndex(
+    baseUrl,
+    token,
+    lakeSchemas,
+    lakeTableIndex,
+    entityById,
+  );
   const enrichedCount = enrichRelationsWithBindingRoles(relations, bindingRoleIndex);
   console.log(`Relations enriched with binding roles: ${enrichedCount}`);
 
@@ -1110,6 +1445,11 @@ async function main() {
   const withRole = dedupedRelations.filter((relation) => relation.role).length;
   console.log(`Relations with role label: ${withRole}`);
 
+  const oertlichkeitenCount = applyOertlichkeiten(entities, dedupedRelations, entityById);
+  const bindingMerged = mergeBindingLocationConnections(entities, bindingRoleIndex.locationConnections);
+  console.log(`Entities with Oertlichkeiten: ${entities.filter((entity) => entity.Oertlichkeiten?.length).length}`);
+  console.log(`Binding-table Oertlichkeiten merged: ${bindingMerged}`);
+
   const exportPayload = {
     exportedAt: new Date().toISOString(),
     packageKey: PACKAGE_KEY,
@@ -1119,26 +1459,8 @@ async function main() {
     relations: dedupedRelations,
   };
 
-  const jsonPath = path.join(ROOT, 'data/context-model-export.json');
-  fs.writeFileSync(jsonPath, `${JSON.stringify(exportPayload, null, 2)}\n`);
-
-  const jsPath = path.join(ROOT, 'data/context-model-export.js');
-  fs.writeFileSync(
-    jsPath,
-    `window.INVESTIGATION_MOCK = ${JSON.stringify(
-      {
-        objectTypes: OBJECT_TYPES,
-        entities,
-        relations: dedupedRelations,
-      },
-      null,
-      2,
-    )};\n`,
-  );
-
+  writeExportFiles(exportPayload);
   console.log(`Wrote ${entities.length} entities and ${dedupedRelations.length} relations`);
-  console.log(`- ${jsonPath}`);
-  console.log(`- ${jsPath}`);
 }
 
 main().catch((error) => {

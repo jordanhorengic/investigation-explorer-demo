@@ -1305,6 +1305,12 @@ code {
   font-weight: 600;
 }
 
+.result-row__status--muted,
+.result-card__status.result-row__status--muted {
+  background: rgb(120 120 120 / 10%);
+  color: var(--text-muted);
+}
+
 .result-row--area {
   cursor: pointer;
 }
@@ -1339,6 +1345,14 @@ code {
 .result-row--on-map:hover,
 .result-row--on-graph:hover {
   background: rgb(27 68 177 / 7%);
+}
+
+.result-row--no-location {
+  background: rgb(120 120 120 / 4%);
+}
+
+.result-row--no-location:hover {
+  background: rgb(120 120 120 / 7%);
 }
 
 .search-results--grid {

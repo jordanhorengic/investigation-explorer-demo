@@ -1133,6 +1133,53 @@
     return visible;
   }
 
+  function buildMapLocationDataIndex() {
+    const withLocation = new Set();
+
+    for (const pinnedId of state.pinnedIds) {
+      const entity = lookup.get(pinnedId);
+      if (!entity) {
+        continue;
+      }
+
+      const ownPins = MapLocations.resolvePinsForEntity(entity, lookup, relations, {
+        ...getPinSettings(pinnedId),
+        showRelated: false,
+      });
+
+      if (ownPins.length === 0) {
+        continue;
+      }
+
+      withLocation.add(pinnedId);
+      for (const id of getLinkedPlacementIds(pinnedId)) {
+        withLocation.add(id);
+      }
+    }
+
+    return withLocation;
+  }
+
+  function getMapResultStatus(entityId, mapPresence, mapLocationPresence) {
+    if (!isEntityOnMap(entityId, mapPresence)) {
+      return null;
+    }
+
+    if (mapLocationPresence?.has(entityId)) {
+      return {
+        label: 'On map',
+        rowClass: 'result-row--on-map',
+        statusClass: '',
+      };
+    }
+
+    return {
+      label: 'No location information',
+      rowClass: 'result-row--no-location',
+      statusClass: ' result-row__status--muted',
+    };
+  }
+
   function buildGraphPresenceIndex() {
     const visible = new Set();
     for (const nodeId of graphState.nodeIds) {
@@ -2789,17 +2836,17 @@
       lookup,
       roleCatalog.index
     );
-    const onMap = isEntityOnMap(entity.id, options.mapPresence);
+    const mapStatus = getMapResultStatus(entity.id, options.mapPresence, options.mapLocationPresence);
     const onGraph = isEntityOnGraph(entity.id, options.graphPresence);
     const color = typeColors[entity.type] || '#1b44b1';
 
     if (groupedList) {
       let status = '';
       let onViz = false;
-      const showMapTag = (context === 'map' || options.mapPresence) && onMap;
+      const showMapTag = (context === 'map' || options.mapPresence) && mapStatus;
       const showGraphTag = (context === 'graph' || options.graphPresence) && onGraph;
       if (showMapTag) {
-        status = '<span class="result-row__status">On map</span>';
+        status = `<span class="result-row__status${mapStatus.statusClass}">${mapStatus.label}</span>`;
         onViz = true;
       } else if (showGraphTag) {
         status = '<span class="result-row__status">On graph</span>';
@@ -2807,7 +2854,7 @@
       }
 
       card.className = `result-row${highlighted ? ' result-row--selected' : ''}${
-        showMapTag ? ' result-row--on-map' : ''
+        showMapTag ? ` ${mapStatus.rowClass}` : ''
       }${showGraphTag ? ' result-row--on-graph' : ''}`;
       if (onViz) {
         card.title = 'Click to remove';
@@ -2854,8 +2901,8 @@
           <button class="btn btn-outline btn-sm result-card__add-graph" type="button">Add to graph</button>
         </div>
       `;
-    } else if ((context === 'map' || options.mapPresence) && onMap) {
-      footer = '<span class="result-card__status">On map</span>';
+    } else if ((context === 'map' || options.mapPresence) && mapStatus) {
+      footer = `<span class="result-card__status${mapStatus.statusClass}">${mapStatus.label}</span>`;
     } else if ((context === 'graph' || options.graphPresence) && onGraph) {
       footer = '<span class="result-card__status">On graph</span>';
     }
@@ -2953,6 +3000,10 @@
       context === 'map' || (context === 'search' && state.activeView === 'map')
         ? buildMapPresenceIndex()
         : null;
+    const mapLocationPresence =
+      context === 'map' || (context === 'search' && state.activeView === 'map')
+        ? buildMapLocationDataIndex()
+        : null;
     const graphPresence =
       context === 'graph' || (context === 'search' && state.activeView === 'graph')
         ? buildGraphPresenceIndex()
@@ -2986,7 +3037,12 @@
 
       for (const entity of group.items) {
         body.appendChild(
-          buildResultCard(entity, context, { groupedList: true, mapPresence, graphPresence })
+          buildResultCard(entity, context, {
+            groupedList: true,
+            mapPresence,
+            mapLocationPresence,
+            graphPresence,
+          })
         );
       }
 

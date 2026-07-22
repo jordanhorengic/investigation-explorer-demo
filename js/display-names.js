@@ -449,11 +449,19 @@
   }
 
   function formatMapPinTooltipHtml(pin) {
-    return formatObjectTooltipHtml(pin.label, pin.sourceEntity.type);
+    const lookup = window.INVESTIGATION_MOCK?.entities
+      ? new Map(window.INVESTIGATION_MOCK.entities.map((entity) => [entity.id, entity]))
+      : null;
+    const name = lookup ? displayName(pin.sourceEntity, lookup) : pin.sourceEntity.id;
+    return formatObjectTooltipHtml(`${name} · ${pin.label}`, pin.sourceEntity.type);
   }
 
   function formatMapPinTooltip(pin) {
-    return `${pin.label}\n${pin.sourceEntity.type}`;
+    const lookup = window.INVESTIGATION_MOCK?.entities
+      ? new Map(window.INVESTIGATION_MOCK.entities.map((entity) => [entity.id, entity]))
+      : null;
+    const name = lookup ? displayName(pin.sourceEntity, lookup) : pin.sourceEntity.id;
+    return `${name} · ${pin.label}\n${pin.sourceEntity.type}`;
   }
 
   window.DisplayNames = {

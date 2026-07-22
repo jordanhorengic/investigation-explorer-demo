@@ -111,6 +111,47 @@
     return `${name} - ${suffix}`;
   }
 
+  function readOertlichkeiten(entity) {
+    return Array.isArray(entity?.Oertlichkeiten) ? entity.Oertlichkeiten : null;
+  }
+
+  function resolveOertlichkeitPins(entity, lookup, options = {}) {
+    const connections = readOertlichkeiten(entity);
+    if (!connections) {
+      return null;
+    }
+
+    const resolved = connections
+      .map((connection) => {
+        const location = lookup.get(connection.id);
+        if (!location || !isLocationEntity(location)) {
+          return null;
+        }
+        return { connection, location };
+      })
+      .filter(Boolean);
+
+    if (resolved.length === 0) {
+      return [];
+    }
+
+    const selected = options.includeAll
+      ? resolved
+      : [resolved.find((entry) => entry.connection.primary) || resolved[0]];
+
+    return selected
+      .map(({ connection, location }) =>
+        makePin(
+          entity,
+          location,
+          connection.type,
+          connection.primary ? 'primary' : 'direct',
+          lookup
+        )
+      )
+      .filter(Boolean);
+  }
+
   function getGeo(entity) {
     if (entity?.geo?.lat && entity?.geo?.lon) {
       return { lat: entity.geo.lat, lon: entity.geo.lon };
@@ -693,6 +734,13 @@
     }
     visited.add(entity.id);
 
+    const contractPins = resolveOertlichkeitPins(entity, lookup, {
+      includeAll: Boolean(options.includeAllLocations),
+    });
+    if (contractPins !== null) {
+      return contractPins;
+    }
+
     const pins = [];
     const homeOnlyForPerson = Boolean(options.homeOnlyForPerson);
 
@@ -717,9 +765,6 @@
       case 'Person': {
         const roles = homeOnlyForPerson ? ['Home'] : PERSON_ADDRESS_ROLES;
         pins.push(...resolvePersonAddressPins(entity, lookup, relations, roles));
-        if (pins.length === 0) {
-          pins.push(...resolveIndirectLocationPins(entity, lookup, relations, 2, true, visited));
-        }
         break;
       }
       case 'Criminal Offence': {
@@ -826,6 +871,12 @@
   }
 
   function entityReferencesLocation(entity, locationId) {
+    for (const connection of readOertlichkeiten(entity) || []) {
+      if (connection.id === locationId) {
+        return connection.type;
+      }
+    }
+
     const fkFields = [
       ['TATORT_ID', 'Scene Location'],
       ['ORT_ID', 'Accident Location'],
@@ -852,27 +903,15 @@
     if (hop === 1 && isLocationEntity(rootEntity) && !isLocationEntity(relatedEntity)) {
       const locationRole = entityReferencesLocation(relatedEntity, rootEntity.id);
       if (locationRole) {
-        const pin = makePin(
-          relatedEntity,
-          rootEntity,
-          formatPinLabel(displayName(relatedEntity, lookup), locationRole),
-          'primary',
-          lookup
-        );
+        const pin = makePin(relatedEntity, rootEntity, locationRole, 'primary', lookup);
         if (pin) {
           return [pin];
         }
       }
 
       if (relation && (relation.kind === 'location' || isLocationRelation(relation, lookup))) {
-        const role = relation.role || relation.label || 'Location';
-        const pin = makePin(
-          relatedEntity,
-          rootEntity,
-          formatPinLabel(displayName(relatedEntity, lookup), role),
-          'direct',
-          lookup
-        );
+        const role = connectionTypeFromRelationLabel(relation.role || relation.label || 'location');
+        const pin = makePin(relatedEntity, rootEntity, role, 'direct', lookup);
         if (pin) {
           return [pin];
         }
@@ -883,6 +922,32 @@
       ...pin,
       connectionType,
     }));
+  }
+
+  function connectionTypeFromRelationLabel(label) {
+    const normalized = String(label || '').trim();
+    if (!normalized) {
+      return 'location';
+    }
+    if (/home|wohnsitz|residence/i.test(normalized)) {
+      return 'residence';
+    }
+    if (/work|arbeits/i.test(normalized)) {
+      return 'workplace';
+    }
+    if (/whereabouts|aufenthalt|sighting/i.test(normalized)) {
+      return 'last sighting';
+    }
+    if (/headquarter|sitz/i.test(normalized)) {
+      return 'headquarters';
+    }
+    if (/branch|niederlassung/i.test(normalized)) {
+      return 'branch';
+    }
+    if (/found|fundort/i.test(normalized)) {
+      return 'found at';
+    }
+    return normalized.toLowerCase();
   }
 
   function collectRelatedEntities(rootEntity, lookup, relations, maxHops, filters) {
@@ -995,9 +1060,16 @@
   }
 
   function resolvePinsForEntity(rootEntity, lookup, relations, settings = {}) {
-    const defaultPins = resolveDefaultPins(rootEntity, lookup, relations);
-    if (!settings.showRelated) {
-      return defaultPins;
+    const showRelated = Boolean(settings.showRelated);
+    const rootPins =
+      resolveOertlichkeitPins(rootEntity, lookup, { includeAll: showRelated }) ??
+      resolveDefaultPins(rootEntity, lookup, relations, {
+        includeAllLocations: showRelated,
+        homeOnlyForPerson: !showRelated,
+      });
+
+    if (!showRelated) {
+      return rootPins;
     }
 
     const relatedPins = resolveRelatedPins(rootEntity, lookup, relations, {
@@ -1007,7 +1079,7 @@
       distanceMiles: settings.distanceMiles || null,
     });
 
-    return dedupePins([...defaultPins, ...relatedPins]);
+    return dedupePins([...rootPins, ...relatedPins]);
   }
 
   function collectEntityIdsInArea(area, lookup, relations) {
