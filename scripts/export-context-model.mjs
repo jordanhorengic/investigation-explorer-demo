@@ -267,21 +267,54 @@ function perspectiveApiBase(perspectiveKey) {
   );
 }
 
+async function probePerspectiveQuery(baseUrl, token, perspectiveKey) {
+  try {
+    const result = await queryTable(baseUrl, token, perspectiveKey, 'Person', ['ID'], 0);
+    return !result.error && (result.rows?.length ?? 0) > 0;
+  } catch {
+    return false;
+  }
+}
+
 async function ensurePerspectiveLoaded(baseUrl, token, perspectiveKey) {
   const base = perspectiveApiBase(perspectiveKey);
+
+  const currentStatus = await apiGet(baseUrl, token, `${base}/load/terminal-status`).catch(() => null);
+  if (currentStatus?.phase === 'SUCCESS' || currentStatus?.status === 'COMPLETED') {
+    console.log('Perspective cache already ready');
+    return;
+  }
+
   console.log('Loading perspective cache...');
   await apiPut(baseUrl, token, `${base}/load`);
 
-  for (let attempt = 0; attempt < 45; attempt += 1) {
+  for (let attempt = 0; attempt < 90; attempt += 1) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     const status = await apiGet(baseUrl, token, `${base}/load/terminal-status`);
     if (status.phase === 'SUCCESS' || status.status === 'COMPLETED') {
       console.log('Perspective cache ready');
       return;
     }
-    if (status.phase === 'FAILED') {
-      throw new Error(`Perspective load failed: ${status.message ?? JSON.stringify(status)}`);
+    if (status.phase === 'FAILED' || status.status === 'FAILED') {
+      if (await probePerspectiveQuery(baseUrl, token, perspectiveKey)) {
+        console.warn(
+          'Perspective reload failed, but existing cache is queryable — continuing export.',
+        );
+        if (status.errors?.[0]) {
+          console.warn(status.errors[0].split('\n')[0]);
+        }
+        return;
+      }
+      throw new Error(`Perspective load failed: ${status.errors?.[0] ?? status.message ?? JSON.stringify(status)}`);
     }
+    if (attempt % 10 === 9) {
+      console.log(`Still loading perspective cache (${status.phase ?? status.status ?? 'unknown'})...`);
+    }
+  }
+
+  if (await probePerspectiveQuery(baseUrl, token, perspectiveKey)) {
+    console.warn('Perspective reload timed out, but existing cache is queryable — continuing export.');
+    return;
   }
 
   throw new Error('Perspective load timed out');
